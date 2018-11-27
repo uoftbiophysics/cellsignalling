@@ -5,6 +5,10 @@ import numpy as np
 State for mode 1, 2: [bool, n]
     - bool == 1 implies BOUND, 0 implies UNBOUND
     - n is number of downstream molecules produced (due to being bound)
+    
+TODO 
+- protect global constants
+- more comments
 """
 
 # globals
@@ -14,20 +18,21 @@ state_size_mode2 = 2
 
 # model parameters
 c = 4.0
-k_on = 50.0
+k_on = 5.0
 k_off = 1.0
-k_p = 10.0
+k_p = 2.0
 
 # model identities
 x = k_on * c / k_off
 pss = x / (1 + x)
 r = k_on * c + k_off
 
-# initial conditions
+# initial conditions (for single trajectory)
 n0 = 0.0
 m0 = 0.0
-p0 = pss
-INIT_COND_MODE1 = [n0, p0]
+p0 = 0
+assert p0 in [0, 1]
+INIT_COND_MODE1 = [p0, n0]
 
 # misc
 NUM_STEPS = 100
@@ -85,12 +90,19 @@ def simulate_traj(num_steps=NUM_STEPS, init_cond=INIT_COND_MODE1):
     return traj, times
 
 
-def multitraj(num_traj, num_steps=NUM_STEPS):
+def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0):
     traj_array = np.zeros((num_steps, state_size_mode1, num_traj))
     times_array = np.zeros((num_steps, num_traj))
 
+    if bound_fraction in [0.0, 1.0]:
+        init_conds = [[bound_fraction, n0] for _ in xrange(num_traj)]
+    else:
+        draws = np.random.binomial(1, bound_fraction, num_traj)
+        print draws
+        init_conds = [[draws[k], n0] for k in xrange(num_traj)]
+
     for k in xrange(num_traj):
-        traj, times = simulate_traj(num_steps=num_steps)
+        traj, times = simulate_traj(num_steps=num_steps, init_cond=init_conds[k])
         traj_array[:, :, k] = traj
         times_array[:, k] = times
     return traj_array, times_array
@@ -120,7 +132,7 @@ def get_mean_var_timeseries(traj_array, times_array):
             statesquaresum += state_at_t[1]**2
 
         mean_vals[idx] = statesum / num_traj
-        var_vals[idx] = statesquaresum / num_traj - mean_vals[idx]**2
+        var_vals[idx] = statesquaresum/num_traj -  mean_vals[idx]**2
     return mean_vals, var_vals, moment_times
 
 
@@ -138,7 +150,7 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
                             + mean_vals[idx] - mean_vals[idx]**2
     else:
         for idx, t in enumerate(moment_times):
-            assert init_p1 == pss  # var given only for init_p1==pss)
+            #assert init_p1 == pss  # var given only for init_p1==pss)
             x1 = c*k_on*k_p*(np.exp(-r*t) - 1 + r*t) / r**2
             x2 = k_p*(k_off - np.exp(-r*t)*k_off + k_on*c*(r*t)) / r**2
             mean_vals[idx] = x1*(1 - init_p1) + x2*init_p1
@@ -147,11 +159,15 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
 
 
 if __name__ == '__main__':
-    num_traj = 1000
-    traj_array, times_array = multitraj(num_traj)
+    # settings
+    num_traj = 200
+    init_bound = pss
+
+    # compute
+    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound)
     mean_vals, var_vals, moment_times = get_mean_var_timeseries(traj_array, times_array)
-    mean_vals_direct, var_vals_direct = theory_cumulants(moment_times, "direct", init_n=n0, init_p1=p0)
-    mean_vals_gen, var_vals_gen = theory_cumulants(moment_times, "generating", init_n=n0, init_p1=p0)
+    mean_vals_direct, var_vals_direct = theory_cumulants(moment_times, "direct", init_p1=init_bound)
+    mean_vals_gen, var_vals_gen = theory_cumulants(moment_times, "generating", init_p1=init_bound)
 
     # plot trajectories
     for k in xrange(num_traj):
@@ -174,5 +190,15 @@ if __name__ == '__main__':
     plt.title('Mode 1 <n>(t) +- sqrt(var(t)) for %d trajectories' % num_traj)
     plt.xlabel('time')
     plt.ylabel('n')
+    plt.legend()
+    plt.show()
+
+    # only vars
+    plt.plot(moment_times, var_vals, '--k', lw=2, label="data")
+    plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
+    plt.plot(moment_times, var_vals_gen, '--r', lw=2, label="generating")
+    plt.title('Mode 1 var(n) for %d trajectories' % num_traj)
+    plt.xlabel('time')
+    plt.ylabel('var(n)')
     plt.legend()
     plt.show()
