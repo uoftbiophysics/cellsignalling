@@ -9,6 +9,8 @@ State for mode 1, 2: [bool, n]
 TODO 
 - protect global constants
 - more comments
+- fix or remove theory curves for 'direct'
+- verify theory curves for 'generating' under different initial conditions and parameters 
 """
 
 # globals
@@ -178,11 +180,12 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
 
 if __name__ == '__main__':
     # settings
-    num_traj = 500
+    num_traj = 200
+    num_steps = 300
     init_bound = pss
 
     # compute
-    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound)
+    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps)
     mean_vals, var_vals, moment_times = get_mean_var_timeseries(traj_array, times_array)
     mean_vals_direct, var_vals_direct = theory_cumulants(moment_times, "direct", init_p1=init_bound)
     mean_vals_gen, var_vals_gen = theory_cumulants(moment_times, "generating", init_p1=init_bound)
