@@ -98,7 +98,7 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0):
         init_conds = [[bound_fraction, n0] for _ in xrange(num_traj)]
     else:
         draws = np.random.binomial(1, bound_fraction, num_traj)
-        print draws
+        #print(draws)
         init_conds = [[draws[k], n0] for k in xrange(num_traj)]
 
     for k in xrange(num_traj):
@@ -154,13 +154,15 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
             x1 = c*k_on*k_p*(np.exp(-r*t) - 1 + r*t) / r**2
             x2 = k_p*(k_off - np.exp(-r*t)*k_off + k_on*c*(r*t)) / r**2
             mean_vals[idx] = x1*(1 - init_p1) + x2*init_p1
-            var_vals[idx] = k_p*pss*t + 2*k_p**2*t/k_off*x/(1+x)**3*(1 + (np.exp(-r*t) - 1)/r)
+            init_p0 = 1-init_p1
+            var_vals[idx] = (k_p/r**4) * (r**2 * ((1 - np.exp(-r*t))*k_off*init_p1 + c**2 *k_on**2 *(init_p0 + init_p1)*t + c*k_on*(k_off*init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t))) - k_p*((1 - np.exp(-r*t))*k_off*init_p1 + c**2 *k_on**2 *(init_p0+init_p1)*t + c*k_on*(k_off *init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t)))**2 + np.exp(-r*t)*k_p*((c*k_on)**4 * np.exp(r*t)*(init_p0 + init_p1)*t**2 - 2*k_off**2*init_p1*(1 - np.exp(r*t) + k_off*t) + 2*c**3*np.exp(r*t)*k_on**3 * t*(k_off*init_p1*t + init_p0*(-1 + k_off*t)) + 2*c*k_off*k_on*(init_p0*(2 + k_off*t + np.exp(r*t)*(-2 + k_off*t)) + init_p1*(2 - k_off*t + 2*np.exp(r*t)*(-1 + k_off*t))) + (k_on*c)**2 *(np.exp(r*t)*k_off*init_p1*t*(4 + k_off*t) + init_p0*(-2 + 2*k_off*t + np.exp(r*t)*(2 + k_off**2 * t**2)))))
+           # var_vals[idx] = k_p*pss*t + 2*k_p**2*t/k_off*x/(1+x)**3*(1 + (np.exp(-r*t) - 1)/r)
     return mean_vals, var_vals
 
 
 if __name__ == '__main__':
     # settings
-    num_traj = 200
+    num_traj = 500
     init_bound = pss
 
     # compute
@@ -194,6 +196,7 @@ if __name__ == '__main__':
     plt.show()
 
     # only vars
+    plt.figure()
     plt.plot(moment_times, var_vals, '--k', lw=2, label="data")
     plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
     plt.plot(moment_times, var_vals_gen, '--r', lw=2, label="generating")
