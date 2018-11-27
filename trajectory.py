@@ -98,7 +98,6 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0):
         init_conds = [[bound_fraction, n0] for _ in xrange(num_traj)]
     else:
         draws = np.random.binomial(1, bound_fraction, num_traj)
-        #print(draws)
         init_conds = [[draws[k], n0] for k in xrange(num_traj)]
 
     for k in xrange(num_traj):
@@ -144,19 +143,36 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
     delta1 = init_p1 - pss
 
     if label == "direct":
+        C1 = pss ** 3 + 1 / r * (delta1 * pss + x / (1 + x) ** 3)
+        C2 = pss ** 2 - delta1 * (1 - x) / (1 + x) ** 2
+        C3 = delta1 * (1 / x) * (1 + x**2) / (1 + x) ** 2
         for idx, t in enumerate(moment_times):
             mean_vals[idx] = k_p * pss * t + init_n + k_p * delta1 * (1-np.exp(-r*t)) / r
-            var_vals[idx] = k_p**2 * pss * t ** 2 + 2 * k_p * init_n * t + 2 * k_p * delta1 * (r*t-1+np.exp(-r*t)) / r**2 \
-                            + mean_vals[idx] - mean_vals[idx]**2
+            var_vals[idx] = 2 * k_p**2 * (C1 * (t - 1/r * (1 - np.exp(-r*t))) +
+                                          C2 * t**2 / 2 +
+                                          C3 * (1 - np.exp(-r*t) * (r*t + 1)) / r**2) + \
+                            mean_vals[idx] - mean_vals[idx]**2
     else:
+        init_p0 = 1 - init_p1
         for idx, t in enumerate(moment_times):
-            #assert init_p1 == pss  # var given only for init_p1==pss)
             x1 = c*k_on*k_p*(np.exp(-r*t) - 1 + r*t) / r**2
             x2 = k_p*(k_off - np.exp(-r*t)*k_off + k_on*c*(r*t)) / r**2
             mean_vals[idx] = x1*(1 - init_p1) + x2*init_p1
-            init_p0 = 1-init_p1
-            var_vals[idx] = (k_p/r**4) * (r**2 * ((1 - np.exp(-r*t))*k_off*init_p1 + c**2 *k_on**2 *(init_p0 + init_p1)*t + c*k_on*(k_off*init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t))) - k_p*((1 - np.exp(-r*t))*k_off*init_p1 + c**2 *k_on**2 *(init_p0+init_p1)*t + c*k_on*(k_off *init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t)))**2 + np.exp(-r*t)*k_p*((c*k_on)**4 * np.exp(r*t)*(init_p0 + init_p1)*t**2 - 2*k_off**2*init_p1*(1 - np.exp(r*t) + k_off*t) + 2*c**3*np.exp(r*t)*k_on**3 * t*(k_off*init_p1*t + init_p0*(-1 + k_off*t)) + 2*c*k_off*k_on*(init_p0*(2 + k_off*t + np.exp(r*t)*(-2 + k_off*t)) + init_p1*(2 - k_off*t + 2*np.exp(r*t)*(-1 + k_off*t))) + (k_on*c)**2 *(np.exp(r*t)*k_off*init_p1*t*(4 + k_off*t) + init_p0*(-2 + 2*k_off*t + np.exp(r*t)*(2 + k_off**2 * t**2)))))
-           # var_vals[idx] = k_p*pss*t + 2*k_p**2*t/k_off*x/(1+x)**3*(1 + (np.exp(-r*t) - 1)/r)
+            var_vals[idx] = (k_p/r**4) * \
+                            (r**2 * ((1 - np.exp(-r*t))*k_off*init_p1 +
+                                     c**2 *k_on**2 *(init_p0 + init_p1)*t +
+                                     c*k_on*(k_off*init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t))) -
+                             k_p*((1 - np.exp(-r*t))*k_off*init_p1 + c**2 *k_on**2 *(init_p0+init_p1)*t +
+                                  c*k_on*(k_off *init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t)))**2 +
+                             np.exp(-r*t)*k_p*((c*k_on)**4 * np.exp(r*t)*(init_p0 + init_p1)*t**2 -
+                                               2*k_off**2*init_p1*(1 - np.exp(r*t) + k_off*t) +
+                                               2*c**3*np.exp(r*t)*k_on**3 * t*(k_off*init_p1*t +
+                                                                               init_p0*(-1 + k_off*t)) +
+                                               2*c*k_off*k_on*(init_p0*(2 + k_off*t + np.exp(r*t)*(-2 + k_off*t))
+                                                               + init_p1*(2 - k_off*t + 2*np.exp(r*t)*(-1 + k_off*t))) +
+                                               (k_on*c)**2 *(np.exp(r*t)*k_off*init_p1*t*(4 + k_off*t) +
+                                                             init_p0*(-2 + 2*k_off*t +
+                                                                      np.exp(r*t)*(2 + k_off**2 * t**2)))))
     return mean_vals, var_vals
 
 
