@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 """
 State for mode 1, 2: [bool, n]
@@ -17,11 +17,12 @@ k_on = 5.0
 k_off = 1.0
 k_p = 10.0
 x = k_on*c/k_off
+pss = x/(1+x)
 
 # initial conditions
 n0 = 0.0
 m0 = 0.0
-p0 = 0.0
+p0 = pss
 INIT_COND_MODE1 = [n0, p0]
 
 # misc
@@ -98,31 +99,78 @@ def get_state_at_t(traj, times, t):
     return traj[step, :]
 
 
-def get_mean_timeseries(traj_array, times_array):
+def get_mean_var_timeseries(traj_array, times_array):
     num_traj = np.shape(traj_array)[-1]
     dt = np.mean(times_array[1,:])
     endtime = np.min(times_array[-1,:])
-    mean_times = np.arange(0.0,endtime, dt)
-    mean_vals = np.zeros(len(mean_times))
-    for idx, t in enumerate(mean_times):
+    moment_times = np.arange(0.0, endtime, dt)
+    mean_vals = np.zeros(len(moment_times))
+    var_vals = np.zeros(len(moment_times))
+    for idx, t in enumerate(moment_times):
         statesum = 0.0
+        statesquaresum = 0.0
+
         for k in xrange(num_traj):
-            state_at_t = get_state_at_t(traj_array[:,:,k], times_array[:,k], t)
+            state_at_t = get_state_at_t(traj_array[:, :, k], times_array[:, k], t)
             statesum += state_at_t[1]
-        mean_vals[idx] = statesum / k
-    return mean_vals, mean_times
+            statesquaresum += state_at_t[1]**2
+
+        mean_vals[idx] = statesum / num_traj
+        var_vals[idx] = statesquaresum / num_traj - mean_vals[idx]**2
+    return mean_vals, var_vals, moment_times
+
+
+def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
+    assert label in ["direct", "generating"]
+    mean_vals = np.zeros(moment_times.shape[0])
+    var_vals = np.zeros(moment_times.shape[0])
+    # identities
+    pss = x / (1 + x)
+    delta1 = init_p1 - pss
+    r = k_on * c - k_off
+
+    if label == "direct":
+        for idx, t in enumerate(moment_times):
+            mean_vals[idx] = k_p * pss * t + init_n + k_p * delta1 * (1-np.exp(-r*t)) / r
+            var_vals[idx] = k_p**2 * pss * t ** 2 + 2 * k_p * init_n * t + 2 * k_p * delta1 * (r*t-1+np.exp(-r*t)) / r**2 \
+                            + mean_vals[idx] - mean_vals[idx]**2
+    else:
+        for idx, t in enumerate(moment_times):
+            assert init_p1 == pss  # var given only for init_p1==pss)
+            x1 = c*k_on*k_p*(np.exp(-r*t) - 1 + r*t) / r**2
+            x2 = k_p*(k_off - np.exp(-r*t)*k_off + k_on*c*(r*t)) / r**2
+            mean_vals[idx] = x1*(1 - init_p1) + x2*init_p1
+            var_vals[idx] = k_p*pss*t + 2*k_p**2*t/k_off*x/(1+x)**3*(1 + (np.exp(-r*t) - 1)/r)
+    return mean_vals, var_vals
 
 
 if __name__ == '__main__':
-    num_traj = 100
+    num_traj = 1000
     traj_array, times_array = multitraj(num_traj)
+    mean_vals, var_vals, moment_times = get_mean_var_timeseries(traj_array, times_array)
+    mean_vals_direct, var_vals_direct = theory_cumulants(moment_times, "direct", init_n=n0, init_p1=p0)
+    mean_vals_gen, var_vals_gen = theory_cumulants(moment_times, "generating", init_n=n0, init_p1=p0)
+
+    # plot trajectories
     for k in xrange(num_traj):
         times_k = times_array[:, k]
         traj_k = traj_array[:, 1, k]
-        plt.plot(times_k, traj_k, '--', lw=1)
-    mean_vals, mean_times = get_mean_timeseries(traj_array, times_array)
-    plt.plot(mean_times, mean_vals, 'k', lw=2)
-    plt.title('Mode 1 <n>(t) for %d trajectories' % num_traj)
+        plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)
+    # plot trajectory cumulants
+    plt.plot(moment_times, mean_vals, 'k', lw=2, label="data")
+    plt.plot(moment_times, mean_vals + np.sqrt(var_vals), '--k', lw=2)
+    plt.plot(moment_times, mean_vals - np.sqrt(var_vals), '--k', lw=2)
+    # plot theory cumulants (direct)
+    plt.plot(moment_times, mean_vals_direct, 'b', lw=2, label="direct")
+    plt.plot(moment_times, mean_vals_direct + np.sqrt(var_vals_direct), '--b', lw=2)
+    plt.plot(moment_times, mean_vals_direct - np.sqrt(var_vals_direct), '--b', lw=2)
+    # plot theory cumulants (generating function)
+    plt.plot(moment_times, mean_vals_gen, 'r', lw=2, label="generating")
+    plt.plot(moment_times, mean_vals_gen + np.sqrt(var_vals_gen), '--r', lw=2)
+    plt.plot(moment_times, mean_vals_gen - np.sqrt(var_vals_gen), '--r', lw=2)
+    # decorate
+    plt.title('Mode 1 <n>(t) +- sqrt(var(t)) for %d trajectories' % num_traj)
     plt.xlabel('time')
     plt.ylabel('n')
+    plt.legend()
     plt.show()
