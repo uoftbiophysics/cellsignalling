@@ -10,14 +10,18 @@ State for mode 1, 2: [bool, n]
 # globals
 num_rxn_mode1 = 3
 state_size_mode1 = 2
+state_size_mode2 = 2
 
 # model parameters
 c = 4.0
-k_on = 5.0
+k_on = 50.0
 k_off = 1.0
 k_p = 10.0
-x = k_on*c/k_off
-pss = x/(1+x)
+
+# model identities
+x = k_on * c / k_off
+pss = x / (1 + x)
+r = k_on * c + k_off
 
 # initial conditions
 n0 = 0.0
@@ -125,9 +129,7 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
     mean_vals = np.zeros(moment_times.shape[0])
     var_vals = np.zeros(moment_times.shape[0])
     # identities
-    pss = x / (1 + x)
     delta1 = init_p1 - pss
-    r = k_on * c - k_off
 
     if label == "direct":
         for idx, t in enumerate(moment_times):
