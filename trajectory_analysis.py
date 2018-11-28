@@ -58,28 +58,31 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0, p=DEFAULT_PAR
             x1 = c*k_on*k_p*(np.exp(-r*t) - 1 + r*t) / r**2
             x2 = k_p*(k_off - np.exp(-r*t)*k_off + k_on*c*(r*t)) / r**2
             mean_vals[idx] = x1*(1 - init_p1) + x2*init_p1
-            var_vals[idx] = (k_p/r**4) * \
-                            (r**2 * ((1 - np.exp(-r*t))*k_off*init_p1 +
-                                     c**2 *k_on**2 *(init_p0 + init_p1)*t +
-                                     c*k_on*(k_off*init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t))) -
-                             k_p*((1 - np.exp(-r*t))*k_off*init_p1 + c**2 *k_on**2 *(init_p0+init_p1)*t +
-                                  c*k_on*(k_off *init_p1*t + init_p0*(-1 + np.exp(-r*t) + k_off*t)))**2 +
-                             np.exp(-r*t)*k_p*((c*k_on)**4 * np.exp(r*t)*(init_p0 + init_p1)*t**2 -
-                                               2*k_off**2*init_p1*(1 - np.exp(r*t) + k_off*t) +
-                                               2*c**3*np.exp(r*t)*k_on**3 * t*(k_off*init_p1*t +
-                                                                               init_p0*(-1 + k_off*t)) +
-                                               2*c*k_off*k_on*(init_p0*(2 + k_off*t + np.exp(r*t)*(-2 + k_off*t))
-                                                               + init_p1*(2 - k_off*t + 2*np.exp(r*t)*(-1 + k_off*t))) +
-                                               (k_on*c)**2 *(np.exp(r*t)*k_off*init_p1*t*(4 + k_off*t) +
-                                                             init_p0*(-2 + 2*k_off*t +
-                                                                      np.exp(r*t)*(2 + k_off**2 * t**2)))))
+
+            var_term_1 = r ** 2 * ((1 - np.exp(-r * t)) * k_off * init_p1 +
+                                   c ** 2 * k_on ** 2 * (init_p0 + init_p1) * t +
+                                   c * k_on * (k_off * init_p1 * t + init_p0 * (-1 + np.exp(-r * t) + k_off * t)))
+            var_term_2 = k_p * ((1 - np.exp(-r * t)) * k_off * init_p1 + c ** 2 * k_on ** 2 * (init_p0 + init_p1) * t +
+                                c * k_on * (k_off * init_p1 * t + init_p0 * (-1 + np.exp(-r * t) + k_off * t))) ** 2
+            var_term_3 = (c * k_on) ** 4 * (init_p0 + init_p1) * t ** 2 - 2 * k_off ** 2 * init_p1 * (
+                        np.exp(-r * t) - 1 + np.exp(-r*t) * k_off * t)
+            var_term_4 = 2 * (k_on*c) ** 3 * t * (k_off * init_p1 * t + init_p0 * (-1 + k_off * t))
+            var_term_5 = 2 * c * k_off * k_on * (
+                        init_p0 * (2*np.exp(-r*t) + k_off * t*np.exp(-r*t) + (-2 + k_off * t)) + init_p1 * (
+                            2*np.exp(-r*t) - k_off * t*np.exp(-r*t) + 2 * (-1 + k_off * t)))
+            var_term_6 = (k_on * c) ** 2 * (
+                        k_off * init_p1 * t * (4 + k_off * t) + init_p0 * (
+                            -2*np.exp(-r*t) + 2 * k_off * t*np.exp(-r*t) + (2 + (k_off*t)** 2)))
+            var_term_7 = var_term_3 + var_term_4 + var_term_5 + var_term_6
+
+            var_vals[idx] = (k_p / r ** 4) * (var_term_1 - var_term_2 + k_p * var_term_7)
     return mean_vals, var_vals
 
 
 if __name__ == '__main__':
     # settings
-    num_traj = 1000
-    num_steps = 100
+    num_traj = 500
+    num_steps = 500
     init_bound = 1.0
 
     # compute
@@ -128,7 +131,7 @@ if __name__ == '__main__':
     # only vars
     plt.figure()
     plt.plot(moment_times, var_vals, '--k', lw=2, label="data")
-    plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
+    #plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
     plt.plot(moment_times, var_vals_gen, '--r', lw=2, label="generating")
     plt.title('Mode 1 var(n) for %d trajectories' % num_traj)
     plt.xlabel('time')

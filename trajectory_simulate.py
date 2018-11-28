@@ -98,7 +98,7 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
 if __name__ == '__main__':
     # settings
     model = 'mode_1'
-    num_traj = 1000
+    num_traj = 200
     num_steps = 100
     init_bound = 1.0
     # compute
