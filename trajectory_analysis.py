@@ -82,7 +82,7 @@ def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0, p=DEFAULT_PAR
 if __name__ == '__main__':
     # settings
     num_traj = 500
-    num_steps = 500
+    num_steps = 200
     init_bound = 1.0
 
     # compute
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     # only vars
     plt.figure()
     plt.plot(moment_times, var_vals, '--k', lw=2, label="data")
-    #plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
+    plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
     plt.plot(moment_times, var_vals_gen, '--r', lw=2, label="generating")
     plt.title('Mode 1 var(n) for %d trajectories' % num_traj)
     plt.xlabel('time')

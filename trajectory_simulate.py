@@ -109,7 +109,7 @@ if __name__ == '__main__':
         traj_k = traj_array[:, 1, k]
         plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)
     # decorate
-    plt.title('Mode 1 <n>(t) +- sqrt(var(t)) for %d trajectories' % num_traj)
+    plt.title('Mode 1 - %d trajectories' % num_traj)
     plt.xlabel('time')
     plt.ylabel('n')
     plt.legend()
