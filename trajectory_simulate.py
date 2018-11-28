@@ -25,14 +25,19 @@ def propensities(state, model, params=DEFAULT_PARAMS):
     propensities = np.zeros(NUM_RXN[model])
     if model == 'mode_1':
         propensities[0] = p.k_on * p.c * (1 - state[0])  # bind (0.0 if already bound)
-        propensities[1] = p.k_off * state[0]           # unbind (0.0 if already unbound)
-        propensities[2] = p.k_p * state[0]             # produce one n molecule
+        propensities[1] = p.k_off * state[0]             # unbind (0.0 if already unbound)
+        propensities[2] = p.k_p * state[0]               # produce one n molecule
+        propensities[3] = p.d_n * state[1]               # degradation n molecule
     elif model == 'mode_2':
-        # TODO
-        return 0
+        propensities[0] = p.k_on * p.c * (1 - state[0])  # bind (0.0 if already bound) and produce one m molecule
+        propensities[1] = p.k_off * state[0]             # unbind (0.0 if already unbound)
+        propensities[2] = p.d_m * state[1]               # degradation m molecule
     elif model == 'combined':
-        # TODO
-        return 0
+        propensities[0] = p.k_on * p.c * (1 - state[0])  # bind (0.0 if already bound)
+        propensities[1] = p.k_off * state[0]             # unbind (0.0 if already unbound)
+        propensities[2] = p.k_p * state[0]               # produce one n molecule
+        propensities[3] = p.d_n * state[1]               # degradation n molecule
+        propensities[4] = p.d_m * state[2]
     return propensities
 
 
