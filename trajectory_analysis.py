@@ -1,112 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-"""
-State for mode 1, 2: [bool, n]
-    - bool == 1 implies BOUND, 0 implies UNBOUND
-    - n is number of downstream molecules produced (due to being bound)
-    
-TODO 
-- protect global constants
-- more comments
-- fix or remove theory curves for 'direct'
-- verify theory curves for 'generating' under different initial conditions and parameters 
-"""
-
-# globals
-num_rxn_mode1 = 3
-state_size_mode1 = 2
-state_size_mode2 = 2
-
-# model parameters
-c = 4.0
-k_on = 5.0
-k_off = 40.0
-k_p = 2.0
-
-# model identities
-x = k_on * c / k_off
-pss = x / (1 + x)
-r = k_on * c + k_off
-
-# initial conditions (for single trajectory)
-n0 = 0.0
-m0 = 0.0
-p0 = 0
-assert p0 in [0, 1]
-INIT_COND_MODE1 = [p0, n0]
-
-# misc
-NUM_STEPS = 100
-
-# rxn update dictionaries for each mode
-update_dict_mode1 = {0: np.array([1.0, 0.0]),
-                     1: np.array([-1.0, 0.0]),
-                     2: np.array([0.0, 1.0])}
-
-
-def propensities_mode1(state):
-    propensities = np.zeros(num_rxn_mode1)
-    propensities[0] = k_on * c * (1 - state[0])  # bind (0.0 if already bound)
-    propensities[1] = k_off * state[0]           # unbind (0.0 if already unbound)
-    propensities[2] = k_p * state[0]             # produce one n molecule
-    return propensities
-
-
-def update_state(state_timeseries, rxn_idx, step):
-    current_state = state_timeseries[step]
-    increment = update_dict_mode1[rxn_idx]
-    state_timeseries[step + 1, :] = current_state + increment
-    return state_timeseries
-
-
-def simulate_traj(num_steps=NUM_STEPS, init_cond=INIT_COND_MODE1):
-    times = np.zeros(num_steps)
-    traj = np.zeros((num_steps, state_size_mode1))
-    traj[0, :] = init_cond
-    times[0] = 0.0
-    for step in xrange(num_steps-1):
-        # generate two U[0,1] random variables
-        r1, r2 = np.random.random(2)
-
-        # generate propensities and their partitions
-        alpha = propensities_mode1(traj[step])
-        alpha_partitions = np.zeros(len(alpha)+1)
-        alpha_sum = 0.0
-        for i in xrange(len(alpha)):
-            alpha_sum += alpha[i]
-            alpha_partitions[i + 1] = alpha_sum
-
-        # find time to first reaction
-        tau = np.log(1 / r1) / alpha_sum
-
-        # pick a reaction
-        r2_scaled = alpha_sum * r2
-        for rxn_idx in xrange(len(alpha)):
-            if alpha_partitions[rxn_idx] <= r2_scaled < alpha_partitions[rxn_idx + 1]:  # i.e. rxn_idx has occurred
-                break
-
-        # update state
-        traj = update_state(traj, rxn_idx, step)
-        times[step+1] = times[step] + tau
-    return traj, times
-
-
-def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0):
-    traj_array = np.zeros((num_steps, state_size_mode1, num_traj))
-    times_array = np.zeros((num_steps, num_traj))
-
-    if bound_fraction in [0.0, 1.0]:
-        init_conds = [[bound_fraction, n0] for _ in xrange(num_traj)]
-    else:
-        draws = np.random.binomial(1, bound_fraction, num_traj)
-        init_conds = [[draws[k], n0] for k in xrange(num_traj)]
-
-    for k in xrange(num_traj):
-        traj, times = simulate_traj(num_steps=num_steps, init_cond=init_conds[k])
-        traj_array[:, :, k] = traj
-        times_array[:, k] = times
-    return traj_array, times_array
+from params import DEFAULT_PARAMS
+from trajectory_simulate import multitraj
 
 
 def get_state_at_t(traj, times, t):
@@ -137,10 +33,12 @@ def get_mean_var_timeseries(traj_array, times_array):
     return mean_vals, var_vals, moment_times
 
 
-def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0):
+def theory_cumulants(moment_times, label, init_n=0.0, init_p1=0.0, p=DEFAULT_PARAMS):
     assert label in ["direct", "generating"]
     mean_vals = np.zeros(moment_times.shape[0])
     var_vals = np.zeros(moment_times.shape[0])
+    # unpack params
+    c, k_on, k_off, k_p, x, pss, r = p.unpack()
     # identities
     delta1 = init_p1 - pss
 
