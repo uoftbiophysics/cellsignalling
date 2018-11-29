@@ -14,7 +14,7 @@ class Params:
         self.d_m = d_m
 
     def unpack(self):
-        return self.c, self.k_on, self.k_off, self.k_p, self.x, self.pss, self.r
+        return self.c, self.k_on, self.k_off, self.k_p, self.x, self.pss, self.r, self.d_n, self.d_m
 
 
 DEFAULT_PARAMS = Params()
