@@ -48,13 +48,13 @@ UPDATE_DICTS = {
     'mode_1': {0: np.array([1.0, 0.0]),    # binding
                1: np.array([-1.0, 0.0]),   # unbinding
                2: np.array([0.0, 1.0]),    # production
-               3: np.array([0.0, -1.0])},  #degradation n
+               3: np.array([0.0, -1.0])},  # degradation n
     'mode_2': {0: np.array([1.0, 1.0]),      # bind + GPCR event
                1: np.array([-1.0, 0.0]),     # unbind
                2: np.array([0.0, -1.0])},    # degradation m
-    'combined': {0: np.array([1.0, 0.0, 1.0]),     #binding + GPCR
-                 1: np.array([-1.0, 0.0, 0.0]),    #unbinding
-                 2: np.array([0.0, 1.0, 0.0]),     #production
-                 3: np.array([0.0, -1.0, 0.0]),    #degradation n
-                 4: np.array([0.0, 0.0, -1.0])}
+    'combined': {0: np.array([1.0, 0.0, 1.0]),     # binding + GPCR event
+                 1: np.array([-1.0, 0.0, 0.0]),    # unbinding
+                 2: np.array([0.0, 1.0, 0.0]),     # production of n
+                 3: np.array([0.0, -1.0, 0.0]),    # degradation n
+                 4: np.array([0.0, 0.0, -1.0])}    # degradation m
 }
