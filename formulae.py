@@ -77,9 +77,21 @@ def theory_cumulants(moment_times, bound_fraction, method='generating', init_n=0
         theory_curves['var_m'] = np.zeros(moment_times.shape[0])
 
         for idx, t in enumerate(moment_times):
-            # TODO
-            theory_curves['mean_m'][idx] = 0.0
-            theory_curves['var_m'][idx] = 0.0
+            # mean
+            x1 = k_on*c * (-k_off+np.exp(-r*t)*k_off-c*k_on+c*k_on*np.exp(-r*t))
+            x2 = k_on*c*(k_on*c-k_on*c*np.exp(-r*t)+k_off**2 *t+c*k_off*k_on*t)
+            # variance
+            var_term_1 = c*k_on*(-k_off+np.exp(-r*t)*k_off-c*k_on+c*k_on*np.exp(-r*t))*bound_fraction/(r**2)
+            var_term_2 = c*k_on*(c*k_on-c*k_on*np.exp(-r*t)+k_off**2*t+c*k_off*k_on*t)/(r**2)
+            var_term_3 = c*k_on*(-k_off+np.exp(-r*t)*k_off-c*k_on+c*np.exp(-r*t)*k_on)*bound_fraction/(r**2)
+            var_term_4 = c*k_on*(c*k_on-c*k_on*np.exp(-r*t)+k_off**2*t+c*k_off*k_on*t)/(r**2)
+            var_term_5 = k_off**3*t**2-2*c*k_on*(-1+bound_fraction)*(2*np.exp(-r*t)+c*k_on*np.exp(-r*t)*t+(-2+c*k_on*t))
+            var_term_6 = k_off*(-2*np.exp(-r*t)+2*np.exp(-r*t)*c*k_on*t-4*np.exp(-r*t)*bound_fraction*(1+c*k_on*t)+(2+(c*k_on*t)**2+bound_fraction*(4-4*c*k_on*t)))
+            var_term_7 = 2*k_off**2*t*(-bound_fraction*np.exp(-r*t)+(-1-bound_fraction+c*k_on*t))+var_term_6
+            var_term_8 = (k_on*c)**2 *k_off/(r**4)*(var_term_5 + var_term_7)
+
+            theory_curves['mean_m'][idx] = (x1*bound_fraction+x2)/(r**2)
+            theory_curves['var_m'][idx] = var_term_1+var_term_2-(var_term_3+var_term_4)**2+var_term_8
 
     else:
         assert method == 'generating'
