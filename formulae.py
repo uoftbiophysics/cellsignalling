@@ -19,7 +19,7 @@ def theory_cumulants(moment_times, bound_fraction, method='generating', init_n=0
     c, k_on, k_off, k_p, x, pss, r, d_n, d_m = p.unpack()
     assert d_n == 0.0  # no theory for this case
     assert d_m == 0.0  # no theory for this case
-
+    init_p0 = 1 - bound_fraction
     # declare output
     theory_curves = {'mean_n': None,
                      'var_n': None,
@@ -45,7 +45,6 @@ def theory_cumulants(moment_times, bound_fraction, method='generating', init_n=0
                 theory_curves['mean_n'][idx] = mean_n_val
                 theory_curves['var_n'][idx] = var_n_val
         else:
-            init_p0 = 1 - bound_fraction
             for idx, t in enumerate(moment_times):
                 x1 = c*k_on*k_p*(np.exp(-r*t) - 1 + r*t) / r**2
                 x2 = k_p*(k_off - np.exp(-r*t)*k_off + k_on*c*(r*t)) / r**2
@@ -102,11 +101,39 @@ def theory_cumulants(moment_times, bound_fraction, method='generating', init_n=0
         theory_curves['cov_nm'] = np.zeros(moment_times.shape[0])
 
         for idx, t in enumerate(moment_times):
-            # TODO
-            theory_curves['mean_n'][idx] = 0.0
-            theory_curves['var_n'][idx] = 0.0
-            theory_curves['mean_m'][idx] = 0.0
-            theory_curves['var_m'][idx] = 0.0
-            theory_curves['cov_nm'][idx] = 0.0
+            # mean n
+            x1 = (1-np.exp(-r*t))*k_off
+            x2 = (k_on*c)**2*t+c*k_on*(k_off*bound_fraction*t+init_p0*(-1+np.exp(-r*t)+k_off*t))
+            # mean m
+            y1 = k_on*c*np.exp(-r*t)*(-c*k_on+k_off*bound_fraction+c*k_on*bound_fraction)/(r**2)
+            y2 = c*k_on*(c*k_on-k_off*bound_fraction+k_off**2*t+c*k_off*k_on*t-c*k_on*bound_fraction)/(r**2)
+            # variance n
+            varN_val_1 = (np.exp(-2*r*t)*k_p(-c**2*k_on**2*k_p*init_p0**2 + 2*c*k_off*k_on*k_p*init_p0*bound_fraction -k_off**2*k_p*bound_fraction**2)) / r**4
+            varN_val_2 = varN_val_1  + (1 / r**4)*k_p*(-c*k_off**2*k_on - 2*c**2*k_off*k_on**2 - c**3*k_on**3 - 4*c*k_off*k_on*k_p + c**2*k_on**2*k_p + k_off**3*bound_fraction +3*c*k_off**2*k_on*bound_fraction + 3*c**2*k_off*k_on**2*bound_fraction)
+            varN_val_25 = c**3*k_on**3*bound_fraction + 2*k_off**2*k_p*bound_fraction + 2*c*k_off*k_on*k_p*bound_fraction - k_off**2*k_p*bound_fraction**2
+            varN_val_3 = varN_val_2 + (1 / r**4)*k_p*(varN_val_25 - 2*c*k_off*k_on*k_p*bound_fraction**2 -c**2*k_on**2*k_p*bound_fraction**2 + c*k_off**3*k_on*t + 3*c**2*k_off**2*k_on**2*t + 3*c**3*k_off*k_on**3*t + c**4*k_on**4*t + 2*c*k_off**2*k_on*k_p*t + 2*c**2*k_off*k_on**2*k_p*t)
+            varN_val_35 = 4*c*k_off*k_on*k_p - 2*c**2*k_on**2*k_p + c*k_off**2*k_on*init_p0+ 2*c**2*k_off*k_on**2*init_p0+c**3*k_on**3*init_p0
+            varN_val_36 = 2*c**2*k_on**2*k_p*init_p0 - k_off**3*bound_fraction -2**c*k_off**2*k_on*bound_fraction- c**2*k_off*k_on**2*bound_fraction-2*k_off**2*k_p*bound_fraction
+            varN_val_37 = 2*c*k_off*k_on*k_p*bound_fraction+2*c**2*k_on**2*k_p*bound_fraction- 2*c*k_off*k_on*k_p*init_p0*bound_fraction-2**c**2*k_on**2*k_p*init_p0*bound_fraction
+            varN_val_38 = 2*k_off**2*k_p*bound_fraction**2 +2*c*k_off*k_on*k_p*bound_fraction**2 + 2*c*k_off**2*k_on*k_p*t +2*c**2*k_off*k_on**2*k_p*t - 2*c**2*k_off*k_on**2*k_p*init_p0*t
+            varN_val_4 = varN_val_3 + (1 / (r**4))*np.exp(-r*t)*k_p*(varN_val_35+ varN_val_36- varN_val_37 + varN_val_38 -2*c**3*k_on**3*k_p*init_p0*t - 2*k_off**3*k_p*bound_fraction*t -2*c*k_off**2*k_on*k_p*bound_fraction*t)
+            # variance m
+            varM_val_1 = np.exp(-r*t)*r**2*(c*k_on*(-1 + bound_fraction) + k_off*bound_fraction)
+            varM_val_2 = c*k_on*(c*k_on - k_off*bound_fraction- c*k_on*bound_fraction+ np.exp(-r*t)*(c*k_on*(-1 + bound_fraction) + k_off*bound_fraction) + k_off**2*t + c*k_off*k_on*t)**2
+            varM_val_3 = r**2*(k_off*(-bound_fraction+ k_off*t) +c*k_on*(1 - bound_fraction+ k_off*t))
+            varM_val_4 = k_off**3*t**2 - 2*c*k_on*(-1 + bound_fraction)*(2*np.exp(-r*t) + c*k_on*t*np.exp(-r*t) + (-2 + c*k_on*t))
+            varM_val_5 = 2*k_off**2*t*(-bound_fraction*np.exp(-r*t) + (-1 - bound_fraction + c*k_on*t))
+            varM_val_6 = k_off*((-2 + 2*c*k_on*t - 4*bound_fraction*(1 + c*k_on*t))*np.exp(-r*t) + 2 + c**2*k_on**2*t**2 + bound_fraction*(4 - 4*c*k_on*t))
+            # covariance n,m
+            cov_val_1 = -c**2*k_on**2 + 2*c*k_off*k_on*bound_fraction*c**2*k_on**2*bound_fraction-k_off**2*bound_fraction**2 - 2*c*k_off*k_on*bound_fraction**2 - c**2*k_on**2*bound_fraction**2
+            cov_val_2 = k_off**2 - 4*c*k_off*k_on + 3*k_off**2*bound_fraction+ 4* c* k_off* k_on *bound_fraction+ c**2 *k_on**2 *bound_fraction- k_off**2 *bound_fraction**2 - 2* c* k_off* k_on*bound_fraction**2 - c**2* k_on**2 *bound_fraction**2 - k_off**3* t + c**2 *k_off *k_on**2* t
+            cov_val_3 = -k_off**2 + 4*c*k_off*k_on + c**2*k_on**2 - 3*k_off**2*bound_fraction-6*c*k_off*k_on*bound_fraction- 3*c**2*k_on**2*bound_fraction+ 2*k_off**2*bound_fraction**2 +4*c*k_off*k_on*bound_fraction**2
+            cov_val_4 = 2*c**2*k_on**2*bound_fraction**2 + 3*c*k_off**2*k_on*t + 2*c**2*k_off*k_on**2*t - c**3*k_on**3*t - 3*k_off**3*bound_fraction*t - 5*c*k_off**2*k_on*bound_fraction*t - c**2*k_off*k_on**2*bound_fraction*t + c**3*k_on**3*bound_fraction*t
+
+            theory_curves['mean_n'][idx] = k_p/(r**2)*(x1*bound_fraction+x2)
+            theory_curves['var_n'][idx] = varN_val_4
+            theory_curves['mean_m'][idx] = y1+y2
+            theory_curves['var_m'][idx] = c*k_on/(r**4)*(varM_val_1-varM_val_2+varM_val_3+c*k_off*k_on*(varM_val_4+varM_val_5+varM_val_6))
+            theory_curves['cov_nm'][idx] = -c*k_on*k_p*np.exp(-2*r*t)/(r**4)*(cov_val_1)-c*k_on*k_p/(r**4)*(cov_val_2) - c*k_on*k_p*np.exp(-r*t)/(r**4)*(cov_val_3+cov_val_4)
 
     return theory_curves
