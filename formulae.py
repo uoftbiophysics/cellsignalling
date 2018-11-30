@@ -4,8 +4,8 @@ from params import DEFAULT_PARAMS
 from settings import DEFAULT_MODEL, VALID_MODELS
 
 
-def theory_cumulants(moment_times, bound_fraction, method='generating', init_n=0.0, init_m=0.0,
-                     p=DEFAULT_PARAMS, model=DEFAULT_MODEL):
+def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0, init_m=0.0,
+                   p=DEFAULT_PARAMS, model=DEFAULT_MODEL):
     """
     Returns, as a dict, multiple output timeseries (aligned to moment_times) depending on the model:
         - mode_1: mean(n)(t), var(n)(t), None, None, None
@@ -94,6 +94,7 @@ def theory_cumulants(moment_times, bound_fraction, method='generating', init_n=0
 
     else:
         assert method == 'generating'
+        assert model == 'combined'
         theory_curves['mean_n'] = np.zeros(moment_times.shape[0])
         theory_curves['var_n'] = np.zeros(moment_times.shape[0])
         theory_curves['mean_m'] = np.zeros(moment_times.shape[0])
