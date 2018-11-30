@@ -83,11 +83,6 @@ if __name__ == '__main__':
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
     data_moments, moment_times = get_moment_timeseries(traj_array, times_array)
     # theory
-    """
-    theory_curves_direct = theory_moments(moment_times, init_bound, method="direct", model=model)
-    mean_vals_direct = theory_curves_direct['mean_n']
-    var_vals_direct = theory_curves_direct['var_n']
-    """
     theory_curves_gen = theory_moments(moment_times, init_bound, method="generating", model=model)
     mean_vals_gen = theory_curves_gen['mean_n']
     var_vals_gen = theory_curves_gen['var_n']
@@ -101,12 +96,6 @@ if __name__ == '__main__':
     plt.plot(moment_times, data_moments['mean_n'], 'k', lw=2, label="data")
     plt.plot(moment_times, data_moments['mean_n'] + np.sqrt(data_moments['var_n']), '--k', lw=2)
     plt.plot(moment_times, data_moments['mean_n'] - np.sqrt(data_moments['var_n']), '--k', lw=2)
-    # plot theory cumulants (direct)
-    """
-    plt.plot(moment_times, mean_vals_direct, 'b', lw=2, label="direct")
-    plt.plot(moment_times, mean_vals_direct + np.sqrt(var_vals_direct), '--b', lw=2)
-    plt.plot(moment_times, mean_vals_direct - np.sqrt(var_vals_direct), '--b', lw=2)
-    """
     # plot theory cumulants (generating function)
     plt.plot(moment_times, mean_vals_gen, 'r', lw=2, label="generating")
     plt.plot(moment_times, mean_vals_gen + np.sqrt(var_vals_gen), '--r', lw=2)
@@ -121,9 +110,6 @@ if __name__ == '__main__':
     # only means
     plt.figure()
     plt.scatter(moment_times, data_moments['mean_n'], s=4.0, c='k', marker='s', label="data", alpha=0.5)
-    """
-    plt.scatter(moment_times, mean_vals_direct, s=4.0, c='b', marker='s', label="direct", alpha=0.5)
-    """
     plt.scatter(moment_times, mean_vals_gen, s=4.0, c='r', marker='s', label="generating", alpha=0.5)
     plt.title('%s mean(n) for %d trajectories' % (model, num_traj))
     plt.xlabel('time')
@@ -134,9 +120,6 @@ if __name__ == '__main__':
     # only vars
     plt.figure()
     plt.plot(moment_times, data_moments['var_n'], '--k', lw=2, label="data")
-    """
-    plt.plot(moment_times, var_vals_direct, '--b', lw=2, label="direct")
-    """
     plt.plot(moment_times, var_vals_gen, '--r', lw=2, label="generating")
     plt.title('%s var(n) for %d trajectories' % (model, num_traj))
     plt.xlabel('time')
