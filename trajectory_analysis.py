@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from formulae import theory_moments
+from trajectory_plotting import plot_traj_and_mean_sd, plot_means, plot_vars
 from trajectory_simulate import multitraj
 
 
@@ -74,55 +75,55 @@ def get_moment_timeseries(traj_array, times_array):
 
 if __name__ == '__main__':
     # settings
-    model = 'mode_1'
+    model = 'mode_2'
     num_traj = 200
     num_steps = 200
-    init_bound = 1.0
-
-    # compute
+    init_bound = 0.0
+    # simulate trajectories
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
+    # compute moments from data
     data_moments, moment_times = get_moment_timeseries(traj_array, times_array)
-    # theory
-    theory_curves_gen = theory_moments(moment_times, init_bound, method="generating", model=model)
-    mean_vals_gen = theory_curves_gen['mean_n']
-    var_vals_gen = theory_curves_gen['var_n']
+    # expectations from theory
+    theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model)
 
-    # plot trajectories
-    for k in xrange(num_traj):
-        times_k = times_array[:, k]
-        traj_k = traj_array[:, 1, k]
-        plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)
-    # plot trajectory cumulants
-    plt.plot(moment_times, data_moments['mean_n'], 'k', lw=2, label="data")
-    plt.plot(moment_times, data_moments['mean_n'] + np.sqrt(data_moments['var_n']), '--k', lw=2)
-    plt.plot(moment_times, data_moments['mean_n'] - np.sqrt(data_moments['var_n']), '--k', lw=2)
-    # plot theory cumulants (generating function)
-    plt.plot(moment_times, mean_vals_gen, 'r', lw=2, label="generating")
-    plt.plot(moment_times, mean_vals_gen + np.sqrt(var_vals_gen), '--r', lw=2)
-    plt.plot(moment_times, mean_vals_gen - np.sqrt(var_vals_gen), '--r', lw=2)
-    # decorate
-    plt.title('%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-    plt.xlabel('time')
-    plt.ylabel('n')
-    plt.legend()
-    plt.show()
+    # model dependent plotting
+    if model == 'mode_1':
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n',
+                              data_mean=data_moments['mean_n'], data_var=data_moments['var_n'],
+                              theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
+                              title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+        plot_means(moment_times, data_moments['mean_n'], model, theory_mean=theory_curves['mean_n'],
+                   title='%s <n>(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'],
+                  title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
 
-    # only means
-    plt.figure()
-    plt.scatter(moment_times, data_moments['mean_n'], s=4.0, c='k', marker='s', label="data", alpha=0.5)
-    plt.scatter(moment_times, mean_vals_gen, s=4.0, c='r', marker='s', label="generating", alpha=0.5)
-    plt.title('%s mean(n) for %d trajectories' % (model, num_traj))
-    plt.xlabel('time')
-    plt.ylabel('<n>(t)')
-    plt.legend()
-    plt.show()
+    elif model == 'mode_2':
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m',
+                              data_mean=data_moments['mean_m'], data_var=data_moments['var_m'],
+                              theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
+                              title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+        plot_means(moment_times, data_moments['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
+                   title='%s <m>(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'],
+                  title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
 
-    # only vars
-    plt.figure()
-    plt.plot(moment_times, data_moments['var_n'], '--k', lw=2, label="data")
-    plt.plot(moment_times, var_vals_gen, '--r', lw=2, label="generating")
-    plt.title('%s var(n) for %d trajectories' % (model, num_traj))
-    plt.xlabel('time')
-    plt.ylabel('var(n)')
-    plt.legend()
-    plt.show()
+    else:
+        assert model == 'combined'
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n',
+                              data_mean=data_moments['mean_n'], data_var=data_moments['var_n'],
+                              theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
+                              title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m',
+                              data_mean=data_moments['mean_m'], data_var=data_moments['var_m'],
+                              theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
+                              title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+        plot_means(moment_times, data_moments['mean_n'], model, theory_mean=theory_curves['mean_n'],
+                   title='%s <n>(t) for %d trajectories' % (model, num_traj))
+        plot_means(moment_times, data_moments['mean_m'], model, theory_mean=theory_curves['mean_m'],
+                   title='%s <m>(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'],
+                  title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'],
+                  title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, data_moments['cov_nm'], model, theory_var=theory_curves['cov_nm'],
+                  title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
