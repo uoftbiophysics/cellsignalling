@@ -66,7 +66,7 @@ def get_moment_timeseries(traj_array, times_array):
 
             moment_curves['mean_n'][idx] = statesum_n / num_traj
             moment_curves['mean_m'][idx] = statesum_m / num_traj
-            moment_curves['var_m'][idx] = statesquaresum_n / num_traj - moment_curves['mean_n'][idx]**2
+            moment_curves['var_n'][idx] = statesquaresum_n / num_traj - moment_curves['mean_n'][idx]**2
             moment_curves['var_m'][idx] = statesquaresum_m / num_traj - moment_curves['mean_m'][idx]**2
             moment_curves['cov_nm'][idx] = stateprod_nm / num_traj - \
                                            moment_curves['mean_n'][idx] * moment_curves['mean_m'][idx]
@@ -75,10 +75,10 @@ def get_moment_timeseries(traj_array, times_array):
 
 if __name__ == '__main__':
     # settings
-    model = 'mode_2'
+    model = 'combined'
     num_traj = 200
     num_steps = 200
-    init_bound = 0.0
+    init_bound = 1.0
     # simulate trajectories
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
     # compute moments from data
@@ -88,42 +88,42 @@ if __name__ == '__main__':
 
     # model dependent plotting
     if model == 'mode_1':
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n',
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
                               data_mean=data_moments['mean_n'], data_var=data_moments['var_n'],
                               theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
                               title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, data_moments['mean_n'], model, theory_mean=theory_curves['mean_n'],
+        plot_means(moment_times, data_moments['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
                    title='%s <n>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'],
+        plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
                   title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
 
     elif model == 'mode_2':
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m',
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=1,
                               data_mean=data_moments['mean_m'], data_var=data_moments['var_m'],
                               theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
                               title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
         plot_means(moment_times, data_moments['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
                    title='%s <m>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'],
+        plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
                   title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
 
     else:
         assert model == 'combined'
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n',
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
                               data_mean=data_moments['mean_n'], data_var=data_moments['var_n'],
                               theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
                               title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m',
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=2,
                               data_mean=data_moments['mean_m'], data_var=data_moments['var_m'],
                               theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
                               title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, data_moments['mean_n'], model, theory_mean=theory_curves['mean_n'],
+        plot_means(moment_times, data_moments['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
                    title='%s <n>(t) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, data_moments['mean_m'], model, theory_mean=theory_curves['mean_m'],
+        plot_means(moment_times, data_moments['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
                    title='%s <m>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'],
+        plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
                   title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'],
+        plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
                   title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, data_moments['cov_nm'], model, theory_var=theory_curves['cov_nm'],
+        plot_vars(moment_times, data_moments['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
                   title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))

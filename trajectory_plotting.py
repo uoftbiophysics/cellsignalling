@@ -27,7 +27,7 @@ def plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, data_mea
     plt.xlabel('time')
     plt.ylabel(state_label)
     plt.legend()
-    plt.savefig('traj_%s.png' % model)
+    plt.savefig('traj_%s_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
@@ -40,7 +40,7 @@ def plot_means(moment_times, data_mean, model, theory_mean=None, title='', state
     plt.xlabel('time')
     plt.ylabel('<%s>(t)' % state_label)
     plt.legend()
-    plt.savefig('traj_%s_mean.png' % model)
+    plt.savefig('traj_%s_mean_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
@@ -54,7 +54,7 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
     plt.xlabel('time')
     plt.ylabel('Var(%s)' % state_label)
     plt.legend()
-    plt.savefig('traj_%s_var.png' % model)
+    plt.savefig('traj_%s_var_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
