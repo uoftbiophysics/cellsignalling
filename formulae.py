@@ -126,18 +126,18 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
                         c * k_on - k_off * bound_fraction + k_off ** 2 * t + c * k_off * k_on * t - c * k_on * bound_fraction) / (
                              r ** 2)
             # variance n
-            varN_val_1 = (np.exp(-2 * r * t) * k_p*(-c ** 2 * k_on ** 2 * k_p * init_p0 ** 2 + 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - k_off ** 2 * k_p * bound_fraction ** 2)) / r ** 4
-            varN_val_2 = varN_val_1 + (1 / r ** 4) * k_p * (
+            varN_val_1 = (np.exp(-2 * r * t) * k_p /(r ** 4))*(-c ** 2 * k_on ** 2 * k_p * init_p0 ** 2 + 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - k_off ** 2 * k_p * bound_fraction ** 2)
+            varN_val_2 = varN_val_1 + (k_p /(r ** 4)) * (
                         -c * k_off ** 2 * k_on - 2 * c ** 2 * k_off * k_on ** 2 - c ** 3 * k_on ** 3 - 4 * c * k_off * k_on * k_p + c ** 2 * k_on ** 2 * k_p + k_off ** 3 * bound_fraction + 3 * c * k_off ** 2 * k_on * bound_fraction + 3 * c ** 2 * k_off * k_on ** 2 * bound_fraction)
             varN_val_25 = c ** 3 * k_on ** 3 * bound_fraction + 2 * k_off ** 2 * k_p * bound_fraction + 2 * c * k_off * k_on * k_p * bound_fraction - k_off ** 2 * k_p * bound_fraction ** 2
             varN_val_3 = varN_val_2 + (1 / r ** 4) * k_p * (
                         varN_val_25 - 2 * c * k_off * k_on * k_p * bound_fraction ** 2 - c ** 2 * k_on ** 2 * k_p * bound_fraction ** 2 + c * k_off ** 3 * k_on * t + 3 * c ** 2 * k_off ** 2 * k_on ** 2 * t + 3 * c ** 3 * k_off * k_on ** 3 * t + c ** 4 * k_on ** 4 * t + 2 * c * k_off ** 2 * k_on * k_p * t + 2 * c ** 2 * k_off * k_on ** 2 * k_p * t)
             varN_val_35 = 4 * c * k_off * k_on * k_p - 2 * c ** 2 * k_on ** 2 * k_p + c * k_off ** 2 * k_on * init_p0 + 2 * c ** 2 * k_off * k_on ** 2 * init_p0 + c ** 3 * k_on ** 3 * init_p0
-            varN_val_36 = 2 * c ** 2 * k_on ** 2 * k_p * init_p0 - k_off ** 3 * bound_fraction - 2 ** c * k_off ** 2 * k_on * bound_fraction - c ** 2 * k_off * k_on ** 2 * bound_fraction - 2 * k_off ** 2 * k_p * bound_fraction
-            varN_val_37 = 2 * c * k_off * k_on * k_p * bound_fraction + 2 * c ** 2 * k_on ** 2 * k_p * bound_fraction - 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - 2 ** c ** 2 * k_on ** 2 * k_p * init_p0 * bound_fraction
+            varN_val_36 = 2 * c ** 2 * k_on ** 2 * k_p * init_p0 - k_off ** 3 * bound_fraction - 2 * c * k_off ** 2 * k_on * bound_fraction - c ** 2 * k_off * k_on ** 2 * bound_fraction - 2 * k_off ** 2 * k_p * bound_fraction
+            varN_val_37 = -2 * c * k_off * k_on * k_p * bound_fraction + 2 * c ** 2 * k_on ** 2 * k_p * bound_fraction - 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - 2 * c ** 2 * k_on ** 2 * k_p * init_p0 * bound_fraction
             varN_val_38 = 2 * k_off ** 2 * k_p * bound_fraction ** 2 + 2 * c * k_off * k_on * k_p * bound_fraction ** 2 + 2 * c * k_off ** 2 * k_on * k_p * t + 2 * c ** 2 * k_off * k_on ** 2 * k_p * t - 2 * c ** 2 * k_off * k_on ** 2 * k_p * init_p0 * t
-            varN_val_4 = varN_val_3 + (1 / (r ** 4)) * np.exp(-r * t) * k_p * (
-                        varN_val_35 + varN_val_36 - varN_val_37 + varN_val_38 - 2 * c ** 3 * k_on ** 3 * k_p * init_p0 * t - 2 * k_off ** 3 * k_p * bound_fraction * t - 2 * c * k_off ** 2 * k_on * k_p * bound_fraction * t)
+            varN_val_4 = varN_val_3 + (np.exp(-r * t) * k_p / (r ** 4)) * (
+                        varN_val_35 + varN_val_36 + varN_val_37 + varN_val_38 - 2 * c ** 3 * k_on ** 3 * k_p * init_p0 * t - 2 * k_off ** 3 * k_p * bound_fraction * t - 2 * c * k_off ** 2 * k_on * k_p * bound_fraction * t)
             # variance m
             varM_val_1 = np.exp(-r * t) * r ** 2 * (c * k_on * (-1 + bound_fraction) + k_off * bound_fraction)
             varM_val_2 = c * k_on * (c * k_on - k_off * bound_fraction - c * k_on * bound_fraction + np.exp(-r * t) * (
