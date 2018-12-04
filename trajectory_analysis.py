@@ -6,11 +6,11 @@ from trajectory_plotting import plot_traj_and_mean_sd, plot_means, plot_vars
 from trajectory_simulate import multitraj
 
 
-def get_state_at_t(traj, times, t):
-    step = 0
+def get_state_at_t(traj, times, t, last_step=0):
+    step = last_step
     while times[step] <= t:
         step += 1
-    return traj[step - 1, :]
+    return traj[step - 1, :], step - 1
 
 
 def get_moment_timeseries(traj_array, times_array):
@@ -25,6 +25,8 @@ def get_moment_timeseries(traj_array, times_array):
     dt = np.mean(times_array[1, :])
     endtime = np.min(times_array[-1, :])
     moment_times = np.arange(0.0, endtime, dt)
+    # pass previous step to get_state_at_t(...) to speedup
+    last_step = np.zeros(num_traj, dtype=int)
     # prepare value dict
     moment_curves = {'mean_n': None,
                      'var_n': None,
@@ -41,7 +43,8 @@ def get_moment_timeseries(traj_array, times_array):
             statesum = 0.0
             statesquaresum = 0.0
             for k in xrange(num_traj):
-                state_at_t = get_state_at_t(traj_array[:, :, k], times_array[:, k], t)
+                state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
+                last_step[k] = step
                 statesum += state_at_t[1]
                 statesquaresum += state_at_t[1]**2
             moment_curves[mean_1or2][idx] = statesum / num_traj
@@ -57,7 +60,8 @@ def get_moment_timeseries(traj_array, times_array):
             statesquaresum_m = 0.0
             stateprod_nm = 0.0
             for k in xrange(num_traj):
-                state_at_t = get_state_at_t(traj_array[:, :, k], times_array[:, k], t)
+                state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
+                last_step[k] = step
                 statesum_n += state_at_t[1]
                 statesquaresum_n += state_at_t[1] ** 2
                 statesum_m += state_at_t[2]
@@ -75,8 +79,8 @@ def get_moment_timeseries(traj_array, times_array):
 
 if __name__ == '__main__':
     # settings
-    model = 'combined'
-    num_traj = 200
+    model = 'mode_1'
+    num_traj = 2000
     num_steps = 200
     init_bound = 1.0
     # simulate trajectories
