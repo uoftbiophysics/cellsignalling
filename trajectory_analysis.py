@@ -90,7 +90,7 @@ def get_moment_timeseries(traj_array, times_array):
 if __name__ == '__main__':
     # settings
     model = 'mode_1'
-    num_traj = 200
+    num_traj = 2000
     num_steps = 200
     init_bound = 1.0
     # simulate trajectories
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model)
 
     # specify histogram timepoints
-    hist_steps = [i*num_traj/10 for i in xrange(10)]
+    hist_steps = [i*num_steps/10 for i in xrange(10)]
 
     # model dependent plotting
     # TODO plot n,m histogram over time for some select timepoints...
