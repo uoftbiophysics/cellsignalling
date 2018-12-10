@@ -61,3 +61,14 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
     if show:
         plt.show()
     return plt.gca()
+
+
+def plot_hist(moment_times, data_observations, step, model, state_label='n', show=True):
+    time = moment_times[step]
+    num_traj = data_observations.shape[1]
+    plt.hist(data_observations[step, :])  # TODO cleanup
+    plt.title('Histogram (%d traj) for %s, %s at step:%d, time:%.2f' % (num_traj, model, state_label, step, time))
+    plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%s_%d_%.2f.png' % (model, state_label, step, time))
+    if show:
+        plt.show()
+    return plt.gca()
