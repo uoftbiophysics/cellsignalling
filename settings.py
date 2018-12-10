@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 """
 State for mode 1, 2: [bool, n]
@@ -10,6 +11,11 @@ TODO
 - fix or remove theory curves for 'direct'
 - convert model structures into class
 """
+
+# project level
+FOLDER_OUTPUT = "output"
+if not os.path.exists(FOLDER_OUTPUT):
+    os.makedirs(FOLDER_OUTPUT)
 
 # model parameters
 GLOB_C = 4.0

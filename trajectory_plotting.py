@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
+from settings import FOLDER_OUTPUT
 
 
 def plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, data_mean=None, data_var=None, theory_mean=None,
@@ -27,7 +30,7 @@ def plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, data_mea
     plt.xlabel('time')
     plt.ylabel(state_label)
     plt.legend()
-    plt.savefig('traj_%s_%s.png' % (model, state_label))
+    plt.savefig(FOLDER_OUTPUT + os.sep + 'traj_%s_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
@@ -40,7 +43,7 @@ def plot_means(moment_times, data_mean, model, theory_mean=None, title='', state
     plt.xlabel('time')
     plt.ylabel('<%s>(t)' % state_label)
     plt.legend()
-    plt.savefig('traj_%s_mean_%s.png' % (model, state_label))
+    plt.savefig(FOLDER_OUTPUT + os.sep + 'traj_%s_mean_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
@@ -54,11 +57,7 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
     plt.xlabel('time')
     plt.ylabel('Var(%s)' % state_label)
     plt.legend()
-    plt.savefig('traj_%s_var_%s.png' % (model, state_label))
+    plt.savefig(FOLDER_OUTPUT + os.sep + 'traj_%s_var_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
-
-
-def plot_traj_general(traj_array, times_array, init_bound, model):
-    num_traj = traj_array.shape[-1]
