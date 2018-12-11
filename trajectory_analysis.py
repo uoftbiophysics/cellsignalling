@@ -42,7 +42,7 @@ def get_moment_timeseries(traj_array, times_array):
         var_1or2 = {'mode_1': 'var_n', 'mode_2': 'var_m'}[model]
         moment_curves[mean_1or2] = np.zeros(len(moment_times))
         moment_curves[var_1or2] = np.zeros(len(moment_times))
-        moment_curves[distro_1or2] = np.zeros((len(moment_times), num_traj))
+        moment_curves[distro_1or2] = np.zeros((len(moment_times), num_traj), dtype=int)
         for idx, t in enumerate(moment_times):
             statesum = 0.0
             statesquaresum = 0.0
@@ -58,8 +58,8 @@ def get_moment_timeseries(traj_array, times_array):
     else:
         assert model == 'combined'
         moment_curves = {key: np.zeros(len(moment_times)) for key in ['mean_n', 'mean_m', 'var_n', 'var_m', 'cov_nm']}
-        moment_curves['distribution_n'] = np.zeros((len(moment_times), num_traj))
-        moment_curves['distribution_m'] = np.zeros((len(moment_times), num_traj))
+        moment_curves['distribution_n'] = np.zeros((len(moment_times), num_traj), dtype=int)
+        moment_curves['distribution_m'] = np.zeros((len(moment_times), num_traj), dtype=int)
         for idx, t in enumerate(moment_times):
             statesum_n = 0.0
             statesquaresum_n = 0.0
@@ -90,8 +90,8 @@ def get_moment_timeseries(traj_array, times_array):
 if __name__ == '__main__':
     # settings
     model = 'mode_1'
-    num_traj = 2000
-    num_steps = 200
+    num_traj = 1000
+    num_steps = 2000
     init_bound = 1.0
     # simulate trajectories
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
@@ -101,7 +101,8 @@ if __name__ == '__main__':
     theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model)
 
     # specify histogram timepoints
-    hist_steps = [i*num_steps/10 for i in xrange(10)]
+    num_points = 20
+    hist_steps = [i*num_steps/num_points for i in xrange(num_points)]
 
     # model dependent plotting
     # TODO plot n,m histogram over time for some select timepoints...
@@ -115,7 +116,8 @@ if __name__ == '__main__':
         plot_vars(moment_times, data_moments['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
                   title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
         for step in hist_steps:
-            plot_hist(moment_times, data_moments['distribution_n'], step, model, state_label='n')
+            plot_hist(moment_times, data_moments['distribution_n'], step, model, state_label='n',
+                      theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'])
 
     elif model == 'mode_2':
         plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=1,
@@ -127,8 +129,8 @@ if __name__ == '__main__':
         plot_vars(moment_times, data_moments['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
                   title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
         for step in hist_steps:
-            plot_hist(moment_times, data_moments['distribution_m'], step, model, state_label='m')
-
+            plot_hist(moment_times, data_moments['distribution_m'], step, model, state_label='m',
+                      theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'])
 
     else:
         assert model == 'combined'
@@ -151,5 +153,7 @@ if __name__ == '__main__':
         plot_vars(moment_times, data_moments['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
                   title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
         for step in hist_steps:
-            plot_hist(moment_times, data_moments['distribution_2'], step, model, state_label='n')
-            plot_hist(moment_times, data_moments['distribution_m'], step, model, state_label='m')
+            plot_hist(moment_times, data_moments['distribution_2'], step, model, state_label='n',
+                      theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'])
+            plot_hist(moment_times, data_moments['distribution_m'], step, model, state_label='m',
+                      theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'])

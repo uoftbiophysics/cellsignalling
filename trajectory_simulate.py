@@ -86,7 +86,7 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
     - traj_array: num_steps x STATE_SIZE[model] x num_traj
     - times_array: num_steps x num_traj
     """
-    traj_array = np.zeros((num_steps, STATE_SIZE[model], num_traj))
+    traj_array = np.zeros((num_steps, STATE_SIZE[model], num_traj), dtype=int)
     times_array = np.zeros((num_steps, num_traj))
     # prep init cond of varying bound states (such that average is bound_fraction
     init_cond_base = INIT_CONDS[model]

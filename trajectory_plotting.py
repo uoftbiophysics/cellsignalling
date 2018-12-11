@@ -63,10 +63,18 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
     return plt.gca()
 
 
-def plot_hist(moment_times, data_observations, step, model, state_label='n', show=True):
+def plot_hist(moment_times, data_observations, step, model, state_label='n', theory_mean=None, theory_var=None, show=True):
     time = moment_times[step]
-    num_traj = data_observations.shape[1]
-    plt.hist(data_observations[step, :])  # TODO cleanup
+    hist_data = data_observations[step, :]
+    hist_bins = np.arange(0, hist_data.max() + 1.5) - 0.5
+    num_traj = len(hist_data)
+    count, bins, _ = plt.hist(data_observations[step, :]+0.01, bins=hist_bins)  # TODO cleanup
+    if theory_mean is not None:
+        assert theory_var is not None
+        mu = theory_mean[step]
+        sigma = np.sqrt(theory_var[step])
+        normal_at_bins = 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu)**2 / (2 * sigma**2))
+        plt.plot(bins, num_traj * normal_at_bins, '--k')
     plt.title('Histogram (%d traj) for %s, %s at step:%d, time:%.2f' % (num_traj, model, state_label, step, time))
     plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%s_%d_%.2f.png' % (model, state_label, step, time))
     if show:
