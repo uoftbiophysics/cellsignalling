@@ -166,3 +166,24 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
                                                        cov_val_3 + cov_val_4)
 
     return theory_curves
+
+
+def est_x_from_n(n, params, t):
+    return n/(params.k_p * t - n)
+
+
+def est_x_from_m(m, params, t):
+    # TODO issue that this depends on k_off? x contains k_off info...
+    print "warning... inferring k_off using information about k_off see formulae.py, est_x_from_m(...)"
+    return m/(params.k_off * t - m)
+
+
+def est_c_from_nm(n, m, params, t):
+    # TODO check
+    print "warning est_c_from_nm unchecked"
+    return 1
+
+def est_k_off_from_nm(n, m, params, t):
+    # TODO check
+    print "warning est_k_off_from_nm unchecked"
+    return 1
