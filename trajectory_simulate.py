@@ -38,6 +38,16 @@ def propensities(state, model, params=DEFAULT_PARAMS):
         propensities[2] = p.k_p * state[0]               # produce one n molecule
         propensities[3] = p.d_n * state[1]               # degradation n molecule
         propensities[4] = p.d_m * state[2]
+    elif model == 'kpr':
+        print "TODO: propensities for kpr model"
+        assert 1 == 2
+        # TODO propensities[0] = p.k_on * p.c * (1 - state[0])  # binding
+        # TODO propensities[1] = p.k_off * state[0]  # unbinding
+        # TODO propensities[2] = p.k_p * state[0]  # kpr forward step + GPCR event
+        # TODO propensities[3] = p.k_p * state[0]  # produce m
+        # TODO propensities[4] = p.k_p * state[0]  # fall off
+        propensities[5] = p.d_n * state[1]  # degradation n molecule
+        propensities[6] = p.d_m * state[2]
     return propensities
 
 
