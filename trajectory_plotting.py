@@ -82,45 +82,45 @@ def plot_hist(moment_times, data_observations, step, model, state_label='n', the
     return plt.gca()
 
 
-def plot_estimation(moment_times, estimate_data, model, params, theory_curves, est_label='x', show=True):
+def plot_estimation(moment_times, estimate_data, model, params, theory_curves, est='x', theory=False, show=True):
     # TODO care normalize var and implement theory
     print "CARE NORMALIZE EST VAR IN PLOT"
     p = params
 
     def true_model_value():
-        if est_label == 'x':
+        if est == 'x':
             model_value = p.k_on * p.c / p.k_off
-        elif est_label == 'c':
+        elif est == 'c':
             model_value = p.c
         else:
-            assert est_label == 'k_off'
+            assert est == 'k_off'
             model_value = p.k_off
         return model_value
 
     def est_theory(t):
         if model == 'mode_1':
-            assert est_label == 'x'
+            assert est == 'x'
             mu_n = theory_curves['mean_n'][idx]
             x_star = mu_n/(p.k_p*t - mu_n)
             est_mu_t = x_star
             est_var_t = (1/mu_n) * ((1 + x_star)**2 + 2 * p.k_p / p.k_off)
 
         elif model == 'mode_2':
-            assert est_label == 'x'
+            assert est == 'x'
             print "WARNING, est_theory() in plot_estimation() not implemented for mode_2"
             assert 1 == 2
             est_mu_t = -1
             est_var_t = -1
 
         else:
-            assert est_label in ['c', 'k_off']
+            assert est in ['c', 'k_off']
             mu_n = theory_curves['mean_n'][idx]
             mu_m = theory_curves['mean_m'][idx]
-            k_off_star = (p.k_p / p.k_off) * mu_m / mu_n
+            k_off_star = (p.k_p / p.k_on) * mu_m / mu_n
             c_star = k_off_star * mu_n / (p.k_p * t - mu_n)
             x_star = c_star * p.k_on / k_off_star
             factor = (1 + x_star) / (x_star * k_off_star * t)
-            if est_label == 'c':
+            if est == 'c':
                 est_mu_t = c_star
                 term_1 = (1 + 3 * x_star ** 2) / (1 + x_star) ** 2
                 term_2 = (k_off_star / p.k_p) * x_star * (1 + x_star - x_star**2 + x_star**3)
@@ -134,15 +134,18 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
 
     estimate_mean_at_t = np.zeros(moment_times.shape)
     estimate_var_at_t = np.zeros(moment_times.shape)
-    theory_mean_at_t = np.zeros(moment_times.shape)
-    theory_var_at_t = np.zeros(moment_times.shape)
     model_value = true_model_value()
     for idx in xrange(len(moment_times)):
-        est_mu_t, est_var_t = est_theory(moment_times[idx])
-        theory_mean_at_t[idx] = est_mu_t
-        theory_var_at_t[idx] = est_var_t
         estimate_mean_at_t[idx] = np.mean(estimate_data[idx, :])
         estimate_var_at_t[idx] = np.var(estimate_data[idx, :])
+
+    if theory:
+        theory_mean_at_t = np.zeros(moment_times.shape)
+        theory_var_at_t = np.zeros(moment_times.shape)
+        for idx in xrange(len(moment_times)):
+            est_mu_t, est_var_t = est_theory(moment_times[idx])
+            theory_mean_at_t[idx] = est_mu_t
+            theory_var_at_t[idx] = est_var_t
 
     plt.close()
     fig = plt.figure(figsize=(8, 6))
@@ -151,22 +154,24 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
     # plot mean over time
     ax1 = fig.add_subplot(121)
     ax1.plot(moment_times, estimate_mean_at_t, '-b', label='sample mean of estimate')
-    ax1.plot(moment_times, theory_mean_at_t, '--b', label='theory')
     ax1.plot(moment_times, [model_value for _ in moment_times], '--k', label='true value')
-    ax1.set_title('mean of estimate for %s' % est_label)
+    if theory:
+        ax1.plot(moment_times, theory_mean_at_t, '--b', label='theory')
+    ax1.set_title('mean of estimate for %s' % est)
     ax1.set_xlabel('t')
-    ax1.set_ylabel('<x_guess>')
+    ax1.set_ylabel('<%s_guess>' % est)
     ax1.legend()
     # plot var over time
     ax2 = fig.add_subplot(122)
     ax2.plot(moment_times, estimate_var_at_t, '-b', label='sample var of estimate')
-    ax2.plot(moment_times, theory_var_at_t, '--b', label='theory')
-    ax2.set_title('variance of estimate for %s' % est_label)
+    if theory:
+        ax2.plot(moment_times, theory_var_at_t, '--b', label='theory')
+    ax2.set_title('variance of estimate for %s' % est)
     ax2.set_xlabel('t')
-    ax2.set_ylabel('Var(x_guess)')
+    ax2.set_ylabel('Var(%s_guess)' % est)
     ax2.legend()
     # save and show
-    plt.savefig(FOLDER_OUTPUT + os.sep + 'est_%s_%s.png' % (model, est_label))
+    plt.savefig(FOLDER_OUTPUT + os.sep + 'est_%s_%s.png' % (model, est))
     if show:
         plt.show()
     return plt.gca()

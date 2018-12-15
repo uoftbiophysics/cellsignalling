@@ -168,22 +168,71 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
     return theory_curves
 
 
+
+
+
 def est_x_from_n(n, params, t):
     return n/(params.k_p * t - n)
 
 
+def est_c_from_n(n, params, t):
+    return n/(params.k_p * t - n) * (params.k_off / params.k_on)
+
+
+def est_k_off_from_n(n, params, t):
+    return (params.k_p * t - n) / n * (params.k_on * params.c)
+
+
 def est_x_from_m(m, params, t):
     # TODO issue that this depends on k_off? x contains k_off info...
-    print "warning... inferring k_off using information about k_off see formulae.py, est_x_from_m(...)"
+    print "warning... inferring x = k_on c / k_off using information about k_off see formulae.py, est_x_from_m(...)"
     return m/(params.k_off * t - m)
 
 
-def est_c_from_nm(n, m, params, t):
-    # TODO check
-    print "warning est_c_from_nm unchecked"
-    return 1
+def est_c_from_m(m, params, t):
+    return m/(params.k_off * t - m) * (params.k_off / params.k_on)
+
+
+def est_k_off_from_m(m, params, t):
+    k_on_c = params.k_on * params.c
+    return k_on_c * m / (k_on_c * t - m)
+
 
 def est_k_off_from_nm(n, m, params, t):
-    # TODO check
-    print "warning est_k_off_from_nm unchecked"
-    return 1
+    return (m / n) * (params.k_p / params.k_on)
+
+
+def est_c_from_nm(n, m, params, t):
+    k_off_guess = est_k_off_from_nm(n, m, params, t)
+    return k_off_guess * n / (params.k_p * t - n)
+
+
+def estimate_general(state, params, t, model, est):
+    assert model in VALID_MODELS
+    assert est in ['x','c','k_off']
+    if model == 'mode_1':
+        if est == 'x':
+            est = est_x_from_n(state[1], params, t)
+        elif est == 'c':
+            est = est_c_from_n(state[1], params, t)
+        else:
+            est = est_k_off_from_n(state[1], params, t)
+    elif model == 'mode_2':
+        if est == 'x':
+            est = est_x_from_m(state[1], params, t)
+        elif est == 'c':
+            est = est_c_from_m(state[1], params, t)
+        else:
+            est = est_k_off_from_m(state[1], params, t)
+    elif model == 'combined':
+        if est == 'x':
+            print "Warning, est == 'x' for model 'combined' not implemented, setting est = -99"
+            est = -99
+        elif est == 'c':
+            est = est_c_from_nm(state[1], state[2], params, t)
+        else:
+            est = est_k_off_from_nm(state[1], state[2], params, t)
+    else:
+        print "Warning, model %s not implemented in estimate_general() in formulae.py" % model
+        assert 1 == 2
+    return est
