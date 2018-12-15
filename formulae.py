@@ -168,9 +168,6 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
     return theory_curves
 
 
-
-
-
 def est_x_from_n(n, params, t):
     return n/(params.k_p * t - n)
 
@@ -198,13 +195,17 @@ def est_k_off_from_m(m, params, t):
     return k_on_c * m / (k_on_c * t - m)
 
 
+def est_k_d_from_nm(n, m, params, t):
+    return (m / n) * (params.k_p / params.k_on)   # note k_d = k_off / k_on
+
+
 def est_k_off_from_nm(n, m, params, t):
-    return (m / n) * (params.k_p / params.k_on)
+    return (m / n) * (params.k_p)
 
 
 def est_c_from_nm(n, m, params, t):
     k_off_guess = est_k_off_from_nm(n, m, params, t)
-    return k_off_guess * n / (params.k_p * t - n)
+    return (k_off_guess / params.k_on) * n / (params.k_p * t - n)
 
 
 def estimate_general(state, params, t, model, est):

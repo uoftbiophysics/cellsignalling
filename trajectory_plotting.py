@@ -68,6 +68,7 @@ def plot_hist(moment_times, data_observations, step, model, state_label='n', the
     hist_data = data_observations[step, :]
     hist_bins = np.arange(0, hist_data.max() + 1.5) - 0.5
     num_traj = len(hist_data)
+    plt.close()
     count, bins, _ = plt.hist(data_observations[step, :]+0.01, bins=hist_bins)  # TODO cleanup
     if theory_mean is not None:
         assert theory_var is not None
@@ -116,8 +117,12 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
             assert est in ['c', 'k_off']
             mu_n = theory_curves['mean_n'][idx]
             mu_m = theory_curves['mean_m'][idx]
-            k_off_star = (p.k_p / p.k_on) * mu_m / mu_n
-            c_star = k_off_star * mu_n / (p.k_p * t - mu_n)
+            """
+            k_d_star = (p.k_p / p.k_on) * mu_m / mu_n  # this is "k_d_star = k_off_star / p.k_on"
+            c_star = k_d_star * mu_n / (p.k_p * t - mu_n)
+            """
+            k_off_star = p.k_p * mu_m / mu_n
+            c_star = (k_off_star / p.k_on) * mu_n / (p.k_p * t - mu_n)
             x_star = c_star * p.k_on / k_off_star
             factor = (1 + x_star) / (x_star * k_off_star * t)
             if est == 'c':
