@@ -39,15 +39,13 @@ def propensities(state, model, params=DEFAULT_PARAMS):
         propensities[3] = p.d_n * state[1]               # degradation n molecule
         propensities[4] = p.d_m * state[2]
     elif model == 'kpr':
-        print "TODO: propensities for kpr model"
-        assert 1 == 2
-        # TODO propensities[0] = p.k_on * p.c * (1 - state[0])  # binding
-        # TODO propensities[1] = p.k_off * state[0]  # unbinding
-        # TODO propensities[2] = p.k_p * state[0]  # kpr forward step + GPCR event
-        # TODO propensities[3] = p.k_p * state[0]  # produce m
-        # TODO propensities[4] = p.k_p * state[0]  # fall off
-        propensities[5] = p.d_n * state[1]  # degradation n molecule
-        propensities[6] = p.d_m * state[2]
+        propensities[0] = p.k_on * p.c * (1 - state[0]) * (1 - state[1])  # binding
+        propensities[1] = p.k_off * state[0]                              # unbinding
+        propensities[2] = p.k_f * state[0]                                # kpr forward step + GPCR event
+        propensities[3] = p.k_off * state[1]                              # fall off
+        propensities[4] = p.k_p * state[1]                                # produce n
+        propensities[5] = p.d_n * state[2]                                # degradation n molecule
+        propensities[6] = p.d_m * state[3]
     return propensities
 
 
@@ -112,20 +110,20 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
 
 if __name__ == '__main__':
     # settings
-    model = 'mode_1'
+    model = 'kpr'
     num_traj = 200
     num_steps = 100
-    init_bound = 1.0
+    init_bound = 0.0
     # compute
-    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps)
+    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model='kpr')
     # plot trajectories
     for k in xrange(num_traj):
         times_k = times_array[:, k]
         traj_k = traj_array[:, 1, k]
         plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)
     # decorate
-    plt.title('Mode 1 - %d trajectories' % num_traj)
+    plt.title('Model: %s - %d trajectories' % (model, num_traj))
     plt.xlabel('time')
-    plt.ylabel('n')
+    plt.ylabel('kpr fraction')
     plt.legend()
     plt.show()

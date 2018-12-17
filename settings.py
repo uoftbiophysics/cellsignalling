@@ -24,6 +24,7 @@ GLOB_K_OFF = 40.0
 GLOB_K_P = 2.0
 GLOB_DEG_N = 0.0
 GLOB_DEG_M = 0.0
+GLOB_K_F = 2.5
 
 # initial conditions (for single trajectory)
 GLOB_N0 = 0.0
@@ -46,12 +47,12 @@ NUM_RXN = {'mode_1': 4,
 STATE_SIZE = {'mode_1': 2,
               'mode_2': 2,
               'combined': 3,
-              'kpr': 3}
+              'kpr': 4}
 # init cond for each model
 INIT_CONDS = {'mode_1': [GLOB_BOUND_BOOL, GLOB_N0],
               'mode_2': [GLOB_BOUND_BOOL, GLOB_M0],
               'combined': [GLOB_BOUND_BOOL, GLOB_N0, GLOB_M0],
-              'kpr': [GLOB_BOUND_BOOL, GLOB_N0, GLOB_M0]}               # TODO handle init cond for kpr
+              'kpr': [GLOB_BOUND_BOOL, 0, GLOB_N0, GLOB_M0]}               # TODO handle init cond for kpr
 # reaction event update dictionary for each model
 UPDATE_DICTS = {
     'mode_1': {0: np.array([1.0, 0.0]),    # binding
@@ -66,11 +67,11 @@ UPDATE_DICTS = {
                  2: np.array([0.0, 1.0, 0.0]),     # production of n
                  3: np.array([0.0, -1.0, 0.0]),    # degradation n
                  4: np.array([0.0, 0.0, -1.0])},   # degradation m
-    'kpr': {0: np.array([1.0, 0.0, 0.0]),   # binding
-            1: np.array([-1.0, 0.0, 0.0]),  # unbinding
-            2: np.array([1.0, 0.0, 1.0]),   # kpr forward step + GPCR event
-            3: np.array([0.0, 1.0, 0.0]),   # produce m
-            4: np.array([-2.0, 0.0, 0.0]),  # fall off
-            5: np.array([0.0, -1.0, 0.0]),  # degradation n
-            6: np.array([0.0, 0.0, -1.0])}  # degradation m
+    'kpr': {0: np.array([1.0, 0.0, 0.0, 0.0]),    # binding
+            1: np.array([-1.0, 0.0, 0.0, 0.0]),   # unbinding
+            2: np.array([-1.0, 1.0, 0.0, 1.0]),   # kpr forward step + GPCR event
+            3: np.array([0.0, -1.0, 0.0, 0.0]),   # fall off
+            4: np.array([0.0, 0.0, 1.0, 0.0]),    # produce n
+            5: np.array([0.0, 0.0, -1.0, 0.0]),   # degradation n
+            6: np.array([0.0, 0.0, 0.0, -1.0])}   # degradation m
 }

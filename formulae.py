@@ -16,7 +16,7 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
     assert model in VALID_MODELS
 
     # unpack params
-    c, k_on, k_off, k_p, x, pss, r, d_n, d_m = p.unpack()
+    c, k_on, k_off, k_p, x, pss, r, d_n, d_m, k_f = p.unpack()
     assert d_n == 0.0  # no theory for this case
     assert d_m == 0.0  # no theory for this case
     init_p0 = 1 - bound_fraction
