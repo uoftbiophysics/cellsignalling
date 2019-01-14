@@ -98,7 +98,7 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
             model_value = p.k_off
         return model_value
 
-    def est_theory(t):
+    def est_theory(idx, t):
         if model == 'mode_1':
             assert est == 'x'
             mu_n = theory_curves['mean_n'][idx]
@@ -122,19 +122,22 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
             c_star = k_d_star * mu_n / (p.k_p * t - mu_n)
             """
             k_off_star = p.k_p * mu_m / mu_n
-            c_star = (k_off_star / p.k_on) * mu_n / (p.k_p * t - mu_n)
+            #c_star = (k_off_star / p.k_on) * mu_n / (p.k_p * t - mu_n)
+            c_star = (1.0 / p.k_on) * (mu_m / t) / (1 - mu_n / (p.k_p *t))
             x_star = c_star * p.k_on / k_off_star
-            factor = (1 + x_star) / (x_star * k_off_star * t)
+
+            # terms common to both sigma_c and s0gma_k_off
+            factor_1 = 1 + x_star + x_star ** 2 + x_star ** 3
+            factor_2 = 1 + 2 * p.k_p / (k_off_star * (1 + x_star) ** 2)
+            factor_3 = 1 - k_off_star / (p.k_p + k_off_star * (1 + x_star) ** 2)
+            den = p.k_p * t * x_star
             if est == 'c':
                 est_mu_t = c_star
-                term_1 = (1 + 3 * x_star ** 2) / (1 + x_star) ** 2
-                term_2 = (k_off_star / p.k_p) * x_star * (1 + x_star - x_star**2 + x_star**3)
-                est_var_t = c_star ** 2 * factor * (term_1 + term_2)
+                est_var_t = c_star ** 2 * factor_1 * factor_2 * factor_3 / den
             else:
                 est_mu_t = k_off_star
-                term_1 = (3 + x_star ** 2) / (1 + x_star) ** 2
-                term_2 = (k_off_star / p.k_p) * ((1 + x_star**2) - 2 * (1 - x_star))
-                est_var_t = k_off_star ** 2 * factor * (term_1 + term_2)
+                factor_4 = (1 + p.k_p / k_off_star) / (x_star ** 2 + p.k_p / k_off_star)
+                est_var_t = k_off_star ** 2 * factor_1 * factor_2 * factor_3 * factor_4 / den
         return est_mu_t, est_var_t
 
     estimate_mean_at_t = np.zeros(moment_times.shape)
@@ -148,7 +151,7 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
         theory_mean_at_t = np.zeros(moment_times.shape)
         theory_var_at_t = np.zeros(moment_times.shape)
         for idx in xrange(len(moment_times)):
-            est_mu_t, est_var_t = est_theory(moment_times[idx])
+            est_mu_t, est_var_t = est_theory(idx, moment_times[idx])
             theory_mean_at_t[idx] = est_mu_t
             theory_var_at_t[idx] = est_var_t
 

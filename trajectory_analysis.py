@@ -3,6 +3,7 @@ import numpy as np
 
 from formulae import theory_moments, estimate_general
 from params import DEFAULT_PARAMS
+from settings import GLOB_PSS_BOUND
 from trajectory_plotting import plot_traj_and_mean_sd, plot_means, plot_vars, plot_hist, plot_estimation
 from trajectory_simulate import multitraj
 
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     model = 'combined'
     num_traj = 1000
     num_steps = 2000
-    init_bound = 1.0
+    init_bound = 0.0
     # model specification
     params = DEFAULT_PARAMS
     # simulate trajectories

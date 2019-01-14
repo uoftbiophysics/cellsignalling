@@ -18,13 +18,17 @@ if not os.path.exists(FOLDER_OUTPUT):
     os.makedirs(FOLDER_OUTPUT)
 
 # model parameters
-GLOB_C = 4.0
-GLOB_K_ON = 5.0
-GLOB_K_OFF = 40.0
+GLOB_C = 1.0
+GLOB_K_ON = 1.0
+GLOB_K_OFF = 20.0
 GLOB_K_P = 2.0
 GLOB_DEG_N = 0.0
 GLOB_DEG_M = 0.0
 GLOB_K_F = 2.5
+
+# defined
+GLOB_X = GLOB_C * GLOB_K_ON / GLOB_K_OFF
+GLOB_PSS_BOUND = GLOB_X / (1 + GLOB_X)
 
 # initial conditions (for single trajectory)
 GLOB_N0 = 0.0

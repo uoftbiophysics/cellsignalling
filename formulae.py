@@ -200,12 +200,17 @@ def est_k_d_from_nm(n, m, params, t):
 
 
 def est_k_off_from_nm(n, m, params, t):
-    return (m / n) * (params.k_p)
+    if n == 0:
+        print 'WARNING for est_k_off_from_nm() -- n==0 at time %.3f (set n=1)' % t
+        n = 1.0
+    return (float(m) / float(n)) * (params.k_p)
 
 
 def est_c_from_nm(n, m, params, t):
-    k_off_guess = est_k_off_from_nm(n, m, params, t)
-    return (k_off_guess / params.k_on) * n / (params.k_p * t - n)
+    #k_off_guess = est_k_off_from_nm(n, m, params, t)
+    #return (k_off_guess / params.k_on) * float(n) / (params.k_p * t - float(n))
+    c_star = (1.0 / params.k_on) * (m / t) / (1 - n / (params.k_p * t))
+    return c_star
 
 
 def estimate_general(state, params, t, model, est):
