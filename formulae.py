@@ -191,10 +191,10 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             C = 2 * x * (1 + g * (3 + x + g * (3 + x * (3 + x))))
             theory_curves['var_m'][idx] = A *(B + C)
 
-            A = k_p * x / ((1 + g) ** 3 * (1 + x) ** 4)
-            B = (1 + g) * t * x * (1 + x)
-            C = - (1 + g) * k_off * t ** 2 * x * (1 + x) ** 2
-            D = 1/k_off * (1 - x + g**2 * (1 + x)**2 - g * (-2 + x + x**2))
+            A = k_p * x / ((1 + g) ** 4 * (1 + x) ** 4 * k_off)
+            B = -1 + x + g**3 * (-1 + k_off * t) * (1 + x)**3
+            C = k_off * (t - t * x ** 2) - g * (-1 + x) * (3 + x) * (-1 + k_off * t * (1 + x))
+            D = g ** 2 * (-3 + x ** 2 * (2 + x) + k_off * t * (1 + x) * (3 + x))
             theory_curves['cov_nm'][idx] = A * (B + C + D)
     return theory_curves
 
