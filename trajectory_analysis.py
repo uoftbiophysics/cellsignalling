@@ -70,8 +70,7 @@ def get_moment_timeseries(traj_array, times_array, params):
 
             moment_curves[mean_1or2][idx] = statesum / num_traj
             moment_curves[var_1or2][idx] = statesquaresum / num_traj - moment_curves[mean_1or2][idx]**2
-    else:
-        assert model == 'combined'
+    elif model == 'combined':
         moment_curves = {key: np.zeros(len(moment_times)) for key in ['mean_n', 'mean_m', 'var_n', 'var_m', 'cov_nm']}
         moment_curves['distribution_n'] = np.zeros((len(moment_times), num_traj), dtype=int)
         moment_curves['distribution_m'] = np.zeros((len(moment_times), num_traj), dtype=int)
@@ -105,14 +104,50 @@ def get_moment_timeseries(traj_array, times_array, params):
             moment_curves['var_m'][idx] = statesquaresum_m / num_traj - moment_curves['mean_m'][idx]**2
             moment_curves['cov_nm'][idx] = stateprod_nm / num_traj - \
                                            moment_curves['mean_n'][idx] * moment_curves['mean_m'][idx]
+
+    else:
+        assert model == 'kpr'
+        moment_curves = {key: np.zeros(len(moment_times)) for key in ['mean_n', 'mean_m', 'var_n', 'var_m', 'cov_nm']}
+        moment_curves['distribution_n'] = np.zeros((len(moment_times), num_traj), dtype=int)
+        moment_curves['distribution_m'] = np.zeros((len(moment_times), num_traj), dtype=int)
+        moment_curves['estimate_c'] = np.zeros((len(moment_times), num_traj))
+        moment_curves['estimate_k_off'] = np.zeros((len(moment_times), num_traj))
+
+        for idx, t in enumerate(moment_times):
+            statesum_n = 0.0
+            statesquaresum_n = 0.0
+            statesum_m = 0.0
+            statesquaresum_m = 0.0
+            stateprod_nm = 0.0
+            for k in xrange(num_traj):
+                state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
+                last_step[k] = step
+                statesum_n += state_at_t[2]
+                statesquaresum_n += state_at_t[2] ** 2
+                statesum_m += state_at_t[3]
+                statesquaresum_m += state_at_t[3] ** 2
+                stateprod_nm += state_at_t[2] * state_at_t[3]
+                # store n(t) and m(t) for each trajectory to get histogram evolution
+                moment_curves['distribution_n'][idx][k] = state_at_t[2]
+                moment_curves['distribution_m'][idx][k] = state_at_t[3]
+                # estimate x from mode_1 and mode_2 current "data" n(t) or m(t)
+                moment_curves['estimate_c'][idx][k] = estimate_general(state_at_t, params, t, model, 'c')
+                moment_curves['estimate_k_off'][idx][k] = estimate_general(state_at_t, params, t, model, 'k_off')
+
+            moment_curves['mean_n'][idx] = statesum_n / num_traj
+            moment_curves['mean_m'][idx] = statesum_m / num_traj
+            moment_curves['var_n'][idx] = statesquaresum_n / num_traj - moment_curves['mean_n'][idx] ** 2
+            moment_curves['var_m'][idx] = statesquaresum_m / num_traj - moment_curves['mean_m'][idx] ** 2
+            moment_curves['cov_nm'][idx] = stateprod_nm / num_traj - \
+                                           moment_curves['mean_n'][idx] * moment_curves['mean_m'][idx]
     return moment_curves, moment_times
 
 
 if __name__ == '__main__':
     # settings
-    model = 'combined'
-    num_traj = 1000
-    num_steps = 2000
+    model = 'kpr'
+    num_traj = 500
+    num_steps = 1000
     init_bound = 0.0
     # model specification
     params = DEFAULT_PARAMS
@@ -160,8 +195,7 @@ if __name__ == '__main__':
             plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
                       theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
 
-    else:
-        assert model == 'combined'
+    elif model == 'combined':
         plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
                               data_mean=simdata['mean_n'], data_var=simdata['var_n'],
                               theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
@@ -187,3 +221,33 @@ if __name__ == '__main__':
                       theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
             plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
                       theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+    else:
+        assert model == 'kpr'
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=2,
+                              data_mean=simdata['mean_n'], data_var=simdata['var_n'],
+                              theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
+                              title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=3,
+                              data_mean=simdata['mean_m'], data_var=simdata['var_m'],
+                              theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
+                              title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+        plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
+                   title='%s <n>(t) for %d trajectories' % (model, num_traj))
+        plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
+                   title='%s <m>(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
+                  title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
+                  title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
+        plot_vars(moment_times, simdata['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
+                  title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
+        # TODO
+        """
+        #plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, theory=True, est='c')
+        #plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, theory=True, est='k_off')
+        for step in hist_steps:
+            plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
+                      theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
+            plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
+                      theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+        """

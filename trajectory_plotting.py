@@ -114,6 +114,7 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
             est_var_t = -1
 
         else:
+            assert model == 'combined'
             assert est in ['c', 'k_off']
             mu_n = theory_curves['mean_n'][idx]
             mu_m = theory_curves['mean_m'][idx]

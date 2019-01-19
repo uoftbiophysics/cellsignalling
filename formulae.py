@@ -106,9 +106,8 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             theory_curves['mean_m'][idx] = (x1 * bound_fraction + x2) / (r ** 2)
             theory_curves['var_m'][idx] = var_term_1 + var_term_2 - (var_term_3 + var_term_4) ** 2 + var_term_8
 
-    else:
+    elif model == 'combined':
         assert method == 'generating'
-        assert model == 'combined'
         theory_curves['mean_n'] = np.zeros(moment_times.shape[0])
         theory_curves['var_n'] = np.zeros(moment_times.shape[0])
         theory_curves['mean_m'] = np.zeros(moment_times.shape[0])
@@ -164,7 +163,39 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             theory_curves['cov_nm'][idx] = -c * k_on * k_p * np.exp(-2 * r * t) / (r ** 4) * (
                 cov_val_1) - c * k_on * k_p / (r ** 4) * (cov_val_2) - c * k_on * k_p * np.exp(-r * t) / (r ** 4) * (
                                                        cov_val_3 + cov_val_4)
+    else:
+        assert method == 'generating'
+        assert model == 'kpr'
+        theory_curves['mean_n'] = np.zeros(moment_times.shape[0])
+        theory_curves['var_n'] = np.zeros(moment_times.shape[0])
+        theory_curves['mean_m'] = np.zeros(moment_times.shape[0])
+        theory_curves['var_m'] = np.zeros(moment_times.shape[0])
+        theory_curves['cov_nm'] = np.zeros(moment_times.shape[0])
 
+        g = k_off / k_f
+        for idx, t in enumerate(moment_times):
+
+            theory_curves['mean_n'][idx] = (k_f * k_p * t) / (k_f + k_off) * x / (1 + x)
+            theory_curves['mean_m'][idx] = (k_f * k_off * t) / (k_f + k_off) * x / (1 + x)
+
+            A1 = k_p * x * ((1 + g) ** 4 * k_off ** 2 * (1 + x) ** 4) ** (-1.0)
+            A2 = (1+g)**3 * k_off**2 * t * (1+x)**3
+            A30 = -1 + k_off * t * (1 + x)
+            A31 = g ** 3 * (-1 + k_off * t) * (1 + x) ** 3
+            A32 = g * (3 + x) * A30
+            A33 = g**2 * A30 * (3 + x * (3 + x))
+            theory_curves['var_n'][idx] = A1 * (A2 + 2*k_p * (A30 + A31 + A32 + A33))
+
+            A = x / ((1 + g) ** 4 * (1 + x) ** 4)
+            B = (1 + g) * k_off * t * (1 + x) * (1 + 2 * g + x**2 + g**2 * (1 + x)**2)
+            C = 2 * x * (1 + g * (3 + x + g * (3 + x * (3 + x))))
+            theory_curves['var_m'][idx] = A *(B + C)
+
+            A = k_p * x / ((1 + g) ** 3 * (1 + x) ** 4)
+            B = (1 + g) * t * x * (1 + x)
+            C = - (1 + g) * k_off * t ** 2 * x * (1 + x) ** 2
+            D = 1/k_off * (1 - x + g**2 * (1 + x)**2 - g * (-2 + x + x**2))
+            theory_curves['cov_nm'][idx] = A * (B + C + D)
     return theory_curves
 
 
@@ -236,6 +267,15 @@ def estimate_general(state, params, t, model, est):
             est = -99
         elif est == 'c':
             est = est_c_from_nm(state[1], state[2], params, t)
+        else:
+            est = est_k_off_from_nm(state[1], state[2], params, t)
+    elif model == 'kpr':
+        if est == 'x':
+            print "Warning, est == 'x' for model 'combined' not implemented, setting est = -99"
+            est = -99
+        elif est == 'c':
+            g = params.k_off / params.k_f
+            est = est_c_from_nm(state[1] * (1 + g), state[2], params, t)
         else:
             est = est_k_off_from_nm(state[1], state[2], params, t)
     else:
