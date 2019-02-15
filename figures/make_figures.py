@@ -256,9 +256,23 @@ def make_figure_C3():
 def make_figure_D1():
     """
     Mode 1 with a prior, plotting MLE for x vs x and comparing to heuristic (ie. non-prior prediction)
+    One Panel.
     """
-    return 0
+    # Set up figure
+    fig, ax = plt.subplots()
+    ax.set_xlabel(DATADICT["mode1_MLE_compare_heuristic"]['xlab'])
+    ax.set_ylabel(DATADICT["mode1_MLE_compare_heuristic"]['ylab'])
+    # Plot curves
+    ax.plot(DATADICT["mode1_MLE_compare_heuristic"]['xpts'][0:399],
+            DATADICT["mode1_MLE_compare_heuristic"]['ypts'][0:399], 'r')
 
+    ax.plot(DATADICT["mode1_MLE_compare_heuristic"]['xpts'][400:],
+            DATADICT["mode1_MLE_compare_heuristic"]['ypts'][400:], 'r')
+
+    ax.scatter(DATADICT["mode1_MLE_compare_prior"]['xpts'], DATADICT["mode1_MLE_compare_prior"]['ypts'], c='b')
+    # Save figure
+    plt.savefig(os.path.join(DIR_OUTPUT, 'figureD1.pdf'))
+    plt.savefig(os.path.join(DIR_OUTPUT, 'figureD1.eps'))
 
 if __name__ == "__main__":
     make_figure_2()
