@@ -23,7 +23,7 @@ def make_figure_2():
     # plot
     fig, axarr = plt.subplots(nrows=1, ncols=2)
     fig.set_size_inches(10, 5)
-    plt.suptitle(r'Mode 1: Mean $n$ and relative error in $x$ estimate ($k_p=10$, $t=120$)')
+    plt.suptitle(r'Mode 1: Mean $n$ and relative error in $x$ estimate')
     # left plot
     axarr[0].plot(curveLk['xpts'], curveLk['ypts'], 'k', label=r'$k_{off}=10$')
     axarr[0].plot(curveLkUp['xpts'], curveLkUp['ypts'], 'k--')
@@ -34,11 +34,13 @@ def make_figure_2():
     axarr[0].set_xlabel(r'$c$')
     axarr[0].set_ylabel(r'$\langle n\rangle/k_pt$')
     axarr[0].legend()
+    axarr[0].set_title(r'($k_p=10$, $t=120$)')
     # right plot
     axarr[1].plot(curveR['xpts'], curveR['ypts'], 'k')
     axarr[1].set_xlabel(r'$x$')
     axarr[1].set_ylabel(r'$\langle\delta x^{2}\rangle$/$x^{2}$')
     axarr[1].set_ylim([0, 1.5])
+    axarr[1].set_title('($k_p=10$, $t=100$, $k_{off}=1$)')
     # save figure
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
