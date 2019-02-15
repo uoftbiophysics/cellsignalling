@@ -1,14 +1,10 @@
-from settings import *
-import numpy as np
 import matplotlib.pyplot as plt
-from load_inputs import DATADICT
+import numpy as np
 import os
 
-def make_figure_3():
-    """
-    Panel A: rel_err_c
-    """
-    return 0
+from load_inputs import DATADICT
+from settings import DIR_OUTPUT
+
 
 def make_figure_2():
     """
@@ -40,9 +36,72 @@ def make_figure_2():
 
     # Save figure
     plt.savefig(os.path.join(DIR_OUTPUT, 'figure2.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure2.png'))
+    plt.savefig(os.path.join(DIR_OUTPUT, 'figure2.eps'))
+
+
+def make_figure_3():
+    """
+    Panel A: rel_err_c
+    """
+    return 0
+
+
+def make_figure_5():
+    """
+    """
+    return 0
+
+
+def make_figure_B1():
+    """
+    """
+    return 0
+
+
+def make_figure_B2():
+    """
+    """
+    return 0
+
+
+def make_figure_B3():
+    """
+    """
+    return 0
+
+
+def make_figure_C1():
+    """
+    """
+    return 0
+
+
+def make_figure_C2():
+    """
+    """
+    return 0
+
+
+def make_figure_C3():
+    """
+    """
+    return 0
+
+
+def make_figure_D1():
+    """
+    """
+    return 0
 
 
 if __name__ == "__main__":
     make_figure_2()
-
+    make_figure_3()
+    make_figure_5()
+    make_figure_B1()
+    make_figure_B2()
+    make_figure_B3()
+    make_figure_C1()
+    make_figure_C2()
+    make_figure_C3()
+    make_figure_D1()
