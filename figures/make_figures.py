@@ -187,12 +187,12 @@ def make_figure_C1():
     """
     figname = 'mode1_error_compare'
     curve1 = DATADICT[figname + '_heuristic']
-    # TODO curve2 = saddlepoint
+    curve2 = DATADICT[figname + '_saddlePointFisher']
     curve3 = DATADICT[figname + '_fullFisher']
     # plot
     plt.figure(figsize=(10, 5))
     plt.plot(curve1['xpts'], curve1['ypts'], 'k', label='Simple Fisher')
-    # TODO plt.scatter(curve2['xpts'], curve2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
+    plt.scatter(curve2['xpts'], curve2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
     plt.scatter(curve3['xpts'], curve3['ypts'], c='r', label='Numeric Fisher (Full)')
     # axis
     plt.title('Mode 1: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$)')
@@ -298,7 +298,7 @@ def make_figure_D1():
     curve2 = DATADICT[figname + '_prior']
     # plot setup
     plt.figure(figsize=(10, 5))
-    plt.title('Mode 1: MLE comparison non-uniform prior ($k_p=10$, $t=100$, $k_{off}=1, $a=0.001$)')
+    plt.title(r'Mode 1: MLE comparison non-uniform prior ($k_p=10$, $t=100$, $k_{off}=1$, $a=0.001$)')
     plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], 'r', label='heuristic')
     plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], 'r')
     plt.scatter(curve2['xpts'], curve2['ypts'], c='b', label='numeric with prior')
