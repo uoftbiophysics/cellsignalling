@@ -12,29 +12,35 @@ def make_figure_2():
     Panel A: <n> vs c for two different Kd, showing overlapping "clouds"
     Panel B: rel_err_x vs x for heuristic form of relative error
     """
-    fig, axes = plt.subplots(nrows=1, ncols=2)
+    figname = 'mode1_composite'
+    curveLk = DATADICT[figname + '_mean_N_Black']
+    curveLkUp = DATADICT[figname + '_Err_N_Black_Upper']
+    curveLkLow = DATADICT[figname + '_Err_N_Black_Lower']
+    curveLr = DATADICT[figname + '_mean_N_Red']
+    curveLrUp = DATADICT[figname + '_Err_N_Red_Upper']
+    curveLrLow = DATADICT[figname + '_Err_N_Red_Lower']
+    curveR = DATADICT['mode1_error_compare_heuristic']
+    # plot
+    fig, axarr = plt.subplots(nrows=1, ncols=2)
     fig.set_size_inches(10, 5)
-    # Panel A
-    axes[0].set_xlabel(DATADICT["mode1_composite_mean_N_Black"]['xlab'])
-    axes[0].set_ylabel(DATADICT["mode1_composite_mean_N_Black"]['ylab'])
-    #panelA_xticks = ["%.2f" % el for el in DATADICT["mode1_composite_mean_N_Black"]['xpts'][0::int(len(DATADICT["mode1_composite_mean_N_Black"]['xpts'])/8)]]
-    #panelA_yticks = [0.2 * r for r in range(6)]
-    #axes[0].xticks([float(el) for el in panelA_xticks], panelA_xticks)
-    #axes[0].yticks(panelA_yticks, ["%.2f" % el for el in panelA_yticks])
-    axes[0].plot(DATADICT["mode1_composite_mean_N_Black"]['xpts'], DATADICT["mode1_composite_mean_N_Black"]['ypts'], 'k')
-    axes[0].plot(DATADICT["mode1_composite_Err_N_Black_Upper"]['xpts'], DATADICT["mode1_composite_Err_N_Black_Upper"]['ypts'], 'k--')
-    axes[0].plot(DATADICT["mode1_composite_Err_N_Black_Lower"]['xpts'], DATADICT["mode1_composite_Err_N_Black_Lower"]['ypts'], 'k--')
-    axes[0].plot(DATADICT["mode1_composite_mean_N_Red"]['xpts'], DATADICT["mode1_composite_mean_N_Red"]['ypts'], 'r')
-    axes[0].plot(DATADICT["mode1_composite_Err_N_Red_Upper"]['xpts'], DATADICT["mode1_composite_Err_N_Red_Upper"]['ypts'], 'r--')
-    axes[0].plot(DATADICT["mode1_composite_Err_N_Red_Lower"]['xpts'], DATADICT["mode1_composite_Err_N_Red_Lower"]['ypts'], 'r--')
-    # Panel B
-    axes[1].plot(DATADICT["mode1_error_compare_heuristic"]['xpts'], DATADICT["mode1_error_compare_heuristic"]['ypts'], 'k')
-    axes[1].set_xlabel('x')
-    axes[1].set_ylabel(r'$\delta x^{2}$/$x^{2}$')
-    axes[1].set_ylim([0, 1.5])
+    plt.suptitle(r'Mode 1: Mean $n$ and relative error in $x$ estimate')
+    # left plot
+    axarr[0].plot(curveLk['xpts'], curveLk['ypts'], 'k')
+    axarr[0].plot(curveLkUp['xpts'], curveLkUp['ypts'], 'k--')
+    axarr[0].plot(curveLkLow['xpts'], curveLkLow['ypts'], 'k--')
+    axarr[0].plot(curveLr['xpts'], curveLr['ypts'], 'r')
+    axarr[0].plot(curveLrUp['xpts'], curveLrUp['ypts'], 'r--')
+    axarr[0].plot(curveLrLow['xpts'], curveLrLow['ypts'], 'r--')
+    axarr[0].set_xlabel(r'$c$')
+    axarr[0].set_ylabel(r'$\langle n\rangle/k_pt$')
+    # right plot
+    axarr[1].plot(curveR['xpts'], curveR['ypts'], 'k')
+    axarr[1].set_xlabel(r'$x$')
+    axarr[1].set_ylabel(r'$\langle\delta x^{2}\rangle$/$x^{2}$')
+    axarr[1].set_ylim([0, 1.5])
     # save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure2.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure2.eps'))
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
 def make_figure_3():
@@ -44,21 +50,22 @@ def make_figure_3():
     Left axis: rel_err_c vs x
     Right axis: rel_err_koff vs x
     """
-    # Set up figure
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
-
-    # Plot
-    ax1.plot(DATADICT["combined_error_composite_compare_c_heuristic"]['xpts'],
-              DATADICT["combined_error_composite_compare_c_heuristic"]['ypts'], 'k')
-    ax2.plot(DATADICT["combined_error_composite_compare_koff_heuristic"]['xpts'],
-              DATADICT["combined_error_composite_compare_koff_heuristic"]['ypts'], 'r')
-    ax1.set_xlabel(DATADICT["combined_error_composite_compare_c_heuristic"]['xlab'])
-    ax1.set_ylabel(DATADICT["combined_error_composite_compare_c_heuristic"]['ylab'])
-    ax2.set_ylabel(DATADICT["combined_error_composite_compare_koff_heuristic"]['ylab'])
+    figname = 'combined_error_composite_compare'
+    curve1 = DATADICT[figname + '_c_heuristic']
+    curve2 = DATADICT[figname + '_koff_heuristic']
+    # plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(curve1['xpts'], curve1['ypts'], 'k', label=r'$\langle\delta c^{2}\rangle$/$c^{2}$')
+    plt.plot(curve2['xpts'], curve2['ypts'], 'r', label=r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
+    plt.xlabel(r'$c$')
+    plt.ylabel('Relative error')
+    plt.title('Combined: MLE Relative error for $c$ and $k_{off}$')
+    plt.legend()
+    # set limits
+    plt.ylim(0, 1.3)
     # save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure3.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure3.eps'))
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
 def make_figure_5():
@@ -68,35 +75,37 @@ def make_figure_5():
     Left axis: rel_err_c vs x
     Right axis: rel_err_koff vs x
     """
-    # Set up figure
-    fig, ax1 = plt.subplots()
-    # For two y axes use:
-    ax2 = ax1.twinx()
-    # Plot
-    ax1.plot(DATADICT["KPR_error_composite_compare_c_heuristic"]['xpts'],
-              DATADICT["KPR_error_composite_compare_c_heuristic"]['ypts'], 'k')
-    ax2.plot(DATADICT["KPR_error_composite_compare_koff_heuristic"]['xpts'],
-              DATADICT["KPR_error_composite_compare_koff_heuristic"]['ypts'], 'r')
-    ax1.set_xlabel(DATADICT["KPR_error_composite_compare_c_heuristic"]['xlab'])
-    ax1.set_ylabel(DATADICT["KPR_error_composite_compare_c_heuristic"]['ylab'])
-    ax2.set_ylabel(DATADICT["KPR_error_composite_compare_koff_heuristic"]['ylab'])
+    figname = 'KPR_error_composite_compare'
+    curve1 = DATADICT[figname + '_c_heuristic']
+    curve2 = DATADICT[figname + '_koff_heuristic']
+    # plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(curve1['xpts'], curve1['ypts'], 'k', label=r'$\langle\delta c^{2}\rangle$/$c^{2}$')
+    plt.plot(curve2['xpts'], curve2['ypts'], 'r', label=r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
+    plt.xlabel(r'$c$')
+    plt.ylabel('Relative error')
+    plt.title('KPR: MLE Relative error for $c$ and $k_{off}$')
+    plt.legend()
+    # set limits
+    #plt.ylim(0, 0.3)
+    #plt.xlim(0, 10)
     # save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure5.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figure5.eps'))
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
 def make_figure_B1():
     """
     'mode1_MLE_compare' figure, 2 curves (numeric vs heuristic)
     """
-    # TODO fix asymptote, fix ylim
     figname = 'mode1_MLE_compare'
     curve1 = DATADICT[figname + '_numeric']
     curve2 = DATADICT[figname + '_heuristic']
     # plot
     plt.figure(figsize=(10, 5))
     c1 = plt.plot(curve1['xpts'], curve1['ypts'], 'ob', label='numeric')
-    c2 = plt.plot(curve2['xpts'], curve2['ypts'], 'r', label='heuristic')
+    c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], 'r', label='heuristic')
+    c2_part2 = plt.plot(curve2['xpts'][400:], curve2['ypts'][400:], 'r')
     plt.title('Mode 1 MLE: Numeric vs Heuristic')
     plt.xlabel(r'$n_{obs}$')
     plt.ylabel(r'$x_{MLE}$')
@@ -175,17 +184,25 @@ def make_figure_C1():
     Mode 1 relative error in x as estimated by two different methods.
     One panel.
     """
-    # Set up axes
-    fig, axes = plt.subplots()
-    axes.set_xlabel('x')
-    axes.set_ylabel(r'$\delta x^{2}$/$x^{2}$')
-    axes.set_ylim([0, 1.5])
-    # Plot
-    axes.plot(DATADICT["mode1_error_compare_heuristic"]['xpts'], DATADICT["mode1_error_compare_heuristic"]['ypts'], 'k')
-    axes.scatter(DATADICT["mode1_error_compare_fullFisher"]['xpts'], DATADICT["mode1_error_compare_fullFisher"]['ypts'], c='b')
+    figname = 'mode1_error_compare'
+    curve1 = DATADICT[figname + '_heuristic']
+    # TODO curve2 = saddlepoint
+    curve3 = DATADICT[figname + '_fullFisher']
+    # plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(curve1['xpts'], curve1['ypts'], 'k', label='Simple Fisher')
+    # TODO plt.scatter(curve2['xpts'], curve2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
+    plt.scatter(curve3['xpts'], curve3['ypts'], c='r', label='Numeric Fisher (Full)')
+    # axis
+    plt.title('Mode 1: MLE Relative error comparison')
+    plt.xlabel(r'$x$')
+    plt.ylabel(r'$\langle\delta x^{2}\rangle$/$x^{2}$')
+    plt.gca().set_xscale('log')
+    plt.ylim([0, 1.5])
+    plt.legend()
     # save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureC1.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureC1.eps'))
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
 def make_figure_C2():
@@ -194,33 +211,41 @@ def make_figure_C2():
     Panel A: relative error in c as estimated by heuristic, saddle point Fisher, and full Fisher
     Panel B: relative error in koff as estimated by heuristic, saddle point Fisher, and full Fisher
     """
-    # Set up axes
-    fig, axes = plt.subplots(nrows=1, ncols=2)
-    axes[0].set_xlabel(DATADICT["combined_error_composite_compare_c_heuristic"]['xlab'])
-    axes[1].set_xlabel(DATADICT["combined_error_composite_compare_koff_heuristic"]['xlab'])
-    axes[0].set_ylabel(r'$\delta c^{2}$/$c^{2}$')
-    axes[1].set_ylabel(r'$\delta koff^{2}$/$koff^{2}$')
-    axes[0].set_xscale('log')
-    axes[1].set_xscale('log')
-    # Plot
-    # Panel A:
-    axes[0].plot(DATADICT["combined_error_composite_compare_c_heuristic"]['xpts'],
-                 DATADICT["combined_error_composite_compare_c_heuristic"]['ypts'], 'k')
-    axes[0].scatter(DATADICT["combined_error_composite_compare_c_saddlePointFisher"]['xpts'],
-                    DATADICT["combined_error_composite_compare_c_saddlePointFisher"]['ypts'], c='b')
-    axes[0].scatter(DATADICT["combined_error_composite_compare_c_fullFisher"]['xpts'],
-                    DATADICT["combined_error_composite_compare_c_fullFisher"]['ypts'], c='r')
-
-    # Panel B:
-    axes[1].plot(DATADICT["combined_error_composite_compare_koff_heuristic"]['xpts'],
-                 DATADICT["combined_error_composite_compare_koff_heuristic"]['ypts'], 'k')
-    axes[1].scatter(DATADICT["combined_error_composite_compare_koff_saddlePointFisher"]['xpts'],
-                    DATADICT["combined_error_composite_compare_koff_saddlePointFisher"]['ypts'], c='b')
-    axes[1].scatter(DATADICT["combined_error_composite_compare_koff_fullFisher"]['xpts'],
-                    DATADICT["combined_error_composite_compare_koff_fullFisher"]['ypts'], c='r')
+    figname = 'combined_error_composite_compare'
+    curveL1 = DATADICT[figname + '_c_heuristic']
+    curveL2 = DATADICT[figname + '_c_saddlePointFisher']
+    curveL3 = DATADICT[figname + '_c_fullFisher']
+    curveR1 = DATADICT[figname + '_koff_heuristic']
+    curveR2 = DATADICT[figname + '_koff_saddlePointFisher']
+    curveR3 = DATADICT[figname + '_koff_fullFisher']
+    # set up axes
+    fig, axarr = plt.subplots(nrows=1, ncols=2)
+    plt.suptitle('Combined: MLE Relative error comparison')
+    axarr[0].set_xlabel(r'$c$')
+    axarr[1].set_xlabel(r'$c$')
+    axarr[0].set_ylabel('Relative error')
+    axarr[0].set_xscale('log')
+    axarr[1].set_xscale('log')
+    # fix to same ylim
+    ylow = -0.05
+    yhigh = 1.5
+    axarr[0].set_ylim(ylow, yhigh)
+    axarr[1].set_ylim(ylow, yhigh)
+    # left plot
+    axarr[0].set_title(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
+    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], 'k', label='Simple Fisher')
+    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
+    axarr[0].scatter(curveL3['xpts'], curveL3['ypts'], c='r', label='Numeric Fisher (Full)')
+    axarr[0].legend(fontsize=8)
+    # right plot
+    axarr[1].set_title(r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
+    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], 'k', label='Simple Fisher')
+    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
+    axarr[1].scatter(curveR3['xpts'], curveR3['ypts'], c='r', label='Numeric Fisher (Full)')
+    axarr[1].legend(fontsize=8)
     # save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureC2.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureC2.eps'))
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
 
 def make_figure_C3():
@@ -229,28 +254,37 @@ def make_figure_C3():
     Panel A: relative error in c as estimated by heuristic, and saddle point Fisher
     Panel B: relative error in koff as estimated by heuristic, and saddle point Fisher
     """
-    # Set up axes
-    fig, axes = plt.subplots(nrows=1, ncols=2)
-    axes[0].set_xlabel(DATADICT["KPR_error_composite_compare_c_heuristic"]['xlab'])
-    axes[1].set_xlabel(DATADICT["KPR_error_composite_compare_koff_heuristic"]['xlab'])
-    axes[0].set_ylabel(r'$\delta c^{2}$/$c^{2}$')
-    axes[1].set_ylabel(r'$\delta koff^{2}$/$koff^{2}$')
-    axes[0].set_xscale('log')
-    axes[1].set_xscale('log')
-    # Plot
-    # Panel A:
-    axes[0].plot(DATADICT["KPR_error_composite_compare_c_heuristic"]['xpts'],
-                 DATADICT["KPR_error_composite_compare_c_heuristic"]['ypts'], 'k')
-    axes[0].scatter(DATADICT["KPR_error_composite_compare_c_saddlePointFisher"]['xpts'],
-                    DATADICT["KPR_error_composite_compare_c_saddlePointFisher"]['ypts'], c='b')
-    # Panel B:
-    axes[1].plot(DATADICT["KPR_error_composite_compare_koff_heuristic"]['xpts'],
-                 DATADICT["KPR_error_composite_compare_koff_heuristic"]['ypts'], 'k')
-    axes[1].scatter(DATADICT["KPR_error_composite_compare_koff_saddlePointFisher"]['xpts'],
-                    DATADICT["KPR_error_composite_compare_koff_saddlePointFisher"]['ypts'], c='b')
+    figname = 'KPR_error_composite_compare'
+    curveL1 = DATADICT[figname + '_c_heuristic']
+    curveL2 = DATADICT[figname + '_c_saddlePointFisher']
+    curveR1 = DATADICT[figname + '_koff_heuristic']
+    curveR2 = DATADICT[figname + '_koff_saddlePointFisher']
+    # set up axes
+    fig, axarr = plt.subplots(nrows=1, ncols=2)
+    plt.suptitle('KPR: MLE Relative error comparison')
+    axarr[0].set_xlabel(r'$c$')
+    axarr[1].set_xlabel(r'$c$')
+    axarr[0].set_ylabel('Relative error')
+    axarr[0].set_xscale('log')
+    axarr[1].set_xscale('log')
+    # fix to same ylim
+    ylow = -0.1
+    yhigh = 2.5
+    axarr[0].set_ylim(ylow, yhigh)
+    axarr[1].set_ylim(ylow, yhigh)
+    # left plot
+    axarr[0].set_title(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
+    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], 'k', label='Simple Fisher')
+    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
+    axarr[0].legend(fontsize=8)
+    # right plot
+    axarr[1].set_title(r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
+    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], 'k', label='Simple Fisher')
+    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], c='b', label='Numeric Fisher (Saddle Point)')
+    axarr[1].legend(fontsize=8)
     # save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureC3.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureC3.eps'))
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
 
 def make_figure_D1():
@@ -258,21 +292,22 @@ def make_figure_D1():
     Mode 1 with a prior, plotting MLE for x vs x and comparing to heuristic (ie. non-prior prediction)
     One Panel.
     """
-    # Set up figure
-    fig, ax = plt.subplots()
-    ax.set_xlabel(DATADICT["mode1_MLE_compare_heuristic"]['xlab'])
-    ax.set_ylabel(DATADICT["mode1_MLE_compare_heuristic"]['ylab'])
-    # Plot curves
-    ax.plot(DATADICT["mode1_MLE_compare_heuristic"]['xpts'][0:399],
-            DATADICT["mode1_MLE_compare_heuristic"]['ypts'][0:399], 'r')
+    figname = 'mode1_MLE_compare'
+    curve1 = DATADICT[figname + '_heuristic']
+    curve2 = DATADICT[figname + '_prior']
+    # plot setup
+    plt.figure(figsize=(10, 5))
+    plt.title('Mode 1: MLE comparison non-uniform prior')
+    plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], 'r', label='heuristic')
+    plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], 'r')
+    plt.scatter(curve2['xpts'], curve2['ypts'], c='b', label='numeric with prior')
+    plt.xlabel(r'$n_{obs}$')
+    plt.ylabel(r'$x_{MLE}$')
+    plt.legend()
+    # save figure
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.eps')
 
-    ax.plot(DATADICT["mode1_MLE_compare_heuristic"]['xpts'][400:],
-            DATADICT["mode1_MLE_compare_heuristic"]['ypts'][400:], 'r')
-
-    ax.scatter(DATADICT["mode1_MLE_compare_prior"]['xpts'], DATADICT["mode1_MLE_compare_prior"]['ypts'], c='b')
-    # Save figure
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureD1.pdf'))
-    plt.savefig(os.path.join(DIR_OUTPUT, 'figureD1.eps'))
 
 if __name__ == "__main__":
     make_figure_2()
