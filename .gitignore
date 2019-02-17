@@ -3,4 +3,7 @@
 *.png
 *.eps
 *.pdf
+*.aux
+*.log
+*.synctex.gz
 figures/output/
