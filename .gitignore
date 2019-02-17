@@ -1,4 +1,6 @@
 .idea/
 *.pyc
 *.png
+*.eps
+*.pdf
 figures/output/

@@ -1,9 +1,8 @@
 import os
-
+import matplotlib as mpl
 
 DIR_INPUT = "input"
 DIR_OUTPUT = "output"
-
 
 for dirs in [DIR_INPUT, DIR_OUTPUT]:
     if not os.path.exists(dirs):
