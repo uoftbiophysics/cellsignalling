@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+plt.style.use('parameters.mplstyle') # particularIMporting
+
 from load_inputs import DATADICT
 from settings import DIR_OUTPUT
-
-plt.style.use('parameters.mplstyle') # particularIMporting
+from settings import COLOR_SCHEME as cs
 
 def make_figure_2():
     """
@@ -23,8 +24,8 @@ def make_figure_2():
     curveR = DATADICT['mode1_error_compare_heuristic']
     # plot
     fig, axarr = plt.subplots(nrows=1, ncols=2)
-    #fig.set_size_inches(10, 5)
-    plt.suptitle(r'Mode 1: Mean $n$ and relative error in $x$ estimate')
+    fig.set_size_inches(7.2, 3.2)
+    #plt.suptitle(r'Mode 1: Mean $n$ and relative error in $x$ estimate')
     # left plot
     axarr[0].plot(curveLk['xpts'], curveLk['ypts'], 'k', label=r'$k_{off}=10$')
     axarr[0].plot(curveLkUp['xpts'], curveLkUp['ypts'], 'k--')
@@ -35,13 +36,13 @@ def make_figure_2():
     axarr[0].set_xlabel(r'$c$')
     axarr[0].set_ylabel(r'$\langle n\rangle/k_pt$')
     axarr[0].legend()
-    axarr[0].set_title(r'($k_p=10$, $t=120$)')
+    #axarr[0].set_title(r'($k_p=10$, $t=120$)')
     # right plot
     axarr[1].plot(curveR['xpts'], curveR['ypts'], 'k')
     axarr[1].set_xlabel(r'$x$')
     axarr[1].set_ylabel(r'$\langle\delta x^{2}\rangle$/$x^{2}$')
-    axarr[1].set_ylim([0, 1.5])
-    axarr[1].set_title('($k_p=10$, $t=100$, $k_{off}=1$)')
+    axarr[1].set_ylim([0, 1.0])
+    #axarr[1].set_title('($k_p=10$, $t=100$, $k_{off}=1$)')
     # save figure
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
@@ -58,13 +59,12 @@ def make_figure_3():
     curve1 = DATADICT[figname + '_c_heuristic']
     curve2 = DATADICT[figname + '_koff_heuristic']
     # plot
-    #plt.figure(figsize=(10, 5))
-    plt.figure()
-    plt.plot(curve1['xpts'], curve1['ypts'], 'k', label=r'$\langle\delta c^{2}\rangle$/$c^{2}$')
-    plt.plot(curve2['xpts'], curve2['ypts'], 'r', label=r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
+    plt.figure(figsize=(4, 3))
+    plt.plot(curve1['xpts'], curve1['ypts'], color=cs['c'], label=r'$\langle\delta c^{2}\rangle$/$c^{2}$')
+    plt.plot(curve2['xpts'], curve2['ypts'], color=cs['koff'], label=r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
     plt.xlabel(r'$c$')
     plt.ylabel('Relative error')
-    plt.title('Combined: MLE Relative error for $c$ and $k_{off}$ ($k_p=10$, $t=100$, $k_{off}=1$)')
+    #plt.title('Combined: MLE Relative error for $c$ and $k_{off}$ ($k_p=10$, $t=100$, $k_{off}=1$)')
     plt.legend()
     # set limits
     plt.ylim(0, 1.3)
@@ -84,13 +84,12 @@ def make_figure_5():
     curve1 = DATADICT[figname + '_c_heuristic']
     curve2 = DATADICT[figname + '_koff_heuristic']
     # plot
-    #plt.figure(figsize=(10, 5))
-    plt.figure()
+    plt.figure(figsize=(4, 3))
     plt.plot(curve1['xpts'], curve1['ypts'], 'k', label=r'$\langle\delta c^{2}\rangle$/$c^{2}$')
     plt.plot(curve2['xpts'], curve2['ypts'], 'r', label=r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
     plt.xlabel(r'$c$')
     plt.ylabel('Relative error')
-    plt.title('KPR: MLE Relative error for $c$ and $k_{off}$ ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$)')
+    #plt.title('KPR: MLE Relative error for $c$ and $k_{off}$ ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$)')
     plt.legend()
     # set limits
     #plt.ylim(0, 0.3)
@@ -110,9 +109,9 @@ def make_figure_B1():
     # plot
     #plt.figure(figsize=(10, 5))
     plt.figure()
-    c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], 'r', label='heuristic')
-    c2_part2 = plt.plot(curve2['xpts'][400:], curve2['ypts'][400:], 'r')
-    c1 = plt.plot(curve1['xpts'], curve1['ypts'], 'ob', label='numeric')
+    c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], color=cs['heuristic'], label='heuristic')
+    c2_part2 = plt.plot(curve2['xpts'][400:], curve2['ypts'][400:], color=cs['heuristic'])
+    c1 = plt.plot(curve1['xpts'], curve1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
     plt.title('Mode 1 MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$)')
     plt.xlabel(r'$n_{obs}$')
     plt.ylabel(r'$x_{MLE}$')
@@ -136,15 +135,15 @@ def make_figure_B2():
     #fig.set_size_inches(10, 5)
     plt.suptitle('Combined MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$, $m=100$)')
     # left subplot
-    cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], 'r', label='heuristic')
-    cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], 'ob', label='numeric')
+    cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
+    cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], marker='o', color=cs['numerical_fisher_sp'], label='numeric')
     axarr[0].set_title(r'Estimate for $c$')
     axarr[0].set_xlabel(r'$n_{obs}$')
     axarr[0].set_ylabel(r'$c^*$')
     axarr[0].legend()
     # right subplot
-    cR1 = axarr[1].plot(curveR1['xpts'], curveR1['ypts'], 'ob', label='numeric')
-    cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], 'r', label='heuristic')
+    cR1 = axarr[1].plot(curveR1['xpts'], curveR1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], color=cs['heuristic'], label='heuristic')
     axarr[1].set_title(r'Estimate for $k_{off}$')
     axarr[1].set_xlabel(r'$n_{obs}$')
     axarr[1].set_ylabel(r'$k_{off}^*$')
@@ -164,20 +163,20 @@ def make_figure_B3():
     curveR1 = DATADICT[figname + '_koff_numeric']
     curveR2 = DATADICT[figname + '_koff_heuristic']
     # plot
+    plt.figure()
     fig, axarr = plt.subplots(nrows=1, ncols=2)
     #fig.set_size_inches(10, 5)
-    plt.figure()
     plt.suptitle('KPR MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$, $m=100$)')
     # left subplot
-    cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], 'ob', label='numeric')
-    cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], 'r', label='heuristic')
+    cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
     axarr[0].set_title(r'Estimate for $c$')
     axarr[0].set_xlabel(r'$n_{obs}$')
     axarr[0].set_ylabel(r'$c^*$')
     axarr[0].legend()
     # right subplot
-    cR1 = axarr[1].plot(curveR1['xpts'], curveR1['ypts'], 'ob', label='numeric')
-    cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], 'r', label='heuristic')
+    cR1 = axarr[1].plot(curveR1['xpts'], curveR1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], color=cs['heuristic'], label='heuristic')
     axarr[1].set_title(r'Estimate for $k_{off}$')
     axarr[1].set_xlabel(r'$n_{obs}$')
     axarr[1].set_ylabel(r'$k_{off}^*$')
@@ -199,9 +198,9 @@ def make_figure_C1():
     # plot
     #plt.figure(figsize=(10, 5))
     plt.figure()
-    plt.plot(curve1['xpts'], curve1['ypts'], 'k', label='Simple Fisher', zorder=1)
-    plt.scatter(curve2['xpts'], curve2['ypts'], c='b', edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
-    plt.scatter(curve3['xpts'], curve3['ypts'], c='r', edgecolor='', label='Numeric Fisher (Full)', zorder=3)
+    plt.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
+    plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'],  edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    plt.scatter(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
     # axis
     plt.title('Mode 1: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$)')
     plt.xlabel(r'$x$')
@@ -242,15 +241,15 @@ def make_figure_C2():
     axarr[1].set_ylim(ylow, yhigh)
     # left plot
     axarr[0].set_title(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
-    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], 'k', label='Simple Fisher', zorder=1)
-    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], c='b', edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
-    axarr[0].scatter(curveL3['xpts'], curveL3['ypts'], c='r', edgecolor='', label='Numeric Fisher (Full)', zorder=3)
+    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
+    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    axarr[0].scatter(curveL3['xpts'], curveL3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
     axarr[0].legend(fontsize=8)
     # right plot
     axarr[1].set_title(r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
-    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], 'k', label='Simple Fisher', zorder=1)
-    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], c='b', edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
-    axarr[1].scatter(curveR3['xpts'], curveR3['ypts'], c='r', edgecolor='', label='Numeric Fisher (Full)', zorder=3)
+    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
+    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    axarr[1].scatter(curveR3['xpts'], curveR3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
     axarr[1].legend(fontsize=8)
     # save figure
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
@@ -283,13 +282,13 @@ def make_figure_C3():
     axarr[1].set_ylim(ylow, yhigh)
     # left plot
     axarr[0].set_title(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
-    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], 'k', label='Simple Fisher', zorder=1)
-    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], c='b', edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
+    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
     axarr[0].legend(fontsize=8)
     # right plot
     axarr[1].set_title(r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
-    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], 'k', label='Simple Fisher', zorder=1)
-    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], c='b', edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
+    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
     axarr[1].legend(fontsize=8)
     # save figure
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
@@ -308,9 +307,9 @@ def make_figure_D1():
     #plt.figure(figsize=(10, 5))
     plt.figure()
     plt.title(r'Mode 1: MLE comparison non-uniform prior ($k_p=10$, $t=100$, $k_{off}=1$, $a=0.001$)')
-    plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], 'r', label='heuristic', zorder=1)
-    plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], 'r', zorder=1)
-    plt.scatter(curve2['xpts'], curve2['ypts'], c='b', edgecolor='', label='numeric with prior', zorder=2)
+    plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], color=cs['heuristic'], label='heuristic', zorder=1)
+    plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], zorder=1)
+    plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'], edgecolor='', label='numeric with prior', zorder=2)
     plt.xlabel(r'$n_{obs}$')
     plt.ylabel(r'$x_{MLE}$')
     plt.legend()
