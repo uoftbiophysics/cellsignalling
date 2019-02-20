@@ -8,11 +8,11 @@ for dirs in [DIR_INPUT, DIR_OUTPUT]:
     if not os.path.exists(dirs):
         os.makedirs(dirs)
 
-color = plt.cm.get_cmap('Set1', 10)
+#color = plt.cm.get_cmap('Classic', 10) #unnecessary unless you want different colors
 
 COLOR_SCHEME = {'c' : 'k',
-           'koff' : color(0),
-           'simple_fisher' : color(1),
-           'numerical_fisher_sp' : color(2),
-           'numerical_fisher' : color(3),
-           'heuristic' : color(4)}
+           'koff' : 'r',
+           'simple_fisher' : 'b',
+           'numerical_fisher_sp' : 'r',
+           'numerical_fisher' : 'c',
+           'heuristic' : 'y'}
