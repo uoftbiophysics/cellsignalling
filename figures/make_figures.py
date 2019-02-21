@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import os
-
-plt.style.use('parameters.mplstyle') # particularIMporting
 
 from load_inputs import DATADICT
 from settings import DIR_OUTPUT
 from settings import COLOR_SCHEME as cs
+
+plt.style.use('parameters.mplstyle')  # particularIMporting
+
 
 def make_figure_2():
     """
@@ -230,7 +230,7 @@ def make_figure_C2():
     fig, axarr = plt.subplots(nrows=1, ncols=2)
     plt.suptitle('Combined: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$)')
     axarr[0].set_xlabel(r'$c$')
-    axarr[1].set_xlabel(r'$k_{off}$')
+    axarr[1].set_xlabel(r'$c$')
     axarr[0].set_ylabel('Relative error')
     axarr[0].set_xscale('log')
     axarr[1].set_xscale('log')
@@ -271,7 +271,7 @@ def make_figure_C3():
     fig, axarr = plt.subplots(nrows=1, ncols=2)
     plt.suptitle('KPR: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$)')
     axarr[0].set_xlabel(r'$c$')
-    axarr[1].set_xlabel(r'$k_{off}$')
+    axarr[1].set_xlabel(r'$c$')
     axarr[0].set_ylabel('Relative error')
     axarr[0].set_xscale('log')
     axarr[1].set_xscale('log')
@@ -306,9 +306,9 @@ def make_figure_D1():
     # plot setup
     #plt.figure(figsize=(10, 5))
     plt.figure()
-    plt.title(r'Mode 1: MLE comparison non-uniform prior ($k_p=10$, $t=100$, $k_{off}=1$, $a=0.001$)')
+    plt.title(r'Mode 1: MLE comparison non-uniform prior ($k_p=10$, $t=100$, $k_{off}=1$, $\lambda=0.001$)')
     plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], color=cs['heuristic'], label='heuristic', zorder=1)
-    plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], zorder=1)
+    plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], color=cs['heuristic'], zorder=1)
     plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'], edgecolor='', label='numeric with prior', zorder=2)
     plt.xlabel(r'$n_{obs}$')
     plt.ylabel(r'$x_{MLE}$')
