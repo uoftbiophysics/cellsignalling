@@ -20,6 +20,7 @@ fs = 12
 def plot_heatmap(arr, crange, koffrange, fname, label):
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO better tick labels and gaps?
+    # TODO log axis on colourbar too?
     # TODO explore alternate option of https://seaborn.pydata.org/generated/seaborn.heatmap.html
 
     # plot setup
@@ -30,7 +31,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label):
     ax = plt.gca()
     # method 1
     period_x_ticks = 33
-    period_y_ticks = 1
+    period_y_ticks = 33
     ax.set_xticks([i for i, cval in enumerate(crange) if i % period_x_ticks == 0])
     ax.set_yticks([i for i, kval in enumerate(koffrange) if i % period_y_ticks == 0])
     ax.set_xticklabels(['%.3f' % cval for i, cval in enumerate(crange) if i % period_x_ticks == 0], fontsize=fs)
@@ -56,8 +57,8 @@ def heatmap_mode1_error_c():
         return val
 
     crange = np.logspace(-2, 1, 100)
-    #koffrange = np.logspace(-2, 1, 100)
-    koffrange = [1.0]
+    koffrange = np.logspace(-2, 1, 100)
+    #koffrange = [1.0]
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
@@ -77,8 +78,8 @@ def heatmap_mode1_error_koff():
         #val = (1 + x) / (KP * T * x) * ((1 + x) ** 2 + 2 * KP / koff)
         return val
 
-    crange = np.arange(0.1, 10.0, 0.1)
-    koffrange = np.arange(0.1, 10.0, 0.1)
+    crange = np.logspace(-2, 1, 100)
+    koffrange = np.logspace(-2, 1, 100)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
@@ -98,8 +99,8 @@ def heatmap_combined_error_c():
         val = num / den
         return val
 
-    crange = np.arange(0.1, 10.0, 0.1)
-    koffrange = np.arange(0.1, 10.0, 0.1)
+    crange = np.logspace(-2, 1, 100)
+    koffrange = np.logspace(-2, 1, 100)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
@@ -119,8 +120,8 @@ def heatmap_combined_error_koff():
         val = num / den
         return val
 
-    crange = np.arange(0.1, 10.0, 0.1)
-    koffrange = np.arange(0.1, 10.0, 0.1)
+    crange = np.logspace(-2, 1, 100)
+    koffrange = np.logspace(-2, 1, 100)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
@@ -134,5 +135,5 @@ def heatmap_combined_error_koff():
 if __name__ == '__main__':
     heatmap_mode1_error_c()
     #heatmap_mode1_error_koff()  # TODO derive error expression
-    #heatmap_combined_error_c()
-    #heatmap_combined_error_koff()
+    heatmap_combined_error_c()
+    heatmap_combined_error_koff()
