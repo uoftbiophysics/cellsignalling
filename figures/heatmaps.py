@@ -22,7 +22,9 @@ def plot_heatmap(arr, crange, koffrange, fname, label):
     # TODO better tick labels and gaps?
     # TODO log axis on colourbar too?
     # TODO explore alternate option of https://seaborn.pydata.org/generated/seaborn.heatmap.html
-
+    """
+    Colours viridis, YlGnBu, terrain
+    """
     # plot setup
     f = plt.figure()
     imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': np.min(arr), 'vmax': np.max(arr)}
@@ -132,8 +134,60 @@ def heatmap_combined_error_koff():
     return
 
 
+def heatmap_kpr_error_c():
+
+    def kpr_error_c(c, koff):
+        x = c * KON / koff
+        # TODO
+        """
+        num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * x ** 2 * (1 + x) ** 3
+        den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
+        val = num / den
+        """
+        val = 0
+        return val
+
+    crange = np.logspace(-2, 1, 100)
+    koffrange = np.logspace(-2, 1, 100)
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = kpr_error_c(cval, koffval)
+
+    label = r'$\langle\delta c^{2}\rangle$/$c^{2}$'
+    plot_heatmap(arr, crange, koffrange, 'heatmap_kpr_heuristic_error_c', label)
+    return
+
+
+def heatmap_kpr_error_koff():
+
+    def kpr_error_koff(c, koff):
+        x = c * KON / koff
+        # TODO
+        """
+        num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * (1 + x) ** 3
+        den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
+        val = num / den
+        """
+        val = 0
+        return val
+
+    crange = np.logspace(-2, 1, 100)
+    koffrange = np.logspace(-2, 1, 100)
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = kpr_error_koff(cval, koffval)
+
+    label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+    plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_koff', label)
+    return
+
+
 if __name__ == '__main__':
     heatmap_mode1_error_c()
     #heatmap_mode1_error_koff()  # TODO derive error expression
     heatmap_combined_error_c()
     heatmap_combined_error_koff()
+    #heatmap_kpr_error_c()  # TODO high g
+    #heatmap_kpr_error_koff()  # TODO high g
