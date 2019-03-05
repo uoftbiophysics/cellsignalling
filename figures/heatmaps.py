@@ -12,6 +12,7 @@ plt.style.use('parameters.mplstyle')  # particularIMporting
 KON = 1
 KP = 10
 T = 100
+KF = 0.01  # TODO "high g regime weird in heatmaps because of sliding koff"
 
 # plot params
 fs = 12
@@ -138,13 +139,9 @@ def heatmap_kpr_error_c():
 
     def kpr_error_c(c, koff):
         x = c * KON / koff
-        # TODO
-        """
-        num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * x ** 2 * (1 + x) ** 3
-        den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
-        val = num / den
-        """
-        val = 0
+        left = (1 + koff / KF) * (1 + x) / (koff * T * x)
+        right = koff / KP + 2 + 2 * x + x ** 2
+        val = left * right
         return val
 
     crange = np.logspace(-2, 1, 100)
@@ -163,13 +160,9 @@ def heatmap_kpr_error_koff():
 
     def kpr_error_koff(c, koff):
         x = c * KON / koff
-        # TODO
-        """
-        num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * (1 + x) ** 3
-        den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
-        val = num / den
-        """
-        val = 0
+        left = (1 + koff / KF) * (1 + x) / (koff * T * x)
+        right = koff / KP + 1
+        val = left * right
         return val
 
     crange = np.logspace(-2, 1, 100)
@@ -189,5 +182,5 @@ if __name__ == '__main__':
     #heatmap_mode1_error_koff()  # TODO derive error expression
     heatmap_combined_error_c()
     heatmap_combined_error_koff()
-    #heatmap_kpr_error_c()  # TODO high g
-    #heatmap_kpr_error_koff()  # TODO high g
+    heatmap_kpr_error_c()  # TODO high g regime clarify
+    heatmap_kpr_error_koff()  # TODO high g regime clarify
