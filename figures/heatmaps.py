@@ -33,9 +33,7 @@ KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
 
 def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
-    # TODO explore alternate option of https://seaborn.pydata.org/generated/seaborn.heatmap.html
-    # TODO fix ticks randomly disappearing on colourbar
-    # TODO flip colourbar minor ticks or remove?
+    # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
     """
     Colours viridis, YlGnBu, terrain, plasma
     """
@@ -64,6 +62,9 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20)
     # TODO ID why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
+
+    # contour line for value 1.0
+    plt.contour(arr, levels=[1.0], linestyles=['dashed'])  # use 'dashed' or 'solid' curve
 
     # save
     plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf')
