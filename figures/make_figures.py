@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import os
+import seaborn as sns
 
 from load_inputs import DATADICT
 from settings import DIR_OUTPUT
 from settings import COLOR_SCHEME as cs
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
-
 
 def make_figure_2():
     """
@@ -27,12 +27,13 @@ def make_figure_2():
     fig.set_size_inches(7.2, 3.2)
     #plt.suptitle(r'Mode 1: Mean $n$ and relative error in $x$ estimate')
     # left plot
-    axarr[0].plot(curveLk['xpts'], curveLk['ypts'], 'k', label=r'$k_{off}=10$')
-    axarr[0].plot(curveLkUp['xpts'], curveLkUp['ypts'], 'k--')
-    axarr[0].plot(curveLkLow['xpts'], curveLkLow['ypts'], 'k--')
-    axarr[0].plot(curveLr['xpts'], curveLr['ypts'], 'r', label=r'$k_{off}=15$')
-    axarr[0].plot(curveLrUp['xpts'], curveLrUp['ypts'], 'r--')
-    axarr[0].plot(curveLrLow['xpts'], curveLrLow['ypts'], 'r--')
+    colour_palette = sns.color_palette("muted", 2)
+    axarr[0].plot(curveLk['xpts'], curveLk['ypts'], c=colour_palette[0], label=r'$k_{off}=10$')
+    axarr[0].plot(curveLkUp['xpts'], curveLkUp['ypts'], c=colour_palette[0], linestyle='--')
+    axarr[0].plot(curveLkLow['xpts'], curveLkLow['ypts'], c=colour_palette[0], linestyle='--')
+    axarr[0].plot(curveLr['xpts'], curveLr['ypts'], c=colour_palette[1], label=r'$k_{off}=15$')
+    axarr[0].plot(curveLrUp['xpts'], curveLrUp['ypts'], c=colour_palette[1], linestyle='--')
+    axarr[0].plot(curveLrLow['xpts'], curveLrLow['ypts'], c=colour_palette[1], linestyle='--')
     axarr[0].set_xlabel(r'$c$')
     axarr[0].set_ylabel(r'$\langle n\rangle/k_pt$')
     axarr[0].legend()
@@ -110,13 +111,14 @@ def make_figure_B1():
     #plt.figure(figsize=(10, 5))
     plt.figure()
     c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], color=cs['heuristic'], label='heuristic')
-    c2_part2 = plt.plot(curve2['xpts'][400:], curve2['ypts'][400:], color=cs['heuristic'])
+    #c2_part2 = plt.plot(curve2['xpts'][400:], curve2['ypts'][400:], color=cs['heuristic'])
     c1 = plt.plot(curve1['xpts'], curve1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
     plt.title('Mode 1 MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$)')
     plt.xlabel(r'$n_{obs}$')
     plt.ylabel(r'$x_{MLE}$')
     plt.legend()
     # save figure
+    plt.gca().set_ylim([-5, max(curve1['ypts'])])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
@@ -143,12 +145,13 @@ def make_figure_B2():
     axarr[0].legend()
     # right subplot
     cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], color=cs['heuristic'], label='heuristic')
-    cR1 = axarr[1].plot(curveR1['xpts'], curveR1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    cR1 = axarr[1].plot(curveR1['xpts'][1:], curveR1['ypts'][1:], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
     axarr[1].set_title(r'Estimate for $k_{off}$')
     axarr[1].set_xlabel(r'$n_{obs}$')
     axarr[1].set_ylabel(r'$k_{off}^*$')
     axarr[1].legend()
     # save figure
+    axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
@@ -157,7 +160,7 @@ def make_figure_B3():
     """
     'KPR_MLE_composite_compare' figure, 4 curves (numeric vs heuristic) for c and koff
     """
-    figname = 'KPR_MLE_composite_compare'
+    figname = 'KPR_HighG_MLE_composite_compare'
     curveL1 = DATADICT[figname + '_c_numeric']
     curveL2 = DATADICT[figname + '_c_heuristic']
     curveR1 = DATADICT[figname + '_koff_numeric']
@@ -176,12 +179,14 @@ def make_figure_B3():
     axarr[0].legend()
     # right subplot
     cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], color=cs['heuristic'], label='heuristic')
-    cR1 = axarr[1].plot(curveR1['xpts'], curveR1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    cR1 = axarr[1].plot(curveR1['xpts'][1:], curveR1['ypts'][1:], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
     axarr[1].set_title(r'Estimate for $k_{off}$')
     axarr[1].set_xlabel(r'$n_{obs}$')
     axarr[1].set_ylabel(r'$k_{off}^*$')
     axarr[1].legend()
     # save figure
+    axarr[0].set_ylim([-5, max(curveL1['ypts']) * 1.1])
+    axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
@@ -262,7 +267,7 @@ def make_figure_C3():
     Panel A: relative error in c as estimated by heuristic, and saddle point Fisher
     Panel B: relative error in koff as estimated by heuristic, and saddle point Fisher
     """
-    figname = 'KPR_error_composite_compare'
+    figname = 'KPR_HighG_error_composite_compare'
     curveL1 = DATADICT[figname + '_c_heuristic']
     curveL2 = DATADICT[figname + '_c_saddlePointFisher']
     curveR1 = DATADICT[figname + '_koff_heuristic']
@@ -270,9 +275,9 @@ def make_figure_C3():
     # set up axes
     fig, axarr = plt.subplots(nrows=1, ncols=2)
     plt.suptitle('KPR: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$)')
-    axarr[0].set_xlabel(r'$c$')
-    axarr[1].set_xlabel(r'$c$')
-    axarr[0].set_ylabel('Relative error')
+    axarr[0].set_xlabel(r'$c_{true}$')
+    axarr[1].set_xlabel(r'$c_{true}$')
+    axarr[0].set_ylabel('Relative error', fontdict={'fontname':'Arial'})
     axarr[0].set_xscale('log')
     axarr[1].set_xscale('log')
     # fix to same ylim
@@ -291,6 +296,8 @@ def make_figure_C3():
     axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
     axarr[1].legend(fontsize=8)
     # save figure
+    #fig.set_size_inches(8.0, 7.0)
+    plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
@@ -319,13 +326,13 @@ def make_figure_D1():
 
 
 if __name__ == "__main__":
-    make_figure_2()
-    make_figure_3()
-    make_figure_5()
-    make_figure_B1()
-    make_figure_B2()
-    make_figure_B3()
+    #make_figure_2()
+    #make_figure_3()
+    #make_figure_5()
+    #make_figure_B1()
+    #make_figure_B2()
+    #make_figure_B3()
     make_figure_C1()
-    make_figure_C2()
-    make_figure_C3()
-    make_figure_D1()
+    #make_figure_C2()
+    #make_figure_C3()
+    #make_figure_D1()
