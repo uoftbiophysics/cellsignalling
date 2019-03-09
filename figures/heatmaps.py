@@ -16,7 +16,7 @@ T = 100
 KF = 1.0
 
 # plot params
-FS = 12
+FS = 16
 SHOW = False
 
 # axes
@@ -30,6 +30,14 @@ LOG_END_KOFF = 3
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
 
+# global vmax and vmin
+assert LOG_START_KOFF == -3
+assert LOG_END_KOFF == 3
+assert LOG_START_C == -3
+assert LOG_END_C == 3
+vmax_obs = 1000003020
+vmin_obs = 0.00022000016528925625
+
 
 def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
@@ -40,7 +48,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     print 'arr limits:', np.min(arr), np.max(arr)
     # plot setup
     f = plt.figure()
-    imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': np.min(arr), 'vmax': np.max(arr), 'norm': mpl.colors.LogNorm()}
+    #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': np.min(arr), 'vmax': np.max(arr), 'norm': mpl.colors.LogNorm()}
+    imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
     im = plt.imshow(arr, **imshow_kw)
     # axes setup
     ax = plt.gca()
@@ -54,12 +63,13 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
                        fontsize=FS)
     ax.invert_yaxis()
-    ax.set_xlabel(r'$c$')
-    ax.set_ylabel(r'$k_{off}$')
+    ax.set_xlabel(r'$c$', fontsize=FS)
+    ax.set_ylabel(r'$k_{off}$', fontsize=FS)
 
     # create colorbar
     cbar = ax.figure.colorbar(im, ax=ax)
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20)
+    cbar.ax.tick_params(labelsize=FS)
     # TODO ID why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
 
