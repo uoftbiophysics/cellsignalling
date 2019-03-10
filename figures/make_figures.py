@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import os
 import seaborn as sns
 
@@ -133,8 +134,10 @@ def make_figure_B2():
     curveR1 = DATADICT[figname + '_koff_numeric']
     curveR2 = DATADICT[figname + '_koff_heuristic']
     # plot
-    fig, axarr = plt.subplots(nrows=1, ncols=2)
-    #fig.set_size_inches(10, 5)
+    fig = plt.figure()
+    gs1 = gridspec.GridSpec(1, 2)
+    axarr = [fig.add_subplot(ss) for ss in gs1]
+    fig.set_size_inches(10, 5)
     plt.suptitle('Combined MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$, $m=100$)')
     # left subplot
     cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
@@ -152,6 +155,7 @@ def make_figure_B2():
     axarr[1].legend()
     # save figure
     axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
+    gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
@@ -166,9 +170,10 @@ def make_figure_B3():
     curveR1 = DATADICT[figname + '_koff_numeric']
     curveR2 = DATADICT[figname + '_koff_heuristic']
     # plot
-    plt.figure()
-    fig, axarr = plt.subplots(nrows=1, ncols=2)
-    #fig.set_size_inches(10, 5)
+    fig = plt.figure()
+    gs1 = gridspec.GridSpec(1, 2)
+    axarr = [fig.add_subplot(ss) for ss in gs1]
+    fig.set_size_inches(10, 5)
     plt.suptitle('KPR MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$, $m=100$)')
     # left subplot
     cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
@@ -187,6 +192,7 @@ def make_figure_B3():
     # save figure
     axarr[0].set_ylim([-5, max(curveL1['ypts']) * 1.1])
     axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
+    gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
@@ -232,7 +238,10 @@ def make_figure_C2():
     curveR2 = DATADICT[figname + '_koff_saddlePointFisher']
     curveR3 = DATADICT[figname + '_koff_fullFisher']
     # set up axes
-    fig, axarr = plt.subplots(nrows=1, ncols=2)
+    fig = plt.figure()
+    gs1 = gridspec.GridSpec(1, 2)
+    axarr = [fig.add_subplot(ss) for ss in gs1]
+    fig.set_size_inches(10, 5)
     plt.suptitle('Combined: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$)')
     axarr[0].set_xlabel(r'$c$')
     axarr[1].set_xlabel(r'$c$')
@@ -257,6 +266,7 @@ def make_figure_C2():
     axarr[1].scatter(curveR3['xpts'], curveR3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
     axarr[1].legend(fontsize=8)
     # save figure
+    gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
@@ -273,7 +283,11 @@ def make_figure_C3():
     curveR1 = DATADICT[figname + '_koff_heuristic']
     curveR2 = DATADICT[figname + '_koff_saddlePointFisher']
     # set up axes
-    fig, axarr = plt.subplots(nrows=1, ncols=2)
+    fig = plt.figure()
+    gs1 = gridspec.GridSpec(1, 2)
+    axarr = [fig.add_subplot(ss) for ss in gs1]
+
+    fig.set_size_inches(10, 5)
     plt.suptitle('KPR: MLE Relative error comparison ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$)')
     axarr[0].set_xlabel(r'$c_{true}$')
     axarr[1].set_xlabel(r'$c_{true}$')
@@ -297,7 +311,7 @@ def make_figure_C3():
     axarr[1].legend(fontsize=8)
     # save figure
     #fig.set_size_inches(8.0, 7.0)
-    plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
+    gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
@@ -330,9 +344,9 @@ if __name__ == "__main__":
     #make_figure_3()
     #make_figure_5()
     #make_figure_B1()
-    #make_figure_B2()
-    #make_figure_B3()
-    make_figure_C1()
-    #make_figure_C2()
-    #make_figure_C3()
+    make_figure_B2()
+    make_figure_B3()
+    #make_figure_C1()
+    make_figure_C2()
+    make_figure_C3()
     #make_figure_D1()
