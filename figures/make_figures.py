@@ -46,7 +46,7 @@ def make_figure_2():
     axarr[1].set_ylim([0, 1.0])
     #axarr[1].set_title('($k_p=10$, $t=100$, $k_{off}=1$)')
     # save figure
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -71,7 +71,7 @@ def make_figure_3():
     # set limits
     plt.ylim(0, 1.3)
     # save figure
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -97,7 +97,7 @@ def make_figure_5():
     #plt.ylim(0, 0.3)
     #plt.xlim(0, 10)
     # save figure
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -120,7 +120,7 @@ def make_figure_B1():
     plt.legend()
     # save figure
     plt.gca().set_ylim([-5, max(curve1['ypts'])])
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -156,7 +156,7 @@ def make_figure_B2():
     # save figure
     axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
     gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -193,7 +193,7 @@ def make_figure_B3():
     axarr[0].set_ylim([-5, max(curveL1['ypts']) * 1.1])
     axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
     gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -220,7 +220,7 @@ def make_figure_C1():
     plt.ylim([0, 1.5])
     plt.legend()
     # save figure
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
@@ -267,7 +267,7 @@ def make_figure_C2():
     axarr[1].legend(fontsize=8)
     # save figure
     gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
 
@@ -312,7 +312,7 @@ def make_figure_C3():
     # save figure
     #fig.set_size_inches(8.0, 7.0)
     gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
 
@@ -335,18 +335,43 @@ def make_figure_D1():
     plt.ylabel(r'$x_{MLE}$')
     plt.legend()
     # save figure
-    plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.pdf')
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.eps')
 
+def make_figure_E1():
+    """
+    Combined estimating one parmaeter vs estimating two parameters vs mode 1 estimate
+    One Panel.
+    """
+    figname = 'Supplementary_E1'
+    curve1 = DATADICT[figname + '_mode1']
+    curve2 = DATADICT[figname + '_TwoParam']
+    curve3 = DATADICT[figname + '_OneParam']
+    # plot setup
+    #plt.figure(figsize=(10, 5))
+    plt.figure()
+    plt.title('Relative error for different receptor schemes\r\n'+r'($m=100, k_p=10$, $t=100$, $k_{off}=1$, $k_{on}=1$)')
+    plt.plot(curve1['xpts'], curve1['ypts'], color=cs['heuristic'], label='Mode 1', zorder=1)
+    plt.plot(curve2['xpts'], curve2['ypts'], color=cs['simple_fisher'], label='Combined Estimating Two Parameters', zorder=1)
+    plt.plot(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher_sp'], label='Combined Estimating One Parameter', zorder=1)
+    plt.xlabel(r'$c_{est}$')
+    plt.ylabel(r'$\delta c^{2}/c^{2}$')
+    plt.legend()
+    plt.xlim((0, 20))
+    plt.ylim((0, 0.6))
+    # save figure
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 if __name__ == "__main__":
     #make_figure_2()
     #make_figure_3()
     #make_figure_5()
     #make_figure_B1()
-    make_figure_B2()
-    make_figure_B3()
+    #make_figure_B2()
+    #make_figure_B3()
     #make_figure_C1()
-    make_figure_C2()
-    make_figure_C3()
+    #make_figure_C2()
+    #make_figure_C3()
     #make_figure_D1()
+    make_figure_E1()
