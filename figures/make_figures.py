@@ -350,11 +350,11 @@ def make_figure_E1():
     # plot setup
     #plt.figure(figsize=(10, 5))
     plt.figure()
-    plt.title('Relative error for different receptor schemes\r\n'+r'($m=100, k_p=10$, $t=100$, $k_{off}=1$, $k_{on}=1$)')
+    plt.title('Relative error for different receptor schemes\r\n'+r'($k_p=10$, $t=100$, $k_{off}=1$, $k_{on}=1$)')
     plt.plot(curve1['xpts'], curve1['ypts'], color=cs['heuristic'], label='Mode 1', zorder=1)
     plt.plot(curve2['xpts'], curve2['ypts'], color=cs['simple_fisher'], label='Combined Estimating Two Parameters', zorder=1)
     plt.plot(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher_sp'], label='Combined Estimating One Parameter', zorder=1)
-    plt.xlabel(r'$c_{est}$')
+    plt.xlabel(r'$c_{true}$')
     plt.ylabel(r'$\delta c^{2}/c^{2}$')
     plt.legend()
     plt.xlim((0, 20))
