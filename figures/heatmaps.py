@@ -48,8 +48,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     print 'arr limits:', np.min(arr), np.max(arr)
     # plot setup
     f = plt.figure()
-    #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': np.min(arr), 'vmax': np.max(arr), 'norm': mpl.colors.LogNorm()}
-    imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
+    imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': np.min(arr), 'vmax': np.max(arr), 'norm': mpl.colors.LogNorm()}
+    #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
     im = plt.imshow(arr, **imshow_kw)
     # axes setup
     ax = plt.gca()
@@ -188,9 +188,113 @@ def heatmap_kpr_error_koff(crange=CRANGE, koffrange=KOFFRANGE):
     return
 
 
+def heatmap_kpr2_error_c(crange=CRANGE, koffrange=KOFFRANGE):
+
+    def kpr2_error_c_full(c, koff):
+        kon = KON
+        kf = KF
+        kp = KP
+        t = T
+        g = koff / KF
+        x = c * kon / koff
+
+        val = ((kf + koff + kf * x + koff * x) ** 4 * ((-2 * kf * koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
+                    1 - x + g ** 2 * (1 + x) ** 2 - g * (-2 + x + x ** 2)) * (-(
+                    (koff * kp ** 2 * t ** 2 * x) / (kf + koff + kf * x + koff * x)) + ((kf * kp * t * x) / (
+                    kf + koff + kf * x + koff * x) + (koff * kp * t * x) / (kf + koff + kf * x + koff * x)) ** 2) * (((
+                                                                                                                                  kf * kp * t * x) / (
+                                                                                                                                  kf + koff + kf * x + koff * x) + (
+                                                                                                                                  koff * kp * t * x) / (
+                                                                                                                                  kf + koff + kf * x + koff * x)) ** 2 - kp * t * (
+                                                                                                                                 (
+                                                                                                                                             kf * kp * t * x) / (
+                                                                                                                                             kf + koff + kf * x + koff * x) + (
+                                                                                                                                             2 * koff * kp * t * x) / (
+                                                                                                                                             kf + koff + kf * x + koff * x)))) / (
+                                                             kf + koff + kf * x + koff * x) ** 2 + (
+                                                             g * kf ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
+                                                                 (1 + g) ** 2 * koff * (1 + x) ** 2 + 2 * g * kp * (
+                                                                     1 + g + x + x ** 2)) * (((kf * kp * t * x) / (
+                                                                 kf + koff + kf * x + koff * x) + (
+                                                                                                          koff * kp * t * x) / (
+                                                                                                          kf + koff + kf * x + koff * x)) ** 2 - kp * t * (
+                                                                                                         (
+                                                                                                                     kf * kp * t * x) / (
+                                                                                                                     kf + koff + kf * x + koff * x) + (
+                                                                                                                     2 * koff * kp * t * x) / (
+                                                                                                                     kf + koff + kf * x + koff * x))) ** 2) / (
+                                                             kf + koff + kf * x + koff * x) ** 2 + (
+                                                             koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (-(
+                                                                 (koff * kp ** 2 * t ** 2 * x) / (
+                                                                     kf + koff + kf * x + koff * x)) + ((
+                                                                                                                    kf * kp * t * x) / (
+                                                                                                                    kf + koff + kf * x + koff * x) + (
+                                                                                                                    koff * kp * t * x) / (
+                                                                                                                    kf + koff + kf * x + koff * x)) ** 2) ** 2 * (
+                                                                         (1 + g) ** 2 * koff * (1 + x) ** 2 + 2 * kp * (
+                                                                             1 + g * (2 + x + g * (1 + x) ** 2)))) / (
+                                                             kf + koff + kf * x + koff * x) ** 2)) / (
+                    c ** 2 * (1 + g) ** 3 * kf ** 2 * koff * kon ** 2 * kp ** 3 * t ** 3 * x ** 3 * (1 + x) ** 3 * (
+                        -(kp * t) + (kf * kp * t * x) / (kf + koff + kf * x + koff * x) + (koff * kp * t * x) / (
+                            kf + koff + kf * x + koff * x)) ** 4)
+        return val
+
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = kpr2_error_c_full(cval, koffval)
+
+    label = r'$\langle\delta c^{2}\rangle$/$c^{2}$'
+    plot_heatmap(arr, crange, koffrange, 'heatmap_kpr2_heuristic_error_c', label)
+    return
+
+
+def heatmap_kpr2_error_koff(crange=CRANGE, koffrange=KOFFRANGE):
+
+    def kpr2_error_koff(c, koff):
+        # Note the "full" heuristic expression for koff error is the same as the high g high t one
+        kon = KON
+        kf = KF
+        kp = KP
+        t = T
+        g = koff / KF
+        x = c * kon / koff
+
+        val = ((kf + koff + kf * x + koff * x) ** 4 * (koff * (
+                    (g * (1 + g) ** 2 * kf ** 2 * kp ** 2 * t ** 2 * x ** 2 * (1 + x) ** 2) / (
+                        kf + koff + kf * x + koff * x) ** 2 + (
+                                (1 + g) ** 2 * koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (1 + x) ** 2) / (
+                                kf + koff + kf * x + koff * x) ** 2 - (2 * kf * koff * kp ** 2 * t ** 2 * x ** 2 * (
+                        (1 + g) ** 2 + (-1 + g) * (1 + 2 * g) * x + (-1 + g) * g * x ** 2)) / (
+                                kf + koff + kf * x + koff * x) ** 2) + 2 * kp * ((
+                                                                                             g ** 2 * kf ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
+                                                                                                 1 + g + x + x ** 2)) / (
+                                                                                             kf + koff + kf * x + koff * x) ** 2 + (
+                                                                                             koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
+                                                                                                 1 + g * (2 + x + g * (
+                                                                                                     1 + x) ** 2))) / (
+                                                                                             kf + koff + kf * x + koff * x) ** 2))) / (
+                    (1 + g) ** 3 * kf ** 2 * koff ** 3 * kp ** 3 * t ** 3 * x ** 3 * (1 + x) ** 3)
+
+        return val
+
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = kpr2_error_koff(cval, koffval)
+
+    label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+    plot_heatmap(arr, crange, koffrange, 'heatmap_kpr2_heuristic_error_koff', label)
+    return
+
+
 if __name__ == '__main__':
+    """
     heatmap_mode1_error_x()
     heatmap_combined_error_c()
     heatmap_combined_error_koff()
     heatmap_kpr_error_c()
     heatmap_kpr_error_koff()
+    """
+    heatmap_kpr2_error_c()
+    heatmap_kpr2_error_koff()

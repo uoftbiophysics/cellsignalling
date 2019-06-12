@@ -9,6 +9,7 @@ from settings import COLOR_SCHEME as cs
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
 
+
 def make_figure_2():
     """
     Signal specificity and relative error in estimation of x for Mode 1.
@@ -197,6 +198,44 @@ def make_figure_B3():
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
+def make_figure_B4():
+    """
+    'KPR2_MLE_composite_compare' figure, 4 curves (numeric vs heuristic) for c and koff
+    """
+    figname = 'KPR2_MLE_composite_compare'
+    curveL1 = DATADICT[figname + '_c_numeric']
+    curveL2 = DATADICT[figname + '_c_heuristic']
+    curveR1 = DATADICT[figname + '_koff_numeric']
+    curveR2 = DATADICT[figname + '_koff_heuristic']
+    # plot
+    fig = plt.figure()
+    gs1 = gridspec.GridSpec(1, 2)
+    axarr = [fig.add_subplot(ss) for ss in gs1]
+    fig.set_size_inches(10, 5)
+    plt.suptitle('KPR2 MLE: Numeric vs Heuristic ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$, $m=100$)')
+    # left subplot
+    cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
+    cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    axarr[0].set_title(r'Estimate for $c$')
+    axarr[0].set_xlabel(r'$n_{obs}$')
+    axarr[0].set_ylabel(r'$c^*$')
+    axarr[0].legend()
+    # right subplot
+    cR2 = axarr[1].plot(curveR2['xpts'], curveR2['ypts'], color=cs['heuristic'], label='heuristic')
+    cR1 = axarr[1].plot(curveR1['xpts'][1:], curveR1['ypts'][1:], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
+    axarr[1].set_title(r'Estimate for $k_{off}$')
+    axarr[1].set_xlabel(r'$n_{obs}$')
+    axarr[1].set_ylabel(r'$k_{off}^*$')
+    axarr[1].legend()
+    # save figure
+    axarr[0].set_ylim([-5, max(curveL1['ypts']) * 1.1])
+    axarr[1].set_ylim([0, max(curveR1['ypts'][1:]) * 1.1])
+    gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+    return
+
+
 def make_figure_C1():
     """
     Mode 1 relative error in x as estimated by two different methods.
@@ -316,6 +355,54 @@ def make_figure_C3():
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
 
 
+def make_figure_C4():
+    """
+    Compare HEURISTIC relative error in c and koff, as estimated by different methods.
+    Panel A: relative error in c as estimated by heuristic {KPR, KPR2}
+    Panel B: relative error in koff as estimated by heuristic {KPR, KPR2}
+    """
+    figname = 'multimodel_heuristic_error_composite_compare'
+    curve1name = 'KPR_error_composite_compare'
+    curve2name = 'KPR2_error_composite_compare'
+    curveL1 = DATADICT[curve1name + '_c_heuristic']
+    curveL2 = DATADICT[curve2name + '_c_heuristic']
+    curveR1 = DATADICT[curve1name + '_koff_heuristic']
+    curveR2 = DATADICT[curve2name + '_koff_heuristic']
+
+    # set up axes
+    fig = plt.figure()
+    gs1 = gridspec.GridSpec(1, 2)
+    axarr = [fig.add_subplot(ss) for ss in gs1]
+
+    fig.set_size_inches(10, 5)
+    plt.suptitle('KPR vs KPR2 - MLE heuristic relative error ($k_p=10$, $t=100$, $k_{off}=1$, $k_f=100$)')
+    axarr[0].set_xlabel(r'$c_{true}$')
+    axarr[1].set_xlabel(r'$c_{true}$')
+    axarr[0].set_ylabel('Relative error', fontdict={'fontname':'Arial'})
+    axarr[0].set_xscale('log')
+    axarr[1].set_xscale('log')
+    # fix to same ylim
+    ylow = -0.1
+    yhigh = 2.5
+    axarr[0].set_ylim(ylow, yhigh)
+    axarr[1].set_ylim(ylow, yhigh)
+    # left plot
+    axarr[0].set_title(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
+    axarr[0].plot(curveL1['xpts'], curveL1['ypts'], color=cs['simple_fisher'], marker='o', label='Simple Fisher KPR', zorder=1)
+    axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color='blue', marker='^', label='Simple Fisher KPR2', zorder=1)
+    axarr[0].legend(fontsize=8)
+    # right plot
+    axarr[1].set_title(r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
+    axarr[1].plot(curveR1['xpts'], curveR1['ypts'], color=cs['simple_fisher'], marker='o', label='Simple Fisher KPR', zorder=1)
+    axarr[1].plot(curveR2['xpts'], curveR2['ypts'], color='blue', marker='^', label='Simple Fisher KPR2', zorder=1)
+    axarr[1].legend(fontsize=8)
+    # save figure
+    #fig.set_size_inches(8.0, 7.0)
+    gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + figname + '_detail' + '.eps')
+
+
 def make_figure_D1():
     """
     Mode 1 with a prior, plotting MLE for x vs x and comparing to heuristic (ie. non-prior prediction)
@@ -337,6 +424,7 @@ def make_figure_D1():
     # save figure
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '_prior' + '.eps')
+
 
 def make_figure_E1():
     """
@@ -363,6 +451,7 @@ def make_figure_E1():
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
+
 if __name__ == "__main__":
     #make_figure_2()
     #make_figure_3()
@@ -370,8 +459,10 @@ if __name__ == "__main__":
     #make_figure_B1()
     #make_figure_B2()
     #make_figure_B3()
+    make_figure_B4()
     #make_figure_C1()
     #make_figure_C2()
     #make_figure_C3()
+    make_figure_C4()
     #make_figure_D1()
-    make_figure_E1()
+    #make_figure_E1()
