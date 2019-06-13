@@ -198,45 +198,30 @@ def heatmap_kpr2_error_c(crange=CRANGE, koffrange=KOFFRANGE):
         g = koff / KF
         x = c * kon / koff
 
-        val = ((kf + koff + kf * x + koff * x) ** 4 * ((-2 * kf * koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
-                    1 - x + g ** 2 * (1 + x) ** 2 - g * (-2 + x + x ** 2)) * (-(
-                    (koff * kp ** 2 * t ** 2 * x) / (kf + koff + kf * x + koff * x)) + ((kf * kp * t * x) / (
-                    kf + koff + kf * x + koff * x) + (koff * kp * t * x) / (kf + koff + kf * x + koff * x)) ** 2) * (((
-                                                                                                                                  kf * kp * t * x) / (
-                                                                                                                                  kf + koff + kf * x + koff * x) + (
-                                                                                                                                  koff * kp * t * x) / (
-                                                                                                                                  kf + koff + kf * x + koff * x)) ** 2 - kp * t * (
-                                                                                                                                 (
-                                                                                                                                             kf * kp * t * x) / (
-                                                                                                                                             kf + koff + kf * x + koff * x) + (
-                                                                                                                                             2 * koff * kp * t * x) / (
-                                                                                                                                             kf + koff + kf * x + koff * x)))) / (
-                                                             kf + koff + kf * x + koff * x) ** 2 + (
-                                                             g * kf ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
-                                                                 (1 + g) ** 2 * koff * (1 + x) ** 2 + 2 * g * kp * (
-                                                                     1 + g + x + x ** 2)) * (((kf * kp * t * x) / (
-                                                                 kf + koff + kf * x + koff * x) + (
-                                                                                                          koff * kp * t * x) / (
-                                                                                                          kf + koff + kf * x + koff * x)) ** 2 - kp * t * (
-                                                                                                         (
-                                                                                                                     kf * kp * t * x) / (
-                                                                                                                     kf + koff + kf * x + koff * x) + (
-                                                                                                                     2 * koff * kp * t * x) / (
-                                                                                                                     kf + koff + kf * x + koff * x))) ** 2) / (
-                                                             kf + koff + kf * x + koff * x) ** 2 + (
-                                                             koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (-(
-                                                                 (koff * kp ** 2 * t ** 2 * x) / (
-                                                                     kf + koff + kf * x + koff * x)) + ((
-                                                                                                                    kf * kp * t * x) / (
-                                                                                                                    kf + koff + kf * x + koff * x) + (
-                                                                                                                    koff * kp * t * x) / (
-                                                                                                                    kf + koff + kf * x + koff * x)) ** 2) ** 2 * (
-                                                                         (1 + g) ** 2 * koff * (1 + x) ** 2 + 2 * kp * (
-                                                                             1 + g * (2 + x + g * (1 + x) ** 2)))) / (
-                                                             kf + koff + kf * x + koff * x) ** 2)) / (
-                    c ** 2 * (1 + g) ** 3 * kf ** 2 * koff * kon ** 2 * kp ** 3 * t ** 3 * x ** 3 * (1 + x) ** 3 * (
-                        -(kp * t) + (kf * kp * t * x) / (kf + koff + kf * x + koff * x) + (koff * kp * t * x) / (
-                            kf + koff + kf * x + koff * x)) ** 4)
+        val = ((kf + koff + kf*x + koff*x)**4 * (
+                                                (koff**2 * kp**2 * t**3 * x**2 * (1 + x)*((kf**2 * kp**2 * t**2 * x**2)/(kf + koff + kf*x + koff*x)**2 +
+                                                                                          (2*kf*koff*kp**2 * t**2 * x**2)/(kf + koff + kf*x + koff*x)**2 +
+                                                                                          (koff**2*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2 -
+                                                                                          (koff*kp**2*t**2*x)/(kf + koff + kf*x + koff*x))**2 *
+                                                                                        ((1 + g)**2*koff*(1 + x)**2 + 2*kp*(1 + g**2*(1 + x)**2 + g*(2 + x))))/
+                                                ((1 + g)**3*(kf + koff + kf*x + koff*x)**2) +
+                                                (g*kf**2 * kp**2 * t**3 * x**2 * (1 + x)*((1 + g)**2*koff*(1 + x)**2 + 2*g*kp*(1 + g + x + x**2)) *
+                                                                                                                       ((koff**2*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2 +
+                                                                                                                        (kf*kp*t*x*(-(kp*t) + (kf*kp*t*x)/(kf + koff + kf*x + koff*x)))/(kf + koff + kf*x + koff*x) +
+                                                                                                                        (2*koff*kp*t*x*(-(kp*t) + (kf*kp*t*x)/(kf + koff + kf*x + koff*x)))/(kf + koff + kf*x + koff*x))**2) /
+                                                ((1 + g)**3*(kf + koff + kf*x + koff*x)**2) +
+                                                (2*kf**2 * koff * kp**3 * t**2 * x**2*(-((kf**2*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2) -
+                                                                                       (2*kf*koff*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2 -
+                                                                                       (koff**2*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2 +
+                                                                                       (koff*kp**2*t**2*x)/(kf + koff + kf*x + koff*x))*(-((kf**2*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2) -
+                                                                                                                                         (2*kf*koff*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2 -
+                                                                                                                                         (koff**2*kp**2*t**2*x**2)/(kf + koff + kf*x + koff*x)**2 +
+                                                                                                                                         (kf*kp**2*t**2*x)/(kf + koff + kf*x + koff*x) +
+                                                                                                                                         (2*koff*kp**2*t**2*x)/(kf + koff + kf*x + koff*x))*(kf**2*(-1 + x)*(-1 + koff*t*(1 + x)) +
+                                                                                                                                                                                             kf*koff*(3 - 2*x - x**2 + 2*koff*t*(-1 + x + 3*x**2 + x**3)) +
+                                                                                                                                                                                             koff**2*(2 - 3*x - 5*x**2 - 2*x**3 + koff*t*(-1 + 2*x + 5*x**2 + 2*x**3)))) /
+                                                ((kf + koff)**4*(kf + koff + kf*x + koff*x)**2))) / \
+              (c**2*kf**2*koff*kon**2*kp**3*t**4*x**3*(1 + x)**4*(-(kp*t) + (kf*kp*t*x)/(kf + koff + kf*x + koff*x) + (koff*kp*t*x)/(kf + koff + kf*x + koff*x))**4)
         return val
 
     arr = np.zeros((len(koffrange), len(crange)))
@@ -260,21 +245,17 @@ def heatmap_kpr2_error_koff(crange=CRANGE, koffrange=KOFFRANGE):
         g = koff / KF
         x = c * kon / koff
 
-        val = ((kf + koff + kf * x + koff * x) ** 4 * (koff * (
-                    (g * (1 + g) ** 2 * kf ** 2 * kp ** 2 * t ** 2 * x ** 2 * (1 + x) ** 2) / (
-                        kf + koff + kf * x + koff * x) ** 2 + (
-                                (1 + g) ** 2 * koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (1 + x) ** 2) / (
-                                kf + koff + kf * x + koff * x) ** 2 - (2 * kf * koff * kp ** 2 * t ** 2 * x ** 2 * (
-                        (1 + g) ** 2 + (-1 + g) * (1 + 2 * g) * x + (-1 + g) * g * x ** 2)) / (
-                                kf + koff + kf * x + koff * x) ** 2) + 2 * kp * ((
-                                                                                             g ** 2 * kf ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
-                                                                                                 1 + g + x + x ** 2)) / (
-                                                                                             kf + koff + kf * x + koff * x) ** 2 + (
-                                                                                             koff ** 2 * kp ** 2 * t ** 2 * x ** 2 * (
-                                                                                                 1 + g * (2 + x + g * (
-                                                                                                     1 + x) ** 2))) / (
-                                                                                             kf + koff + kf * x + koff * x) ** 2))) / (
-                    (1 + g) ** 3 * kf ** 2 * koff ** 3 * kp ** 3 * t ** 3 * x ** 3 * (1 + x) ** 3)
+        val = ((kf + koff + kf*x + koff*x)**4 * ((-2*kf**2 * koff * kp**3 * t**2 * x**2*((kf + koff)*(-kf - 2*koff + koff*(kf + koff)*t) +
+                                                                                         (kf**2 + 2*kf*koff + 3*koff**2 - 2*koff**2*(kf + koff)*t)*x -
+                                                                                         koff*(kf + 5*koff)*(-1 + (kf + koff)*t)*x**2 -
+                                                                                         2*koff**2*(-1 + (kf + koff)*t)*x**3)) /
+                                                 ((kf + koff)**4*(kf + koff + kf*x + koff*x)**2) +
+                                                 (g*kf**2 * kp**2 * t**3 * x**2*(1 + x)*((1 + g)**2*koff*(1 + x)**2 + 2*g*kp*(1 + g + x + x**2))) /
+                                                 ((1 + g)**3*(kf + koff + kf*x + koff*x)**2) +
+                                                 (koff**2*kp**2*t**3*x**2*(1 + x)*((1 + g)**2*koff*(1 + x)**2 +
+                                                                                   2*kp*(1 + g*(2 + x + g*(1 + x)**2)))) /
+                                                 ((1 + g)**3*(kf + koff + kf*x + koff*x)**2))) / \
+              (kf**2*koff**3*kp**3*t**4*x**3*(1 + x)**4)
 
         return val
 
