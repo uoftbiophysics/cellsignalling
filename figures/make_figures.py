@@ -9,12 +9,12 @@ from settings import COLOR_SCHEME as cs
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
 
-
 def make_figure_2():
     """
     Signal specificity and relative error in estimation of x for Mode 1.
     Panel A: <n> vs c for two different Kd, showing overlapping "clouds"
     Panel B: rel_err_x vs x for heuristic form of relative error
+    Panel C: over-layed cross sections from heatmaps
     """
     figname = 'mode1_composite'
     curveLk = DATADICT[figname + '_mean_N_Black']
@@ -453,16 +453,16 @@ def make_figure_E1():
 
 
 if __name__ == "__main__":
-    #make_figure_2()
+    make_figure_2()
     #make_figure_3()
     #make_figure_5()
     #make_figure_B1()
     #make_figure_B2()
     #make_figure_B3()
-    make_figure_B4()
+    #make_figure_B4()
     #make_figure_C1()
     #make_figure_C2()
     #make_figure_C3()
-    make_figure_C4()
+    #make_figure_C4()
     #make_figure_D1()
     #make_figure_E1()
