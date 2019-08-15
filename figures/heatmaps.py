@@ -46,7 +46,32 @@ vmax_obs = 1000003020
 vmin_obs = 0.00022000016528925625
 
 
-def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
+def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, **kwargs):
+    # default parameters
+    if 'levels' in kwargs.keys():
+        levels = kwargs['levels']
+    else:
+        levels = [10, 100, 1000, 1E4]
+    if 'vmin' in kwargs.keys():
+        vmin = kwargs['vmin']
+    else:
+        vmin = np.min(arr)
+    if 'vmax' in kwargs.keys():
+        vmax = kwargs['vmax']
+    else:
+        vmax = np.max(arr)
+    if 'contour_linestyle' in kwargs.keys():
+        contour_linestyle = 'dashed'
+    else:
+        contour_linestyle = 'solid'
+    if 'contour_color' in kwargs.keys():
+        contour_color = kwargs['contour_color']
+    else:
+        contour_color = None
+    if 'contour_linewidths' in kwargs.keys():
+        contour_lindewidths = kwargs['contour_linewidths']
+    else:
+        contour_lindewidths = None
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
     """
@@ -55,7 +80,10 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     #print 'arr limits:', np.min(arr), np.max(arr)
     # plot setup
     f = plt.figure()
-    imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': np.min(arr), 'vmax': np.max(arr), 'norm': mpl.colors.LogNorm()}
+    if log_norm:
+        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+    else:
+        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
     #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
     im = plt.imshow(arr, **imshow_kw)
 
@@ -68,10 +96,17 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
     #ax.set_xticklabels(['%.3f' % cval for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0], fontsize=FS)
     #ax.set_yticklabels(['%.3f' % kval for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0], fontsize=FS)
-    ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0],
-                       fontsize=FS)
-    ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
-                       fontsize=FS)
+    if log_norm:
+        ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0],
+                           fontsize=FS)
+        ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
+                           fontsize=FS)
+    else:
+        ax.set_xticklabels(["{:10.2f}".format(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0],
+                           fontsize=FS)
+        ax.set_yticklabels(["{:10.2f}".format(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
+                           fontsize=FS)
+
     ax.invert_yaxis()
     ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
     ax.set_ylabel('z', fontsize=FS)
@@ -86,15 +121,16 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW):
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
 
     # contour line for value 1.0
-    plt.contour(arr, levels=[10, 100, 1000, 1E4], linestyles=['dashed'])  # use 'dashed' or 'solid' curve
+    plt.contour(arr, levels=levels, linestyles=[contour_linestyle], colors=contour_color, linewidths=contour_lindewidths)
 
     # save
-    plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf')
-    plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps')
+    if save == True:
+        plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf')
+        plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps')
     if show:
         plt.show()
 
-    return
+    return fig, ax
 
 
 def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=True, make_panel=False,
@@ -423,17 +459,104 @@ def heatmap_kpr2_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr2_heuristic_error_koff', label)
     return
 
+T=100
+def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
+    nobs = 0.1 * KP * T
+    mobs = 0.15 * KP * T
+    figname = 'heatmap_log_posterior_mode1'
+    def log_posterior_x(c, koff, n):
+        x = KON * c / koff
+        mu = KP * T * x / (1 + x)
+        var = (KP * T * x)/(1 + x) + (2 * KP**2 * T * x)/(koff * (1 + x)**3) *(1 + (np.exp(-T * koff * (1 + x)) - 1)/(T * koff * (1 + x)))
+        post = -(n - mu)**2 / (2 * var) - 0.5 * np.log(2 * 3.14159 * var)
+        return post
+
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = log_posterior_x(cval, koffval, nobs)
+
+    label = r'$ln(P(x|n))$'
+    fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
+                           levels=list(range(-50, 0, 5)), vmin=-60, vmax=0, contour_color='w', contour_linewidths=0.5)
+    ax.set_xlabel(r'$c$', fontsize=FS)
+    ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+
+    # Superimpose heuristic estimate
+    def heuristic_estimate(c, n):
+        koff_est = ((KP * T - n) * KON * c) / n
+        return koff_est
+
+    estimate_line = []
+    for c in crange:
+        estimate_line.append(heuristic_estimate(c, nobs))
+    # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+    xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
+    ypts = [ax.get_ylim()[1] * koff / max(koffrange) for koff in estimate_line]
+    ax.plot(xpts, ypts, 'k--')
+    # save figure
+    fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+    fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+
+    # ------------------
+    # Repeat for Model 2
+    # ------------------
+    figname = 'heatmap_log_posterior_combined'
+
+    def log_posterior_c_koff(c, koff, n, m):
+        x = KON * c / koff
+        meanN = KP * T * x / (1 + x)
+        meanM = koff * T * x / (1 + x)
+        varN = (KP * T * x) / (1 + x) + (2 * KP ** 2 * T * x) / (koff * (1 + x) ** 3) * (
+                    1 + (np.exp(-T * koff * (1 + x)) - 1) / (T * koff * (1 + x)))
+        varM = (koff * T * x) * (1 + x**2) / (1 + x)**3 + 2 * x**2 / (1 + x)**4 * (1 - np.exp(-koff * T * (1 + x)))
+        covNM = (KP * T * x * (1-x)) / (1+x)**3 * (1 + (np.exp(-koff * T * (1+x)) - 1) / (T * koff * (1 + x)))
+        sigma = np.array([[varN, covNM], [covNM, varM]])
+        sigma_inv = np.linalg.inv(sigma)
+        q = np.array([n - meanN, m - meanM])
+        post = -0.5 * np.transpose(q).dot(sigma_inv).dot(q) - 0.5 * np.log((2 * 3.14159)**2 * np.linalg.det(sigma))
+        return post
+
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
+
+    label = r'$ln(P(c, k_{off}|n, m))$'
+    fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
+                           levels=list(range(-100, 0, 10)), vmin=-200, vmax=0, contour_color='w', contour_linewidths=0.5)
+    ax.set_xlabel(r'$c$', fontsize=FS)
+    ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+
+    # Superimpose heuristic estimate
+    def heuristic_estimate_c(n, m):
+        c_est = KP * m / (KP * T - n)
+        return c_est
+    def heuristic_estimate_koff(n, m):
+        koff_est = KP * m / n
+        return koff_est
+    # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+    koff_star = [ax.get_ylim()[1]/max(koffrange) * heuristic_estimate_koff(nobs, mobs) for _ in range(len(xpts))]
+    c_star = [ax.get_xlim()[1] / max(crange) *heuristic_estimate_c(nobs, mobs) for _ in range(len(ypts))]
+    ax.plot(xpts, koff_star, 'k--')
+    ax.plot(c_star, ypts, 'k--')
+    # save figure
+    fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+    fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+
+    return
 
 if __name__ == '__main__':
 
-    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
-    heatmap_mode1_error_x()
-    figure_2_combined_cross_sections()
+    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    #heatmap_mode1_error_x()
+    #figure_2_combined_cross_sections()
 
-    heatmap_combined_error_c()
-    heatmap_combined_error_koff()
-    heatmap_kpr_error_c()
-    heatmap_kpr_error_koff()
+    #heatmap_combined_error_c()
+    #heatmap_combined_error_koff()
+    #heatmap_kpr_error_c()
+    #heatmap_kpr_error_koff()
 
-    heatmap_kpr2_error_c()
-    heatmap_kpr2_error_koff()
+    #heatmap_kpr2_error_c()
+    #heatmap_kpr2_error_koff()
+    heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
