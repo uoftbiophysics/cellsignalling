@@ -115,7 +115,7 @@ def make_figure_B1():
     c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], color=cs['heuristic'], label='heuristic')
     #c2_part2 = plt.plot(curve2['xpts'][400:], curve2['ypts'][400:], color=cs['heuristic'])
     c1 = plt.plot(curve1['xpts'], curve1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
-    plt.title('Mode 1 MLE: Numeric vs Heuristic ($k_p=10$, $t=1000$, $k_{off}=1$)')
+    plt.title('Mode 1 MLE: Numeric vs Heuristic')# ($k_p=10$, $t=1000$, $k_{off}=1$)')
     plt.xlabel(r'$n_{obs}$')
     plt.ylabel(r'$x_{MLE}$')
     plt.legend()
@@ -139,7 +139,7 @@ def make_figure_B2():
     gs1 = gridspec.GridSpec(1, 2)
     axarr = [fig.add_subplot(ss) for ss in gs1]
     fig.set_size_inches(10, 5)
-    plt.suptitle('Combined MLE: Numeric vs Heuristic ($k_p=10$, $t=1000$, $k_{off}=1$, $m=100$)')
+    plt.suptitle('Combined MLE: Numeric vs Heuristic')# ($k_p=10$, $t=1000$, $k_{off}=1$, $m=100$)')
     # left subplot
     cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
     cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
@@ -175,7 +175,7 @@ def make_figure_B3():
     gs1 = gridspec.GridSpec(1, 2)
     axarr = [fig.add_subplot(ss) for ss in gs1]
     fig.set_size_inches(10, 5)
-    plt.suptitle('KPR MLE: Numeric vs Heuristic ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$, $m=100$)')
+    plt.suptitle('KPR MLE: Numeric vs Heuristic')# ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$, $m=100$)')
     # left subplot
     cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
     cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
@@ -212,7 +212,7 @@ def make_figure_B4():
     gs1 = gridspec.GridSpec(1, 2)
     axarr = [fig.add_subplot(ss) for ss in gs1]
     fig.set_size_inches(10, 5)
-    plt.suptitle('KPR2 MLE: Numeric vs Heuristic ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$, $m=100$)')
+    plt.suptitle('KPR2 MLE: Numeric vs Heuristic')# ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$, $m=100$)')
     # left subplot
     cL2 = axarr[0].plot(curveL2['xpts'], curveL2['ypts'], color=cs['heuristic'], label='heuristic')
     cL1 = axarr[0].plot(curveL1['xpts'], curveL1['ypts'], marker='o', linestyle='None', color=cs['numerical_fisher_sp'], label='numeric')
@@ -252,7 +252,7 @@ def make_figure_C1():
     plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'],  edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
     plt.scatter(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
     # axis
-    plt.title('Mode 1: MLE Relative error comparison ($k_p=10$, $t=1000$, $k_{off}=1$)')
+    plt.title('Mode 1: MLE Relative error comparison')# ($k_p=10$, $t=1000$, $k_{off}=1$)')
     plt.xlabel(r'$x$')
     plt.ylabel(r'$\alpha \langle\delta x^{2}\rangle$/$x^{2}$')
     plt.gca().set_xscale('log')
@@ -281,7 +281,7 @@ def make_figure_C2():
     gs1 = gridspec.GridSpec(1, 2)
     axarr = [fig.add_subplot(ss) for ss in gs1]
     fig.set_size_inches(10, 5)
-    plt.suptitle('Combined: MLE Relative error comparison ($k_p=10$, $t=1000$, $k_{off}=1$)')
+    plt.suptitle('Combined: MLE Relative error comparison')# ($k_p=10$, $t=1000$, $k_{off}=1$)')
     axarr[0].set_xlabel(r'$c$')
     axarr[1].set_xlabel(r'$c$')
     axarr[0].set_ylabel('Relative error')
@@ -327,7 +327,7 @@ def make_figure_C3():
     axarr = [fig.add_subplot(ss) for ss in gs1]
 
     fig.set_size_inches(10, 5)
-    plt.suptitle('KPR: MLE Relative error comparison ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$)')
+    plt.suptitle('KPR: MLE Relative error comparison')# ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$)')
     axarr[0].set_xlabel(r'$c_{true}$')
     axarr[1].set_xlabel(r'$c_{true}$')
     axarr[0].set_ylabel('Relative error', fontdict={'fontname':'Arial'})
@@ -375,7 +375,7 @@ def make_figure_C4():
     axarr = [fig.add_subplot(ss) for ss in gs1]
 
     fig.set_size_inches(10, 5)
-    plt.suptitle('KPR vs KPR2 - MLE heuristic relative error ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$)')
+    plt.suptitle('KPR vs KPR2 - MLE heuristic relative error')# ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$)')
     axarr[0].set_xlabel(r'$c_{true}$')
     axarr[1].set_xlabel(r'$c_{true}$')
     axarr[0].set_ylabel('Relative error', fontdict={'fontname':'Arial'})
@@ -414,7 +414,7 @@ def make_figure_D1():
     # plot setup
     #plt.figure(figsize=(10, 5))
     plt.figure()
-    plt.title(r'Mode 1: MLE comparison non-uniform prior ($k_p=10$, $t=1000$, $k_{off}=1$, $\lambda=0.001$)')
+    plt.title(r'Mode 1: MLE comparison non-uniform prior ')#($k_p=10$, $t=1000$, $k_{off}=1$, $\lambda=0.001$)')
     plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], color=cs['heuristic'], label='heuristic', zorder=1)
     plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], color=cs['heuristic'], zorder=1)
     plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'], edgecolor='', label='numeric with prior', zorder=2)
@@ -453,16 +453,16 @@ def make_figure_E1():
 
 
 if __name__ == "__main__":
-    #make_figure_2()
-    #make_figure_3()
-    #make_figure_5()
-    #make_figure_B1()
-    #make_figure_B2()
-    #make_figure_B3()
-    #make_figure_B4()
-    #make_figure_C1()
-    #make_figure_C2()
-    #make_figure_C3()
-    #make_figure_C4()
-    #make_figure_D1()
+    make_figure_2()
+    make_figure_3()
+    make_figure_5()
+    make_figure_B1()
+    make_figure_B2()
+    make_figure_B3()
+    make_figure_B4()
+    make_figure_C1()
+    make_figure_C2()
+    make_figure_C3()
+    make_figure_C4()
+    make_figure_D1()
     make_figure_E1()
