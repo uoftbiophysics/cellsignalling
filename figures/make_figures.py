@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from numpy import divide
 import matplotlib.gridspec as gridspec
 import os
 import seaborn as sns
@@ -439,14 +440,16 @@ def make_figure_E1():
     #plt.figure(figsize=(10, 5))
     plt.figure()
     plt.title('Relative error for different receptor schemes')#+'\r\n'+r'($k_p=10$, $t=1000$, $k_{off}=1$, $k_{on}=1$)')
-    plt.plot(curve1['xpts'], curve1['ypts'], color=cs['heuristic'], label='Mode 1', zorder=1)
-    plt.plot(curve2['xpts'], curve2['ypts'], color=cs['simple_fisher'], label='Combined Estimating Two Parameters', zorder=1)
-    plt.plot(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher_sp'], label='Combined Estimating One Parameter', zorder=1)
+    plt.plot(curve1['xpts'], divide(curve1['ypts'], curve1['ypts']), color=cs['heuristic'], label='Mode 1', zorder=1)
+    plt.plot(curve2['xpts'], divide(curve2['ypts'], curve1['ypts']), color=cs['simple_fisher'], label='Combined Estimating Two Parameters', zorder=1)
+    plt.plot(curve3['xpts'], divide(curve3['ypts'], curve1['ypts']), color=cs['numerical_fisher_sp'], label='Combined Estimating One Parameter', zorder=1)
     plt.xlabel(r'$c$')
     plt.ylabel(r'$\delta c^{2}/c^{2}$')
     plt.legend()
     plt.xlim((0, 20))
-    plt.ylim((0, 0.1))
+    #plt.ylim((0, 0.1))
+    plt.show()
+    return
     # save figure
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
