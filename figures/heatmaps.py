@@ -586,104 +586,288 @@ def heatmap_ratios(crange=CTILDERANGE, koffrange=ZRANGE,
 
 
 T=100
+KF=100
 def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
-    nobs = 0.1 * KP * T
-    mobs = 0.15 * KP * T
-    figname = 'heatmap_log_posterior_mode1'
-    def log_posterior_x(c, koff, n):
-        x = KON * c / koff
-        mu = KP * T * x / (1 + x)
-        var = (KP * T * x)/(1 + x) + (2 * KP**2 * T * x)/(koff * (1 + x)**3) *(1 + (np.exp(-T * koff * (1 + x)) - 1)/(T * koff * (1 + x)))
-        post = -(n - mu)**2 / (2 * var) - 0.5 * np.log(2 * 3.14159 * var)
-        return post
+    nobs = 0.1 * KP * T # 100
+    mobs = 0.15 * KP * T # 150
+    def mode1_plot():
+        figname = 'heatmap_log_posterior_mode1'
+        def log_posterior_x(c, koff, n):
+            x = KON * c / koff
+            mu = KP * T * x / (1 + x)
+            var = (KP * T * x)/(1 + x) + (2 * KP**2 * T * x)/(koff * (1 + x)**3) *(1 + (np.exp(-T * koff * (1 + x)) - 1)/(T * koff * (1 + x)))
+            post = -(n - mu)**2 / (2 * var) - 0.5 * np.log(2 * 3.14159 * var)
+            return post
 
-    arr = np.zeros((len(koffrange), len(crange)))
-    for i, koffval in enumerate(koffrange):
-        for j, cval in enumerate(crange):
-            arr[i, j] = log_posterior_x(cval, koffval, nobs)
+        arr = np.zeros((len(koffrange), len(crange)))
+        for i, koffval in enumerate(koffrange):
+            for j, cval in enumerate(crange):
+                arr[i, j] = log_posterior_x(cval, koffval, nobs)
 
-    label = r'$ln(P(x|n))$'
-    fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
-                           levels=list(range(-50, 0, 5)), vmin=-60, vmax=0, contour_color='w', contour_linewidths=0.5)
-    ax.set_xlabel(r'$c$', fontsize=FS)
-    ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+        label = r'$ln(P(x|n))$'
+        fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
+                               levels=list(range(-50, 0, 5)), vmin=-60, vmax=0, contour_color='w', contour_linewidths=0.5)
+        ax.set_xlabel(r'$c$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
 
-    # Superimpose heuristic estimate
-    def heuristic_estimate(c, n):
-        koff_est = ((KP * T - n) * KON * c) / n
-        return koff_est
+        # Superimpose heuristic estimate
+        def heuristic_estimate(c, n):
+            koff_est = ((KP * T - n) * KON * c) / n
+            return koff_est
 
-    estimate_line = []
-    for c in crange:
-        estimate_line.append(heuristic_estimate(c, nobs))
-    # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
-    xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
-    ypts = [ax.get_ylim()[1] * koff / max(koffrange) for koff in estimate_line]
-    ax.plot(xpts, ypts, 'k--')
-    # save figure
-    fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
-    fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+        estimate_line = []
+        for c in crange:
+            estimate_line.append(heuristic_estimate(c, nobs))
+        # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+        xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
+        ypts = [ax.get_ylim()[1] * koff / max(koffrange) for koff in estimate_line]
+        ax.plot(xpts, ypts, 'k--')
+        # save figure
+        fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+        fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
     # ------------------
     # Repeat for Model 2
     # ------------------
-    figname = 'heatmap_log_posterior_combined'
+    def mode2_plot():
+        figname = 'heatmap_log_posterior_combined'
 
-    def log_posterior_c_koff(c, koff, n, m):
-        x = KON * c / koff
-        meanN = KP * T * x / (1 + x)
-        meanM = koff * T * x / (1 + x)
-        varN = (KP * T * x) / (1 + x) + (2 * KP ** 2 * T * x) / (koff * (1 + x) ** 3) * (
-                    1 + (np.exp(-T * koff * (1 + x)) - 1) / (T * koff * (1 + x)))
-        varM = (koff * T * x) * (1 + x**2) / (1 + x)**3 + 2 * x**2 / (1 + x)**4 * (1 - np.exp(-koff * T * (1 + x)))
-        covNM = (KP * T * x * (1-x)) / (1+x)**3 * (1 + (np.exp(-koff * T * (1+x)) - 1) / (T * koff * (1 + x)))
-        sigma = np.array([[varN, covNM], [covNM, varM]])
-        sigma_inv = np.linalg.inv(sigma)
-        q = np.array([n - meanN, m - meanM])
-        post = -0.5 * np.transpose(q).dot(sigma_inv).dot(q) - 0.5 * np.log((2 * 3.14159)**2 * np.linalg.det(sigma))
-        return post
+        def log_posterior_c_koff(c, koff, n, m):
+            x = KON * c / koff
+            meanN = KP * T * x / (1 + x)
+            meanM = koff * T * x / (1 + x)
+            varN = (KP * T * x) / (1 + x) + (2 * KP ** 2 * T * x) / (koff * (1 + x) ** 3) * (
+                        1 + (np.exp(-T * koff * (1 + x)) - 1) / (T * koff * (1 + x)))
+            varM = (koff * T * x) * (1 + x**2) / (1 + x)**3 + 2 * x**2 / (1 + x)**4 * (1 - np.exp(-koff * T * (1 + x)))
+            covNM = (KP * T * x * (1-x)) / (1+x)**3 * (1 + (np.exp(-koff * T * (1+x)) - 1) / (T * koff * (1 + x)))
+            sigma = np.array([[varN, covNM], [covNM, varM]])
+            sigma_inv = np.linalg.inv(sigma)
+            q = np.array([n - meanN, m - meanM])
+            post = -0.5 * np.transpose(q).dot(sigma_inv).dot(q) - 0.5 * np.log((2 * 3.14159)**2 * np.linalg.det(sigma))
+            return post
 
-    arr = np.zeros((len(koffrange), len(crange)))
-    for i, koffval in enumerate(koffrange):
-        for j, cval in enumerate(crange):
-            arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
+        arr = np.zeros((len(koffrange), len(crange)))
+        for i, koffval in enumerate(koffrange):
+            for j, cval in enumerate(crange):
+                arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
 
-    label = r'$ln(P(c, k_{off}|n, m))$'
-    fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
-                           levels=list(range(-100, 0, 10)), vmin=-200, vmax=0, contour_color='w', contour_linewidths=0.5)
-    ax.set_xlabel(r'$c$', fontsize=FS)
-    ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+        label = r'$ln(P(c, k_{off}|n, m))$'
+        fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
+                               levels=list(range(-100, 0, 10)), vmin=-200, vmax=0, contour_color='w', contour_linewidths=0.5)
+        ax.set_xlabel(r'$c$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
 
-    # Superimpose heuristic estimate
-    def heuristic_estimate_c(n, m):
-        c_est = KP * m / (KP * T - n)
-        return c_est
-    def heuristic_estimate_koff(n, m):
-        koff_est = KP * m / n
-        return koff_est
-    # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
-    koff_star = [ax.get_ylim()[1]/max(koffrange) * heuristic_estimate_koff(nobs, mobs) for _ in range(len(xpts))]
-    c_star = [ax.get_xlim()[1] / max(crange) *heuristic_estimate_c(nobs, mobs) for _ in range(len(ypts))]
-    ax.plot(xpts, koff_star, 'k--')
-    ax.plot(c_star, ypts, 'k--')
-    # save figure
-    fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
-    fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+        # Superimpose heuristic estimate
+        def heuristic_estimate_c(n, m):
+            c_est = KP * m / (KP * T - n)
+            return c_est
+        def heuristic_estimate_koff(n, m):
+            koff_est = KP * m / n
+            return koff_est
+        # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+        xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
+        ypts = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], len(koffrange))
 
+        koff_star = [ax.get_ylim()[1]/max(koffrange) * heuristic_estimate_koff(nobs, mobs) for _ in range(len(xpts))]
+        c_star = [ax.get_xlim()[1] / max(crange) * heuristic_estimate_c(nobs, mobs) for _ in range(len(ypts))]
+        ax.plot(xpts, koff_star, 'k--')
+        ax.plot(c_star, ypts, 'k--')
+        # save figure
+        fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+        fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+
+    # ------------------
+    # Repeat for Model 3
+    # ------------------
+    def KPR1_plot(crange=crange, koffrange=koffrange):
+        figname = 'heatmap_log_posterior_KPR1'
+
+        def log_posterior_c_koff(c, koff, n, m):
+            x = KON * c / koff
+            meanN = (KF / (KF + koff)) * KP * T * x / (1 + x)
+            meanM = (KF / (KF + koff)) * koff * T * x / (1 + x)
+            varN = -((KF * KP * T * x)**2 /((KF + koff)**2 * (1 + x)**2)) + \
+                   (KF*KP*T*x)/((KF + koff)*(1 + x)) - \
+                   (KF * KP**2 * x* ((KF - koff*x)* (2*koff**3*(-1 + koff*T)*(1 + x)**3 + \
+                                                KF**3*(-2 + 2*koff*T*(1 + x) + koff**2*T**2*x*(1 + x)**2) + \
+                                                2*KF**2*koff*(-3 - x + koff**2*T**2*x*(1 + x)**2 +\
+                                                              koff*T*(3 + 4*x + x**2)) +\
+                                                KF*koff**2*(koff**2*T**2*x*(1 + x)**2 - 2*(3 + 3*x + x**2) +\
+                                                            2*koff*T*(3 + 6*x + 4*x**2 + x**3))) -\
+                                2*koff**4*x*(1 + x)**3*np.exp(-((KF + koff)*T)) +\
+                                2*KF*(KF + koff)**3*np.exp(-(koff*T*(1 + x))))) / (koff**2 * (KF + koff)**4 * (1 + x)**4 * (-KF + koff*x))
+            varM = -((KF**2*koff**2*T**2*x**2)/((KF + koff)**2*(1 + x)**2)) + (KF*koff*T*x)/((KF + koff)*(1 + x)) + \
+                   (KF**2*x**2*((KF - koff*x)*(KF**2*(2 - 2*koff*T*(1 + x) + koff**2*T**2*(1 + x)**2) +\
+                                               koff**2*(koff**2*T**2*(1 + x)**2 - 2*koff*T*(2 + 3*x + x**2) +\
+                                                        2*(3 + 3*x + x**2)) +\
+                                               2*KF*koff*(3 + x + koff**2*T**2*(1 + x)**2 -\
+                                                          koff*T*(3 + 4*x + x**2))) +\
+                                2*koff**3*(1 + x)**3*np.exp(-((KF + koff)*T)) -\
+                                2*(KF + koff)**3*np.exp(-(koff*T*(1 + x))))) / ((KF + koff)**4*(1 + x)**4*(KF - koff*x))
+            covNM = (KF*KP*x*(-(KF*koff**2*(KF + koff)**2*T**2*x*(1 + x)**2) - \
+                              ((KF - koff*x)*(koff**3*(-1 + koff*T)*(1 + x)**3 +\
+                                              KF*koff**2*(-3 + 2*x**2 + x**3 + koff**2*T**2*x*(1 + x)**2 +\
+                                                          koff*T*(3 + 4*x + x**2)) +\
+                                              KF**3*(-1 + x + koff**2*T**2*x*(1 + x)**2 + koff*(T - T*x**2)) +\
+                                              KF**2*koff*(-3 + 2*x + x**2 + 2*koff**2*T**2*x*(1 + x)**2 +\
+                                                          koff*T*(3 + x - 3*x**2 - x**3))) -\
+                               koff**3*(-KF + koff)*x*(1 + x)**3*np.exp(-((KF + koff)*T)) -\
+                               KF*(KF + koff)**3*(-1 + x)*np.exp(-(koff*T*(1 + x)))) / (-KF + koff*x)))/(koff*(KF + koff)**4*(1 + x)**4)
+            sigma = np.array([[varN, covNM], [covNM, varM]])
+            sigma_inv = np.linalg.inv(sigma)
+            q = np.array([n - meanN, m - meanM])
+            post = -0.5 * np.transpose(q).dot(sigma_inv).dot(q) - 0.5 * np.log(
+                (2 * 3.14159) ** 2 * np.linalg.det(sigma))
+            return post
+
+        arr = np.zeros((len(koffrange), len(crange)))
+        for i, koffval in enumerate(koffrange):
+            for j, cval in enumerate(crange):
+                arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
+
+        label = r'$ln(P(c, k_{off}|n, m))$'
+        fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
+                               levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
+                               contour_linewidths=0.5)
+        ax.set_xlabel(r'$c$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+
+        # Superimpose heuristic estimate
+        def heuristic_estimate_c(n, m):
+            c_est = - KP * m * (KP * m + KF * n) / (KON * n * (KP * m + KF * n - KF * KP * T))
+            return c_est
+
+        def heuristic_estimate_koff(n, m):
+            koff_est = KP * m / n
+            return koff_est
+
+        # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+        xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
+        koff_star = [ax.get_ylim()[1] / max(koffrange) * heuristic_estimate_koff(nobs, mobs) + ax.get_ylim()[0]
+                     for _ in range(len(xpts))]
+        ax.plot(xpts, koff_star, 'k--')
+
+        ypts = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], len(koffrange))
+        c_star = [ax.get_xlim()[1] / max(crange) * heuristic_estimate_c(nobs, mobs) + ax.get_xlim()[0]
+                  for _ in range(len(ypts))]
+
+        ax.plot(c_star, ypts, 'k--')
+        # save figure
+        fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+        #fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+
+    # ------------------
+    # Repeat for KPR 2
+    # ------------------
+    n1obs = nobs * 0.1
+    n2obs = mobs * 0.5
+    def KPR2_plot(crange=crange, koffrange=koffrange):
+        figname = 'heatmap_log_posterior_KPR2'
+
+        def log_posterior_c_koff(c, koff, n1, n2):
+            x = KON * c / koff
+            meanN1 = koff * KP * T * x / ((1 + x) * (KF + koff))
+            meanN2 = KF * KP * T * x / ((1 + x) * (KF + koff))
+            varN1 = -((koff**2*KP**2*T**2*x**2)/(KF + koff + KF*x + koff*x)**2) + \
+                    (koff*KP*T*x)/(KF + koff + KF*x + koff*x) + \
+                    (KP**2*x*((KF - koff*x)*(koff**2*(-2 + 2*koff*T*(1 + x) + koff**2*T**2*x*(1 + x)**2) +\
+                                             KF**2*(2*x + koff**2*T**2*x*(1 + x)**2 +\
+                                                    2*koff*T*(1 + 2*x + 2*x**2 + x**3)) +\
+                                             2*KF*koff*(-1 - 2*x**2 - x**3 + koff**2*T**2*x*(1 + x)**2 +\
+                                                        koff*T*(2 + 3*x + 2*x**2 + x**3))) -\
+                              2*KF*koff*(-KF + koff*(-1 + x))*(1 + x)**3*np.exp(-((KF + koff)*T)) -\
+                              2*(KF + koff)**3*x*np.exp(-(koff*T*(1 + x)))))/((KF + koff)**4*(1 + x)**4*(KF - koff*x))
+
+            varN2 = -((KF**2*KP**2*T**2*x**2)/(KF + koff + KF*x + koff*x)**2) + \
+                    (KF*KP*T*x)/(KF + koff + KF*x + koff*x) -\
+                    (KF*KP**2*x*((KF - koff*x) * (2*koff**3*(-1 + koff*T)*(1 + x)**3 +\
+                                                  KF**3*(-2 + 2*koff*T*(1 + x) + koff**2*T**2*x*(1 + x)**2) +\
+                                                  2*KF**2*koff*(-3 - x + koff**2*T**2*x*(1 + x)**2 +\
+                                                                koff*T*(3 + 4*x + x**2)) +\
+                                                  KF*koff**2*(koff**2*T**2*x*(1 + x)**2 - 2*(3 + 3*x + x**2) +\
+                                                              2*koff*T*(3 + 6*x + 4*x**2 + x**3))) -\
+                                 2*koff**4*x*(1 + x)**3*np.exp(-((KF + koff)*T)) +\
+                                 2*KF*(KF + koff)**3*np.exp(-(koff*T*(1 + x)))))/(koff**2*(KF + koff)**4*(1 + x)**4*(-KF + koff*x))
+
+            covN1N2 = (KF*KP**2*x*(-(koff**2*(KF + koff)**2*T**2*x*(1 + x)**2) + \
+                                 (-((KF - koff*x)*(KF**2*(-1 + x + koff**2*T**2*x*(1 + x)**2 + koff*(T - T*x**2)) + \
+                                                   KF*koff*(-3 + 2*x + x**2 + 2*koff**2*T**2*x*(1 + x)**2 -\
+                                                            2*koff*T*(-1 + x + 3*x**2 + x**3)) +\
+                                                   koff**2*(-2 + 3*x + 5*x**2 + 2*x**3 +\
+                                                            koff**2*T**2*x*(1 + x)**2 -\
+                                                            koff*T*(-1 + 2*x + 5*x**2 + 2*x**3)))) -\
+                                  koff**2*(1 + x)**3*(-KF + koff*(-1 + 2*x))*\
+                                  np.exp(-((KF + koff)*T)) +\
+                                  (KF + koff)**3*(-1 + x)*np.exp(-(koff*T*(1 + x))))/(-KF + koff*x)))/\
+                    (koff*(KF + koff)**4*(1 + x)**4)
+            sigma = np.array([[varN1, covN1N2], [covN1N2, varN2]])
+            sigma_inv = np.linalg.inv(sigma)
+            q = np.array([n1 - meanN1, n2 - meanN2])
+            post = -0.5 * np.transpose(q).dot(sigma_inv).dot(q) - 0.5 * np.log(
+                (2 * 3.14159) ** 2 * np.linalg.det(sigma))
+            return post
+
+        arr = np.zeros((len(koffrange), len(crange)))
+        for i, koffval in enumerate(koffrange):
+            for j, cval in enumerate(crange):
+                arr[i, j] = log_posterior_c_koff(cval, koffval, n1obs, n2obs)
+
+        label = r'$ln(P(c, k_{off}|n_1, n_2))$'
+        fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
+                               levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
+                               contour_linewidths=0.5)
+        ax.set_xlabel(r'$c$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+
+        # Superimpose heuristic estimate
+        def heuristic_estimate_c(n1, n2):
+            c_est = -KF * n1 * (n1 + n2) / (KON * n2 * (n1 + n2 - KP * T))
+            return c_est
+
+        def heuristic_estimate_koff(n1, n2):
+            koff_est = KF * n1 / n2
+            return koff_est
+
+        # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+        xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
+        koff_star = [ax.get_ylim()[1] / max(koffrange) * heuristic_estimate_koff(n1obs, n2obs) + ax.get_ylim()[0]
+                     for _ in range(len(xpts))]
+        ax.plot(xpts, koff_star, 'k--')
+
+        print(min(koffrange), max(koffrange))
+        print(heuristic_estimate_koff(n1obs, n2obs))
+        print(koff_star[0])
+
+        ypts = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], len(koffrange))
+        c_star = [ax.get_xlim()[1] / max(crange) * heuristic_estimate_c(n1obs, n2obs) + ax.get_xlim()[0]
+                  for _ in range(len(ypts))]
+
+        print(min(crange), max(crange))
+        print(heuristic_estimate_c(n1obs, n2obs))
+        print(c_star[0])
+
+        ax.plot(c_star, ypts, 'k--')
+        # save figure
+        fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+        # fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
+
+    #mode1_plot()
+    #mode2_plot()
+    #KPR1_plot()
+    KPR2_plot()
     return
 
 if __name__ == '__main__':
-
     #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
     #heatmap_mode1_error_x()
     #figure_2_combined_cross_sections()
 
     #heatmap_combined_error_c()
     #heatmap_combined_error_koff()
-    #heatmap_kpr_error_c()
-    #heatmap_kpr_error_koff()
+    #heatmap_KPr_error_c()
+    #heatmap_KPr_error_koff()
 
     #heatmap_kpr2_error_c()
     #heatmap_kpr2_error_koff()
-    #heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
-    heatmap_ratios()
+    heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
+    #heatmap_ratios()
