@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import multiprocessing as mp
+from functools import partial
 
 # unit params
 KON = 1
@@ -37,15 +38,22 @@ KOFF_TRUE = 1.0
 relErrorCvaryingC = []
 relErrorKoffvaryingC = []
 
+
 def integrateH(q, returnq, koffTrue=KOFF_TRUE):
     cTrue = q.get()
+    # found at
+    # https://stackoverflow.com/questions/10984924/generate-new-function-from-old-function-with-only-one-argument-set
+    reduceH = partial(H, c=cTrue, koff=koffTrue)
+    reduceProb = partial(prior, c=cTrue, koff=koffTrue)
+
     SumProb = 0
+
     print "Summing probability"
     for n in range(1, KP*T, 1):
         if n * 100 / (KP * T) % 5 == 0 and int(n * 100 / (KP * T)) != 0:
             print n * 100 / (KP * T), "%"
         for m in range(1, KP*T, 1):
-            SumProb += prior(n, m, cTrue, koffTrue)
+            SumProb += reduceProb(n, m)
     print SumProb
     print "Computing weighted Hessian"
     WeightedHessian = np.zeros((2,2))
@@ -53,8 +61,8 @@ def integrateH(q, returnq, koffTrue=KOFF_TRUE):
         if n * 100 / (KP * T) % 5 == 0 and int(n * 100 / (KP * T))!=0 :
             print n * 100 / (KP * T), "%"
         for m in range(1, KP * T, 1):
-            WeightedHessian = np.add(WeightedHessian, np.multiply(H(n, m, cTrue, koffTrue), prior(n, m, cTrue, koffTrue)))
-
+            # prob is scalar though?)
+            WeightedHessian = np.add(WeightedHessian, np.multiply(reduceH(n, m), reduceProb(n, m)))
     AvgHessian = np.divide(WeightedHessian, SumProb)
     InvIntHessian = np.linalg.inv(AvgHessian)
 
