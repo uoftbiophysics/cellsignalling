@@ -834,17 +834,9 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
                      for _ in range(len(xpts))]
         ax.plot(xpts, koff_star, 'k--')
 
-        print(min(koffrange), max(koffrange))
-        print(heuristic_estimate_koff(n1obs, n2obs))
-        print(koff_star[0])
-
         ypts = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], len(koffrange))
         c_star = [ax.get_xlim()[1] / max(crange) * heuristic_estimate_c(n1obs, n2obs) + ax.get_xlim()[0]
                   for _ in range(len(ypts))]
-
-        print(min(crange), max(crange))
-        print(heuristic_estimate_c(n1obs, n2obs))
-        print(c_star[0])
 
         ax.plot(c_star, ypts, 'k--')
         # save figure
@@ -869,5 +861,5 @@ if __name__ == '__main__':
 
     #heatmap_kpr2_error_c()
     #heatmap_kpr2_error_koff()
-    heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
-    #heatmap_ratios()
+    #heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
+    heatmap_ratios()

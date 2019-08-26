@@ -249,8 +249,8 @@ def make_figure_C1():
     #plt.figure(figsize=(8, 4))
     plt.figure()
     plt.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
-    plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'],  edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
-    plt.scatter(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
+    plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'],  edgecolor='', label='Saddle Point Fisher', zorder=2)
+    plt.scatter(curve3['xpts'], curve3['ypts'], color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher', zorder=3)
     # axis
     #plt.title('Mode 1: MLE Relative error comparison')# ($k_p=10$, $t=1000$, $k_{off}=1$)')
     plt.xlabel(r'$x$')
@@ -295,14 +295,14 @@ def make_figure_C2():
     # left plot
     ##axarr[0].set_title(r'$\alpha \langle\delta c^{2}\rangle$/$c^{2}$')
     axarr[0].plot(curveL1['xpts'], curveL1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
-    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
-    axarr[0].scatter(curveL3['xpts'], curveL3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
+    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Saddle Point Fisher', zorder=2)
+    axarr[0].scatter(curveL3['xpts'], curveL3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher', zorder=3)
     axarr[0].legend(fontsize=8)
     # right plot
     ##axarr[1].set_title(r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
     axarr[1].plot(curveR1['xpts'], curveR1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
-    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
-    axarr[1].scatter(curveR3['xpts'], curveR3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher (Full)', zorder=3)
+    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Saddle Point Fisher', zorder=2)
+    axarr[1].scatter(curveR3['xpts'], curveR3['ypts'], marker='o', color=cs['numerical_fisher'], edgecolor='', label='Numeric Fisher', zorder=3)
     axarr[1].legend(fontsize=8)
     # save figure
     gs1.tight_layout(fig, rect=[0, 0.03, 1, 0.95])
@@ -330,8 +330,8 @@ def make_figure_C3():
     #plt.suptitle('KPR: MLE Relative error comparison')# ($k_p=10$, $t=1000$, $k_{off}=1$, $k_f=100$)')
     axarr[0].set_xlabel(r'$c$')
     axarr[1].set_xlabel(r'$c$')
-    axarr[0].set_ylabel(r'\alpha \langle \delta c^2 \rangle /c^2', fontdict={'fontname':'Arial'})
-    axarr[1].set_ylabel(r'\alpha \langle \delta k_{off}^2 \rangle /k_{off}^2', fontdict={'fontname': 'Arial'})
+    axarr[0].set_ylabel(r'$\alpha \langle \delta c^2 \rangle /c^2$', fontdict={'fontname':'Arial'})
+    axarr[1].set_ylabel(r'$\alpha \langle \delta k_{off}^2 \rangle /k_{off}^2$', fontdict={'fontname': 'Arial'})
     axarr[0].set_xscale('log')
     axarr[1].set_xscale('log')
     # fix to same ylim
@@ -342,12 +342,12 @@ def make_figure_C3():
     # left plot
     #axarr[0].set_title(r'$\alpha \langle\delta c^{2}\rangle$/$c^{2}$')
     axarr[0].plot(curveL1['xpts'], curveL1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
-    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    axarr[0].scatter(curveL2['xpts'], curveL2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Saddle Point Fisher', zorder=2)
     axarr[0].legend(fontsize=8)
     # right plot
     #axarr[1].set_title(r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$')
     axarr[1].plot(curveR1['xpts'], curveR1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
-    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Numeric Fisher (Saddle Point)', zorder=2)
+    axarr[1].scatter(curveR2['xpts'], curveR2['ypts'], marker='o', color=cs['numerical_fisher_sp'], edgecolor='', label='Saddle Point Fisher', zorder=2)
     axarr[1].legend(fontsize=8)
     # save figure
     #fig.set_size_inches(8.0, 7.0)
@@ -415,7 +415,7 @@ def make_figure_D1():
     # plot setup
     #plt.figure(figsize=(8, 4))
     plt.figure()
-    plt.title(r'Mode 1: MLE comparison non-uniform prior ')#($k_p=10$, $t=1000$, $k_{off}=1$, $\lambda=0.001$)')
+    #plt.title(r'Mode 1: MLE comparison non-uniform prior ')#($k_p=10$, $t=1000$, $k_{off}=1$, $\lambda=0.001$)')
     plt.plot(curve1['xpts'][0:399], curve1['ypts'][0:399], color=cs['heuristic'], label='heuristic', zorder=1)
     plt.plot(curve1['xpts'][400:], curve1['ypts'][400:], color=cs['heuristic'], zorder=1)
     plt.scatter(curve2['xpts'], curve2['ypts'], color=cs['numerical_fisher_sp'], edgecolor='', label='numeric with prior', zorder=2)
@@ -460,10 +460,10 @@ if __name__ == "__main__":
     #make_figure_B1()
     #make_figure_B2()
     #make_figure_B3()
-    #make_figure_B4()
+    make_figure_B4()
     #make_figure_C1()
     #make_figure_C2()
     #make_figure_C3()
     #make_figure_C4()
-    make_figure_D1()
+    #make_figure_D1()
     #make_figure_E1()
