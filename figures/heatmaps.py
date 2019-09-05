@@ -585,8 +585,6 @@ def heatmap_ratios(crange=CTILDERANGE, koffrange=ZRANGE,
                  levels=[0.1, 0.5, 0.99], save=False, show=True)
 
 
-T=100
-KF=100
 def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     nobs = 0.1 * KP * T # 100
     mobs = 0.15 * KP * T # 150
@@ -849,6 +847,104 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     KPR2_plot()
     return
 
+def heatmap_ratio(eqn1, eqn2, label, filename, crange=CRANGE, koffrange=KOFFRANGE):
+
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = eqn1(cval, koffval)/eqn2(cval, koffval)
+            if arr[i,j] < 0:
+                print(cval,koffval,eqn1(cval, koffval),eqn2(cval, koffval))
+                print(eqn1,eqn2)
+                print(eqns.SigmacrlbC2NoTrace,eqns.SigmacrlbC2)
+                print('     >>>>>',cval,koffval)
+
+    plot_heatmap(arr, crange, koffrange, filename, label)
+    return
+
+def all_heatmap_ratio(notrace=False, longtime=False, highG=False):
+    subdir1 = 'ratio'
+
+    label = [r'Mode 1 $\langle\delta x^{2}\rangle / \langle\delta x^{2}_{crlb}\rangle$',
+             r'Mode 2 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$',
+             r'Mode 2 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$',
+             r'Mode 3 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$',
+             r'Mode 3 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$',
+             r'Mode 4 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$',
+             r'Mode 4 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$',
+            ]
+    filename_arr = ['ratioX1', 'ratioC2', 'ratioC3', 'ratioC4', 'ratioK2', 'ratioK3', 'ratioK4']
+
+    # list of full equations to take the ratio (except model 1 which is full)
+    noTraceCrlb = [eqns.Sigmacrlb1NoTrace, eqns.SigmacrlbC2NoTrace, eqns.SigmacrlbC3NoTrace, eqns.SigmacrlbC4NoTrace, eqns.SigmacrlbK2NoTrace, eqns.SigmacrlbK3NoTrace, eqns.SigmacrlbK4NoTrace]
+    fullCrlb = [eqns.Sigmacrlb1, eqns.SigmacrlbC2, eqns.SigmacrlbC3, eqns.SigmacrlbC4, eqns.SigmacrlbK2, eqns.SigmacrlbK3, eqns.SigmacrlbK4]
+
+    equation1 = noTraceCrlb; equation2 = fullCrlb; subdir2 = 'no_trace_over_full'; extralabel = ''
+
+    """
+    if (not longtime and not highG):
+        equation1 = noTraceCrlb; equation2 = fullCrlb; subdir2 = 'no_trace_over_full'; extralabel = ''
+
+    if (notrace and not longtime and not highG):
+        equation1 = noTraceRelErr2; equation2 = noTraceCrlb; subdir2 = 'notrace'; extralabel = ' without trace'
+
+    if (not notrace and longtime and not highG):
+        equation1 = longTimeRelErr; equation2 = longTimeCrlb; subdir2 = 'longtime'; extralabel = ' at long time'
+    """
+
+
+    if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+        os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
+    for i, filename in enumerate(filename_arr):
+        print(equation1[i])
+        heatmap_ratio(equation1[i], equation2[i], label[i] + extralabel, subdir1 + os.sep + subdir2 + os.sep + filename)
+
+    """
+    # TODO : Add Trace and determinant plots to it all
+
+    if (notrace and longtime and highG):
+        subdir2 = 'NoTraceLongTimeHighG'
+        if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+            os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
+        heatmap_ratio(RelErrX1NoTraceLongTime, Sigmacrlb1NoTraceLongTime, r'Mode 1 $\langle\delta x^{2}\rangle / \langle\delta x^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioX1')
+        heatmap_ratio(RelErrC2NoTraceLongTime, SigmacrlbC2NoTraceLongTime, r'Mode 2 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioC2')
+        heatmap_ratio(RelErrC3NoTraceLongTime, SigmacrlbC3NoTraceLongTime, r'Mode 3 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioC3')
+        heatmap_ratio(RelErrC4NoTraceLongTime, SigmacrlbC4NoTraceLongTime, r'Mode 4 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioC4')
+        heatmap_ratio(RelErrK2NoTraceLongTime, SigmacrlbK2NoTraceLongTime, r'Mode 2 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioK2')
+        heatmap_ratio(RelErrK3NoTraceLongTime, SigmacrlbK3NoTraceLongTime, r'Mode 3 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioK3')
+        heatmap_ratio(RelErrK4NoTraceLongTime, SigmacrlbK4NoTraceLongTime, r'Mode 4 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioK4')
+
+    if (notrace and longtime and not highG):
+        subdir2 = 'NoTraceLongTime'
+        if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+            os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
+        heatmap_ratio(RelErrX1NoTraceLongTime, Sigmacrlb1NoTraceLongTime, r'Mode 1 $\langle\delta x^{2}\rangle / \langle\delta x^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioX1')
+        heatmap_ratio(RelErrC2NoTraceLongTime, SigmacrlbC2NoTraceLongTime, r'Mode 2 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioC2')
+        heatmap_ratio(RelErrC3NoTraceLongTime, SigmacrlbC3NoTraceLongTime, r'Mode 3 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioC3')
+        heatmap_ratio(RelErrC4NoTraceLongTime, SigmacrlbC4NoTraceLongTime, r'Mode 4 $\langle\delta c^{2}\rangle / \langle\delta c^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioC4')
+        heatmap_ratio(RelErrK2NoTraceLongTime, SigmacrlbK2NoTraceLongTime, r'Mode 2 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioK2')
+        heatmap_ratio(RelErrK3NoTraceLongTime, SigmacrlbK3NoTraceLongTime, r'Mode 3 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioK3')
+        heatmap_ratio(RelErrK4NoTraceLongTime, SigmacrlbK4NoTraceLongTime, r'Mode 4 $\langle\delta k_{off}^{2}\rangle / \langle\delta k_{off}^{2}_{crlb}\rangle$ without trace, long time', subdirectory1 + os.sep + subdirectory2 + os.sep + 'ratioK4')
+
+    elif (notrace and not longtime):
+        subdirectory2 = 'NoTrace'
+        if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+            os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
+        heatmap_ratio(RelErrX1NoTrace, Sigmacrlb1NoTrace, r'Mode 1 $\langle\delta x^{2}\rangle / \langle\delta x^{2}_{crlb}\rangle$', 'ratioX1')
+
+    elif (not notrace and longtime):
+        subdirectory2 = 'LongTime'
+        if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+            os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
+        heatmap_ratio(RelErrX1LongTime, Sigmacrlb1LongTime, r'Mode 1 $\langle\delta x^{2}\rangle / \langle\delta x^{2}_{crlb}\rangle$ long time', 'ratioX1NoTraceLongtime')
+
+    else:
+        subdirectory2 = 'NoTraceLongTime'
+        if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+            os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
+        heatmap_ratio(RelErrX1, Sigmacrlb1, r'Mode 1 $\langle\delta x^{2}\rangle / \langle\delta x^{2}_{crlb}\rangle$', 'ratioX1')
+    """
+
 if __name__ == '__main__':
     #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
     #heatmap_mode1_error_x()
@@ -862,4 +958,4 @@ if __name__ == '__main__':
     #heatmap_kpr2_error_c()
     #heatmap_kpr2_error_koff()
     #heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
-    heatmap_ratios()
+heatmap_ratios()
