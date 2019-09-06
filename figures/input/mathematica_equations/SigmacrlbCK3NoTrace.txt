@@ -1,0 +1,1 @@
+(koff**2*(1 + koff/KF)*(koff/KF - (c*kon)/koff)*(1 + (c*kon)/koff)*T + KP*(1 + (koff**2*(1 + (c*kon)/koff)*(1 + (c*kon)/koff + koff*T))/KF**2 + (koff*(2 + (c*kon)/koff + koff*(1 + (c*kon)/koff)*T))/KF))/((1 + koff/KF)*kon*KP*T**2)

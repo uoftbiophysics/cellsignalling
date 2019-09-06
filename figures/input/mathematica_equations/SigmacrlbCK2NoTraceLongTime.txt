@@ -1,0 +1,1 @@
+-((c*koff*(1 + (c*kon)/koff))/(KP*T))
