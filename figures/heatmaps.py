@@ -26,11 +26,11 @@ SHOW = False
 
 # axes
 POINTS_BETWEEN_TICKS = 10
-LOG_START_C = -3
+LOG_START_C = -1
 LOG_END_C = 3
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
-LOG_START_KOFF = -3
+LOG_START_KOFF = -1
 LOG_END_KOFF = 3
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
@@ -39,40 +39,40 @@ CTILDERANGE = np.divide(list(CRANGE), c0)
 ZRANGE = np.divide(list(KOFFRANGE), KP)
 
 # global vmax and vmin
-assert LOG_START_KOFF == -3
+assert LOG_START_KOFF == -1
 assert LOG_END_KOFF == 3
-assert LOG_START_C == -3
+assert LOG_START_C == -1
 assert LOG_END_C == 3
 vmax_obs = 1000003020
 vmin_obs = 0.00022000016528925625
 
 
-def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, **kwargs):
+def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False, **kwargs):
+    xy_label = [r'${c}$', r'${k}_{off}$']
     # default parameters
-    if 'levels' in kwargs.keys():
-        levels = kwargs['levels']
-    else:
-        levels = [10, 100, 1000, 1E4]
-    if 'vmin' in kwargs.keys():
-        vmin = kwargs['vmin']
-    else:
-        vmin = np.min(arr)
-    if 'vmax' in kwargs.keys():
-        vmax = kwargs['vmax']
-    else:
-        vmax = np.max(arr)
-    if 'contour_linestyle' in kwargs.keys():
-        contour_linestyle = 'dashed'
-    else:
-        contour_linestyle = 'solid'
-    if 'contour_color' in kwargs.keys():
-        contour_color = kwargs['contour_color']
-    else:
-        contour_color = None
-    if 'contour_linewidths' in kwargs.keys():
-        contour_lindewidths = kwargs['contour_linewidths']
-    else:
-        contour_lindewidths = None
+    if 'levels' in kwargs.keys(): levels = kwargs['levels']
+    else: levels = [1, 10, 100, 1000, 1E4]
+
+    if 'vmin' in kwargs.keys(): vmin = kwargs['vmin']
+    else: vmin = np.min(arr)
+
+    if 'vmax' in kwargs.keys(): vmax = kwargs['vmax']
+    else: vmax = np.max(arr)
+
+    if 'contour_linestyle' in kwargs.keys(): contour_linestyle = kwargs['contour_linestyle']
+    else: contour_linestyle = 'solid'
+
+    if 'contour_color' in kwargs.keys(): contour_color = kwargs['contour_color']
+    else: contour_color = None
+
+    if 'contour_linewidths' in kwargs.keys(): contour_lindewidths = kwargs['contour_linewidths']
+    else: contour_lindewidths = None
+
+    if dedim == True:
+        crange = crange*KON/KP;
+        koffrange = koffrange/KP;
+        xy_label = [r'$\tilde{c}$', r'$\tilde{k}_{off}$'];
+
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
     """
@@ -86,60 +86,46 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     else:
         imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
     #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
-    im = plt.imshow(arr, **imshow_kw)
+    im = plt.imshow(arr, interpolation='spline36', **imshow_kw)
 
     # axes setup
-    fig = plt.gcf()
-    ax = plt.gca()
+    fig = plt.gcf(); ax = plt.gca()
 
     # method 1
     ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
     ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
-    #ax.set_xticklabels(['%.3f' % cval for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0], fontsize=FS)
-    #ax.set_yticklabels(['%.3f' % kval for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0], fontsize=FS)
-    ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0],
-                       fontsize=FS)
-    ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
-                       fontsize=FS)
+    ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+    ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
     """
     if log_norm:
-        ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0],
-                           fontsize=FS)
-        ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
-                           fontsize=FS)
+        ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+        ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
     else:
-        ax.set_xticklabels(["{:10.2f}".format(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0],
-                           fontsize=FS)
-        ax.set_yticklabels(["{:10.2f}".format(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0],
-                           fontsize=FS)
+        ax.set_xticklabels(["{:10.2f}".format(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+        ax.set_yticklabels(["{:10.2f}".format(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
     """
-
     ax.invert_yaxis()
-    #ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
-    #ax.set_ylabel(r'$z$', fontsize=FS)
-    ax.set_xlabel(r'${c}$', fontsize=FS)
-    ax.set_ylabel(r'${k}_{off}$', fontsize=FS)
+    ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
 
     # create colorbar
     cbar = fig.colorbar(im)
-    cbar.ax.minorticks_off()
-    cbar.update_ticks()
-    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20)
-    cbar.ax.tick_params(labelsize=FS)
+    cbar.ax.minorticks_off(); cbar.update_ticks()
+    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
+
     # TODO IDK why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
-
     # contour line for value 1.0
-    plt.contour(arr, levels=levels, linestyles=[contour_linestyle], colors=contour_color, linewidths=contour_lindewidths)
+    plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
 
     # save
     if save == True:
-        plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf')
-        plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps')
+        plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps')
     if show:
         plt.show()
 
-    return fig, ax
+    plt.close()
+    #return fig, ax
+    return 0
 
 
 def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=True, make_panel=False,
@@ -199,7 +185,6 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
 
     return
 
-
 def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
                              scale_factor=alpha, label_style=0):
     def combined_error_c(ctilde, z, scale_factor=scale_factor):
@@ -222,7 +207,6 @@ def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
         label = r'$\langle\delta c^{2}\rangle$/$c^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_c', label)
     return
-
 
 def heatmap_combined_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
                              scale_factor=alpha, label_style=0):
@@ -316,7 +300,6 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
-
 def heatmap_kpr_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
                         scale_factor=alpha, label_style=0):
 
@@ -352,7 +335,6 @@ def heatmap_kpr_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr_heuristic_error_c', label)
     return
 
-
 def heatmap_kpr_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
                         scale_factor=alpha, label_style=0):
 
@@ -376,7 +358,6 @@ def heatmap_kpr_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
         label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr_heuristic_error_koff', label)
     return
-
 
 def heatmap_kpr2_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
                         scale_factor=alpha, label_style=0):
@@ -427,7 +408,6 @@ def heatmap_kpr2_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
         label = r'$\langle\delta c^{2}\rangle$/$c^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr2_heuristic_error_c', label)
     return
-
 
 def heatmap_kpr2_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
                         scale_factor=alpha, label_style=0):
@@ -592,7 +572,6 @@ def heatmap_ratios(crange=CTILDERANGE, koffrange=ZRANGE,
     plot_heatmap(model3_divided_by_model1, crange, koffrange, 'heatmap_ratio_2_over_1',
                  r'Model 3 $\langle \sigma^{2}_{c^{*}}\rangle$/ Model 1 $\langle \sigma_{c^{*}}\rangle$',
                  levels=[0.1, 0.5, 0.99], save=False, show=True)
-
 
 def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     nobs = 0.1 * KP * T # 100
@@ -856,72 +835,79 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     KPR2_plot()
     return
 
-def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE):
+def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, contour_args=None):
     print(eqn1,eqn2)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
             arr[i, j] = eqn1(cval, koffval)/eqn2(cval, koffval)
-    print(np.min(arr))
 
-    plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm)
+    plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm, dedim=dedim, **contour_args)
     return 0
 
-def all_heatmaps_ratio(dict_ratio, subdir1='heatmaps', longtime=False, highG=False):
+def all_heatmaps_ratio(dict_ratio, dedim=False, subdir1='heatmaps', longtime=False, highG=False, contour_args=None):
 
     if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2']):
         os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2'])
 
     for ratio in dict_ratio['plots']:
-        heatmap_ratio(dict_ratio['plots'][ratio]['num'], dict_ratio['plots'][ratio]['denom'], dict_ratio['plots'][ratio]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + ratio, dict_ratio['log'])
+        heatmap_ratio(dict_ratio['plots'][ratio]['num'], dict_ratio['plots'][ratio]['denom'], dict_ratio['plots'][ratio]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + ratio, dict_ratio['log'], dedim=dedim, contour_args=contour_args)
     return 0
 
-def heatmap_one_equation(equation, label, filename, log_norm, crange=CTILDERANGE, koffrange=ZRANGE, kon=KON, T=T, KF=KF, KP=KP):
+def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, kon=KON, T=T, KF=KF, KP=KP, contour_args=None):
     print(equation)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
-            arr[i, j] = equation(cval, koffval)
-            if arr[i,j] < 0:
-                print(crange[j],koffrange[i])
-
+            arr[i, j] = equation(cval, koffval)+10**(-10)
     print(np.min(arr))
 
-    plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm)
-
+            #if arr[i,j] < 0:
+            #    print(crange[j],koffrange[i])
+    plot_heatmap(arr, crange, koffrange, filename, label, dedim=dedim, log_norm=log_norm, **contour_args)
     return 0
 
-def all_heatmaps_one_equation(dict_ratio, subdir1='heatmaps', longtime=False, highG=False):
+def all_heatmaps_one_equation(dict_ratio, subdir1='heatmaps', longtime=False, highG=False, dedim=False, contour_args=None):
 
     if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2']):
         os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2'])
 
     for name_eqn in dict_ratio['plots']:
-        heatmap_one_equation(dict_ratio['plots'][name_eqn]['eqn'], dict_ratio['plots'][name_eqn]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + name_eqn, dict_ratio['log'])
+        heatmap_one_equation(dict_ratio['plots'][name_eqn]['eqn'], dict_ratio['plots'][name_eqn]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + name_eqn, dict_ratio['log'], dedim=dedim, contour_args=contour_args)
     return 0
 
 
 if __name__ == '__main__':
-    #all_heatmaps_one_equation(pd.RELERRANDTRACE_NOTRACE)
-    #print("\n\n\n\n\n\n\DONE 1\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.DETANDEVAL_NOTRACE)
-    print("\n\n\n\n\n\n\DONE 2\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.COV_NOTRACE)
 
-    print("\n\n\n\n\n\n\DONE NOTRACE\n\n\n\n\n\n")
+    contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
+    subdir_2_use = 'heatmaps_dedimensionalized'
 
-    all_heatmaps_one_equation(pd.DIAGANDTRACE_FULL)
-    print("\n\n\n\n\n\n\DONE 3\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.DETANDEVAL_FULL)
-    print("\n\n\n\n\n\n\DONE 4\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.COV_FULL)
+    all_heatmaps_ratio(pd.EVALS_RATIO, subdir1='heatmaps_dedimensionalized', contour_args=contour_args)
+
+    all_heatmaps_one_equation(pd.RELERRANDTRACE_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 1\n\n\n\n\n\n")
+    all_heatmaps_one_equation(pd.DETANDEVAL_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 2\n\n\n\n\n\n")
+    all_heatmaps_one_equation(pd.COV_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+
+    print("\n\n\n\n\n\nDONE NOTRACE\n\n\n\n\n\n")
+
+    all_heatmaps_one_equation(pd.DIAGANDTRACE_FULL, subdir1=subdir_2_use, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 3\n\n\n\n\n\n")
+    all_heatmaps_one_equation(pd.DETANDEVAL_FULL, subdir1=subdir_2_use, contour_args=contour_args)
+
+    print("\n\n\n\n\n\nDONE 4\n\n\n\n\n\n")
+    all_heatmaps_one_equation(pd.COV_FULL, subdir1=subdir_2_use, contour_args=contour_args)
 
     print("\n\n\n\n\n\n\DONE FULL\n\n\n\n\n\n")
 
-    all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO)
-    all_heatmaps_ratio(pd.DETANDEVAL_RATIO)
-    all_heatmaps_ratio(pd.COV_RATIO)
+    all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 5\n\n\n\n\n\n")
+    all_heatmaps_ratio(pd.DETANDEVAL_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 6\n\n\n\n\n\n")
+    all_heatmaps_ratio(pd.COV_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
 
+    """
     #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
     #heatmap_mode1_error_x()
     #figure_2_combined_cross_sections()
@@ -935,3 +921,4 @@ if __name__ == '__main__':
     #heatmap_kpr2_error_koff()
     #heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
 #heatmap_ratios()
+"""

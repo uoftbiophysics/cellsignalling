@@ -27,7 +27,7 @@ DIAGANDTRACE_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : True,
                              }
                   }
 
-DETANDEVAL_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : False,
+DETANDEVAL_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : True, #some of the eigenvalues are 0!
                    'plots' : {
                                'ratioDetSigma2': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Mode 2 Det($\Sigma_{notrace}$) /    Det($\Sigma_{crlb}$)'},
                                'ratioDetSigma3': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb3, 'label' : r'Mode 3 Det($\Sigma_{notrace}$) / Det($\Sigma_{crlb}$)'},
@@ -62,17 +62,26 @@ RELERRANDTRACE_NOTRACE = { 'subdir2' : 'notrace', 'log' : True,
                                'relErrK3': { 'eqn' : eqns.RelErrK3NoTrace, 'label' : r'Mode 3 $\langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
                                'relErrC4': { 'eqn' : eqns.RelErrC4NoTrace, 'label' : r'Mode 4 $\langle\delta c^{2}\rangle /c^{2}$'},
                                'relErrK4': { 'eqn' : eqns.RelErrK4NoTrace, 'label' : r'Mode 4 $\langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
+                               'SigmacrlbC2': { 'eqn' : eqns.SigmacrlbC2NoTrace, 'label' : r'Mode 2 $\langle\delta c^{2}\rangle$'},
+                               'SigmacrlbK2': { 'eqn' : eqns.SigmacrlbK2NoTrace, 'label' : r'Mode 2 $\langle{\delta k_{off}^2}\rangle$'},
+                               'SigmacrlbC3': { 'eqn' : eqns.SigmacrlbC3NoTrace, 'label' : r'Mode 3 $\langle\delta c^{2}\rangle /c^{2}$'},
+                               'SigmacrlbK3': { 'eqn' : eqns.SigmacrlbK3NoTrace, 'label' : r'Mode 3 $\langle{\delta k_{off}^2}\rangle$'},
+                               'SigmacrlbC4': { 'eqn' : eqns.SigmacrlbC4NoTrace, 'label' : r'Mode 4 $\langle\delta c^{2}\rangle$'},
+                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4NoTrace, 'label' : r'Mode 4 $\langle{\delta k_{off}^2}\rangle$'},
                                'traceSigma2': {'eqn' : eqns.traceSigmacrlb2NoTrace, 'label' : r'Mode 2 tr($\Sigma$)'},
                                'traceSigma3': {'eqn' : eqns.traceSigmacrlb3NoTrace, 'label' : r'Mode 3 tr($\Sigma$)'},
                                'traceSigma4': {'eqn' : eqns.traceSigmacrlb4NoTrace, 'label' : r'Mode 4 tr($\Sigma$)'}
                              }
                   }
 
-DETANDEVAL_NOTRACE = { 'subdir2' : 'notrace', 'log' : False,
+DETANDEVAL_NOTRACE = { 'subdir2' : 'notrace', 'log' : True,
                    'plots' : {
                                'detSigma2': {'eqn' : eqns.DetSigmacrlb2NoTrace, 'label' : r'Mode 2 Det($\Sigma$)'},
                                'detSigma3': {'eqn' : eqns.DetSigmacrlb3NoTrace, 'label' : r'Mode 3 Det($\Sigma$)'},
                                'detSigma4': {'eqn' : eqns.DetSigmacrlb4NoTrace, 'label' : r'Mode 4 Det($\Sigma$)'},
+                               'relDetSigma2': {'eqn' : eqns.RelDetSigmacrlb2NoTrace, 'label' : r'Mode 2 Det($\Sigma$)/$c^2 k_{off}^2$'},
+                               'relDetSigma3': {'eqn' : eqns.RelDetSigmacrlb3NoTrace, 'label' : r'Mode 3 Det($\Sigma$)/$c^2 k_{off}^2$'},
+                               'relDetSigma4': {'eqn' : eqns.RelDetSigmacrlb4NoTrace, 'label' : r'Mode 4 Det($\Sigma$)/$c^2 k_{off}^2$'},
                                'evalplusSigma2': {'eqn' : eqns.evalplusSigmacrlb2NoTrace, 'label' : r'Mode 2 $\lambda_{+}$'},
                                'evalminusSigma2': {'eqn' : eqns.evalminusSigmacrlb2NoTrace, 'label' : r'Mode 2 $\lambda_{-}$'},
                                'evalplusSigma3': {'eqn' : eqns.evalplusSigmacrlb3NoTrace, 'label' : r'Mode 3 $\lambda_{+}$'},
@@ -91,9 +100,17 @@ COV_NOTRACE = { 'subdir2' : 'notrace', 'log' : False,
                              }
                   }
 
+EVALS_RATIO = { 'subdir2' : 'notrace', 'log' : True,
+                   'plots' : {
+                              'ratioEvalsSigma2' : { 'num' : eqns.evalplusSigmacrlb2NoTrace, 'denom' : eqns.evalminusSigmacrlb2NoTrace, 'label' : r'Mode 2 $\lambda_{+}$ / ${\lambda_{-}}_{crlb}$'},
+                              'ratioEvalsSigma3' : { 'num' : eqns.evalplusSigmacrlb3NoTrace, 'denom' : eqns.evalminusSigmacrlb3NoTrace, 'label' : r'Mode 3 $\lambda_{+}$ / ${\lambda_{-}}_{crlb}$'},
+                              'ratioEvalsSigma4' : { 'num' : eqns.evalplusSigmacrlb4NoTrace, 'denom' : eqns.evalminusSigmacrlb4NoTrace, 'label' : r'Mode 4 $\lambda_{+}$ / ${\lambda_{-}}_{crlb}$'}
+                             }
+                  }
+
 ############################ No ratios Full ######################################
 
-DIAGANDTRACE_FULL = { 'subdir2' : 'notrace', 'log' : True,
+DIAGANDTRACE_FULL = { 'subdir2' : 'full', 'log' : True,
                    'plots' : {
                                #'relErrX1': { 'eqn' : eqns.RelErrorX1, 'label' : r'Mode 1 $\langle\delta x^{2}\rangle /x^{2}$'},
                                'SigmacrlbC2': { 'eqn' : eqns.SigmacrlbC2, 'label' : r'Mode 2 $\langle \delta c^{2} \rangle$'},
@@ -101,18 +118,21 @@ DIAGANDTRACE_FULL = { 'subdir2' : 'notrace', 'log' : True,
                                'SigmacrlbC3': { 'eqn' : eqns.SigmacrlbC3, 'label' : r'Mode 3 $\langle\delta c^{2}\rangle$'},
                                'SigmacrlbK3': { 'eqn' : eqns.SigmacrlbK3, 'label' : r'Mode 3 $\langle \delta k_{off}^2 \rangle$'},
                                'SigmacrlbC4': { 'eqn' : eqns.SigmacrlbC4, 'label' : r'Mode 4 $\langle \delta c^{2} \rangle$'},
-                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4, 'label' : r'Mode 4 $\langle \delta k_{off}^2 \rangle}$'},
+                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4, 'label' : r'Mode 4 $\langle \delta k_{off}^2 \rangle$'},
                                'traceSigma2': {'eqn' : eqns.traceSigmacrlb2, 'label' : r'Mode 2 tr($\Sigma$)'},
                                'traceSigma3': {'eqn' : eqns.traceSigmacrlb3, 'label' : r'Mode 3 tr($\Sigma$)'},
                                'traceSigma4': {'eqn' : eqns.traceSigmacrlb4, 'label' : r'Mode 4 tr($\Sigma$)'}
                              }
                   }
 
-DETANDEVAL_FULL = { 'subdir2' : 'notrace', 'log' : False,
+DETANDEVAL_FULL = { 'subdir2' : 'full', 'log' : False,
                    'plots' : {
-                               'detSigma2': {'eqn' : eqns.DetSigmacrlb2, 'label' : r'Mode 2 Det($\Sigma$'},
-                               'detSigma3': {'eqn' : eqns.DetSigmacrlb3, 'label' : r'Mode 3 Det($\Sigma$'},
-                               'detSigma4': {'eqn' : eqns.DetSigmacrlb4, 'label' : r'Mode 4 det($\Sigma$'},
+                               'detSigma2': {'eqn' : eqns.DetSigmacrlb2, 'label' : r'Mode 2 Det($\Sigma$)'},
+                               'detSigma3': {'eqn' : eqns.DetSigmacrlb3, 'label' : r'Mode 3 Det($\Sigma$)'},
+                               'detSigma4': {'eqn' : eqns.DetSigmacrlb4, 'label' : r'Mode 4 det($\Sigma$)'},
+                               'relDetSigma2': {'eqn' : eqns.RelDetSigmacrlb2, 'label' : r'Mode 2 Det($\Sigma$)/$c^2 k_{off}^2$'},
+                               'relDetSigma3': {'eqn' : eqns.RelDetSigmacrlb3, 'label' : r'Mode 3 Det($\Sigma$)/$c^2 k_{off}^2$'},
+                               'relDetSigma4': {'eqn' : eqns.RelDetSigmacrlb4, 'label' : r'Mode 4 Det($\Sigma$)/$c^2 k_{off}^2$'},
                                'evalplusSigma2': {'eqn' : eqns.evalplusSigmacrlb2, 'label' : r'Mode 2 $\lambda_{+}$'},
                                'evalminusSigma2': {'eqn' : eqns.evalminusSigmacrlb2, 'label' : r'Mode 2 $\lambda_{-}$'},
                                'evalplusSigma3': {'eqn' : eqns.evalplusSigmacrlb3, 'label' : r'Mode 3 $\lambda_{+}$'},
@@ -123,10 +143,10 @@ DETANDEVAL_FULL = { 'subdir2' : 'notrace', 'log' : False,
                   }
 
 
-COV_FULL = { 'subdir2' : 'notrace', 'log' : False,
+COV_FULL = { 'subdir2' : 'full', 'log' : False,
                    'plots' : {
-                               'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Mode 2 \langle \delta c \delta k_{off} \rangle$'},
-                               'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Mode 3 \langle \delta c \delta k_{off} \rangle$ '},
-                               'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Mode 4 \langle \delta c \delta k_{off} \rangle$'}
+                               'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Mode 2 $\langle \delta c \delta k_{off} \rangle$'},
+                               'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Mode 3 $\langle \delta c \delta k_{off} \rangle$ '},
+                               'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Mode 4 $\langle \delta c \delta k_{off} \rangle$'}
                              }
                   }

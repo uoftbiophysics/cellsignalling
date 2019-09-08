@@ -266,6 +266,54 @@ def Sigmacrlb1(c, koff, kon=KON, T=T, KF=KF, KP=KP):
 def RelErrC2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return ((1 + (c*kon)/koff)*((c**2*kon**2)/koff + KP))/(c*kon*KP*T)
 
+def RelDetSigmacrlb3NoTraceLongTime(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb3NoTraceLongTime(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb4LongTime(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb4LongTime(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb4NoTrace(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb4NoTraceLongTime(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb4NoTraceLongTime(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb2(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb3(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb2NoTrace(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb2LongTime(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb2LongTime(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb4(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb3LongTimeHighG(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb3LongTimeHighG(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb4LongTimeHighG(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb4LongTimeHighG(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb3NoTraceLongTimeHighG(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb3NoTraceLongTimeHighG(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb2NoTraceLongTime(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb2NoTraceLongTime(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb3LongTime(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb3LongTime(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb3NoTrace(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
+def RelDetSigmacrlb4NoTraceLongTimeHighG(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return ( DetSigmacrlb4NoTraceLongTimeHighG(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
+
 def traceSigmacrlb2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC2(c, koff, kon, T, KF, KP)+SigmacrlbK2(c, koff, kon, T, KF, KP))
 
