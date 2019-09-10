@@ -82,9 +82,11 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     # plot setup
     f = plt.figure()
     if log_norm:
-        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
     else:
-        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
+        #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
+        imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
     #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
     im = plt.imshow(arr, interpolation='spline36', **imshow_kw)
 
@@ -109,8 +111,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
     # create colorbar
     cbar = fig.colorbar(im)
-    cbar.ax.minorticks_off(); cbar.update_ticks()
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
+    cbar.ax.minorticks_off(); cbar.update_ticks()
 
     # TODO IDK why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
@@ -838,9 +840,17 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
 def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, contour_args=None):
     print(eqn1,eqn2)
     arr = np.zeros((len(koffrange), len(crange)))
+    arr1 = np.zeros((len(koffrange), len(crange)))
+    arr2 = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
             arr[i, j] = eqn1(cval, koffval)/eqn2(cval, koffval)
+            arr1[i, j] = eqn1(cval, koffval)
+            arr2[i, j] = eqn2(cval, koffval)
+
+    print(np.min(arr), np.max(arr))
+    print(np.min(arr1), np.max(arr1))
+    print(np.min(arr2), np.max(arr2))
 
     plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm, dedim=dedim, **contour_args)
     return 0
@@ -860,7 +870,7 @@ def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, kof
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
             arr[i, j] = equation(cval, koffval)+10**(-10)
-    print(np.min(arr))
+    print(np.min(arr),np.max(arr))
 
             #if arr[i,j] < 0:
             #    print(crange[j],koffrange[i])
@@ -880,8 +890,8 @@ def all_heatmaps_one_equation(dict_ratio, subdir1='heatmaps', longtime=False, hi
 if __name__ == '__main__':
 
     contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    subdir_2_use = 'heatmaps_dedimensionalized'
-
+    subdir_2_use = 'heatmaps'
+    """
     all_heatmaps_ratio(pd.EVALS_RATIO, subdir1='heatmaps_dedimensionalized', contour_args=contour_args)
 
     all_heatmaps_one_equation(pd.RELERRANDTRACE_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
@@ -900,14 +910,14 @@ if __name__ == '__main__':
     all_heatmaps_one_equation(pd.COV_FULL, subdir1=subdir_2_use, contour_args=contour_args)
 
     print("\n\n\n\n\n\n\DONE FULL\n\n\n\n\n\n")
-
-    all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 5\n\n\n\n\n\n")
-    all_heatmaps_ratio(pd.DETANDEVAL_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 6\n\n\n\n\n\n")
-    all_heatmaps_ratio(pd.COV_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
-
     """
+    all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 5\n\n\n\n\n\n")
+    all_heatmaps_ratio(pd.DETANDEVAL_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    print("\n\n\n\n\n\nDONE 6\n\n\n\n\n\n")
+    all_heatmaps_ratio(pd.COV_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+
+
     #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
     #heatmap_mode1_error_x()
     #figure_2_combined_cross_sections()
@@ -921,4 +931,3 @@ if __name__ == '__main__':
     #heatmap_kpr2_error_koff()
     #heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
 #heatmap_ratios()
-"""
