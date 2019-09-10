@@ -150,3 +150,20 @@ COV_FULL = { 'subdir2' : 'full', 'log' : False,
                                'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Model 4 $\langle \delta c \delta k_{off} \rangle$'}
                              }
                   }
+
+############################ Supplemen ######################################
+
+SI_RATIOS = { 'subdir2' : 'ratios', 'log' : True,
+                   'plots' : {
+                              'ratioSigmaX1' : { 'num' : eqns.Sigmacrlb1NoTrace, 'denom' : eqns.Sigmacrlb1, 'label' : r'Model 1 $\langle\delta x^{2}\rangle^A$/$\langle\delta x^{2}\rangle^B$'},
+                              'ratioSigmaC2' : { 'num' : eqns.SigmacrlbC2NoTrace, 'denom' : eqns.SigmacrlbC2, 'label' : r'Model 2 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
+                              'ratioSigmaC3' : { 'num' : eqns.SigmacrlbC3NoTrace, 'denom' : eqns.SigmacrlbC3, 'label' : r'Model 3 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
+                              'ratioSigmaC4' : { 'num' : eqns.SigmacrlbC4NoTrace, 'denom' : eqns.SigmacrlbC4, 'label' : r'Model 4 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
+                              'ratioSigmaK2' : { 'num' : eqns.SigmacrlbK2NoTrace, 'denom' : eqns.SigmacrlbK2, 'label' : r'Model 2 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
+                              'ratioSigmaK3' : { 'num' : eqns.SigmacrlbK3NoTrace, 'denom' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
+                              'ratioSigmaK4' : { 'num' : eqns.SigmacrlbK4NoTrace, 'denom' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
+                              'ratioDetSigma2': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Model 2 $| \Sigma^A |$/$| \Sigma^B |$'},
+                              'ratioDetSigma3': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb3, 'label' : r'Model 3 $| \Sigma^A |$/$| \Sigma^B |$'},
+                              'ratioDetSigma4': { 'num' : eqns.DetSigmacrlb4NoTrace, 'denom' : eqns.DetSigmacrlb4, 'label' : r'Model 4 $| \Sigma^A |$/$| \Sigma^B |$'}
+                             }
+                  }

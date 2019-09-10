@@ -838,7 +838,7 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     return
 
 def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, contour_args=None):
-    print(eqn1,eqn2)
+    print("Plotting equations:",eqn1,eqn2)
     arr = np.zeros((len(koffrange), len(crange)))
     arr1 = np.zeros((len(koffrange), len(crange)))
     arr2 = np.zeros((len(koffrange), len(crange)))
@@ -847,10 +847,6 @@ def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrang
             arr[i, j] = eqn1(cval, koffval)/eqn2(cval, koffval)
             arr1[i, j] = eqn1(cval, koffval)
             arr2[i, j] = eqn2(cval, koffval)
-
-    print(np.min(arr), np.max(arr))
-    print(np.min(arr1), np.max(arr1))
-    print(np.min(arr2), np.max(arr2))
 
     plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm, dedim=dedim, **contour_args)
     return 0
@@ -865,15 +861,15 @@ def all_heatmaps_ratio(dict_ratio, dedim=False, subdir1='heatmaps', longtime=Fal
     return 0
 
 def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, kon=KON, T=T, KF=KF, KP=KP, contour_args=None):
-    print(equation)
+    print("Plotting equation:",equation)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
             arr[i, j] = equation(cval, koffval)+10**(-10)
-    print(np.min(arr),np.max(arr))
 
-            #if arr[i,j] < 0:
-            #    print(crange[j],koffrange[i])
+    if np.min(arr[i,j]) < 0:
+        print("Cannot plot log, negative values in equation",equation)
+        return 0
     plot_heatmap(arr, crange, koffrange, filename, label, dedim=dedim, log_norm=log_norm, **contour_args)
     return 0
 
@@ -886,37 +882,41 @@ def all_heatmaps_one_equation(dict_ratio, subdir1='heatmaps', longtime=False, hi
         heatmap_one_equation(dict_ratio['plots'][name_eqn]['eqn'], dict_ratio['plots'][name_eqn]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + name_eqn, dict_ratio['log'], dedim=dedim, contour_args=contour_args)
     return 0
 
+def plotting_all_functions(subdir_2_use, contour_args=None):
+        all_heatmaps_ratio(pd.EVALS_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
+
+        all_heatmaps_one_equation(pd.RELERRANDTRACE_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+        print("\n\n\n\n\n\nDONE 1\n\n\n\n\n\n")
+        all_heatmaps_one_equation(pd.DETANDEVAL_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+        print("\n\n\n\n\n\nDONE 2\n\n\n\n\n\n")
+        all_heatmaps_one_equation(pd.COV_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+
+        print("\n\n\n\n\n\nDONE NOTRACE\n\n\n\n\n\n")
+
+        all_heatmaps_one_equation(pd.DIAGANDTRACE_FULL, subdir1=subdir_2_use, contour_args=contour_args)
+        print("\n\n\n\n\n\nDONE 3\n\n\n\n\n\n")
+        all_heatmaps_one_equation(pd.DETANDEVAL_FULL, subdir1=subdir_2_use, contour_args=contour_args)
+
+        print("\n\n\n\n\n\nDONE 4\n\n\n\n\n\n")
+        all_heatmaps_one_equation(pd.COV_FULL, subdir1=subdir_2_use, contour_args=contour_args)
+
+        print("\n\n\n\n\n\n\DONE FULL\n\n\n\n\n\n")
+
+        all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+        print("\n\n\n\n\n\nDONE 5\n\n\n\n\n\n")
+        all_heatmaps_ratio(pd.DETANDEVAL_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+        print("\n\n\n\n\n\nDONE 6\n\n\n\n\n\n")
+        all_heatmaps_ratio(pd.COV_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+        return 0
+
 
 if __name__ == '__main__':
 
     contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    subdir_2_use = 'heatmaps'
-    """
-    all_heatmaps_ratio(pd.EVALS_RATIO, subdir1='heatmaps_dedimensionalized', contour_args=contour_args)
+    subdir_2_use = 'supplementary
 
-    all_heatmaps_one_equation(pd.RELERRANDTRACE_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 1\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.DETANDEVAL_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 2\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.COV_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
-
-    print("\n\n\n\n\n\nDONE NOTRACE\n\n\n\n\n\n")
-
-    all_heatmaps_one_equation(pd.DIAGANDTRACE_FULL, subdir1=subdir_2_use, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 3\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.DETANDEVAL_FULL, subdir1=subdir_2_use, contour_args=contour_args)
-
-    print("\n\n\n\n\n\nDONE 4\n\n\n\n\n\n")
-    all_heatmaps_one_equation(pd.COV_FULL, subdir1=subdir_2_use, contour_args=contour_args)
-
-    print("\n\n\n\n\n\n\DONE FULL\n\n\n\n\n\n")
-    """
-    all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 5\n\n\n\n\n\n")
-    all_heatmaps_ratio(pd.DETANDEVAL_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-    print("\n\n\n\n\n\nDONE 6\n\n\n\n\n\n")
-    all_heatmaps_ratio(pd.COV_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-
+    all_heatmaps_ratio(pd.SI_RATIOS, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    #plotting_all_functions(subdir_2_use, contour_args)
 
     #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
     #heatmap_mode1_error_x()
