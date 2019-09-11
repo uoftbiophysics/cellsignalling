@@ -913,7 +913,7 @@ def plotting_all_functions(subdir_2_use, contour_args=None):
 if __name__ == '__main__':
 
     contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    subdir_2_use = 'supplementary
+    subdir_2_use = 'supplementary'
 
     all_heatmaps_ratio(pd.SI_RATIOS, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
     #plotting_all_functions(subdir_2_use, contour_args)
