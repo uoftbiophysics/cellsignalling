@@ -2,19 +2,18 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from functools import partial
+
 import plotting_dictionaries as pd
+import equations as eqns
 
 #from load_inputs import DATADICT
 from settings import DIR_OUTPUT, DIR_INPUT
 from settings import COLOR_SCHEME as cs
+from settings import KON, KP, T, KF
+
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
-
-# unit params
-KON = 1.
-KP = 10.
-T = 1000.
-KF = 1.0
 
 # de-dimensionalise params
 c0 = KP/KON
@@ -917,6 +916,41 @@ def dk_plotting():
     heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
     return 0
 
+
+def custom_ratio_diagram(plotdict, subdir1='heatmaps', dedim=True, contour_args=None):
+    if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + plotdict['subdir2']):
+        os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + plotdict['subdir2'])
+
+    eps = 10**(-10)
+    # params
+    fix_C = 1
+    fix_KON = 1
+    fix_KP = 10
+    fix_T = 1000
+
+    ax1label = r'$k_{f}/k_{p}$'
+    ax1range = np.logspace(-1, 3, TOTAL_POINTS_KOFF) / KP
+    ax2label = r'$k_{off}/k_{p}$'
+    ax2range = ZRANGE
+
+    # form is like (c, koff, kon=KON, T=T, KF=KF, KP=KP): -- leave kf / koff unspecified
+    num_fast = partial(eqns.DetSigmacrlb3NoTrace, fix_C, kon=fix_KON, T=fix_T, KP=fix_KP)
+    den_fast = partial(eqns.DetSigmacrlb2NoTrace, fix_C, kon=fix_KON, T=fix_T, KP=fix_KP)
+    print num_fast
+
+    ratio_arr = np.zeros((len(ax2range), len(ax1range)))
+    for i, ival in enumerate(ax2range):
+        for j, jval in enumerate(ax1range):
+            num = num_fast(jval, KF=ival)
+            den = den_fast(jval, KF=ival)
+            ratio_arr[i, j] = num/den + eps  #equation(cval, koffval)
+
+    plt.imshow(ratio_arr)
+    plt.show()
+
+    return
+
+
 if __name__ == '__main__':
     """
     This is how I use the code generally.
@@ -926,13 +960,15 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
+
     dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
     #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
     contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)], 'cmap_colour' : 'YlGnBu'}
 
-    plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
 
-    dictionary_SI = pd.SI_RATIOS; contour_args_SI = {'cmap_colour' : 'PuBu'}
-    plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=True, contour_args=contour_args_SI)
+    #dictionary_SI = pd.SI_RATIOS_subset; contour_args_SI = {'cmap_colour' : 'PuBu'}
+    #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=True, contour_args=contour_args_SI)
 
-#heatmap_ratios()
+    dictionary_SI = pd.SI_RATIOS_subset2; contour_args_SI = {'cmap_colour': 'bone'}  # or pink
+    custom_ratio_diagram(dictionary_SI, contour_args=contour_args_SI)

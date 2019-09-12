@@ -11,6 +11,12 @@ for dirs in [DIR_INPUT, DIR_OUTPUT]:
     if not os.path.exists(dirs):
         os.makedirs(dirs)
 
+# globals for heatmaps and equations (to prevent circular imports)
+KON = 1.
+KP = 10.
+T = 1000.
+KF = 1.0
+
 # color = plt.cm.get_cmap('Classic', 10)  # unnecessary unless you want different colors
 colour_palette = sns.color_palette("muted", 10)
 #sns.palplot(colour_palette)
