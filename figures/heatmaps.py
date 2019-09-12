@@ -77,8 +77,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     if 'contour_linewidths' in kwargs.keys(): contour_lindewidths = kwargs['contour_linewidths']
     else: contour_lindewidths = None
 
-    if 'cmap_colour' in kwargs.keys(): cmap_scale = kwargs['cmap_colour']
-    else: cmap_scale = 'YlGnBu'
+    if 'cmap_colour' in kwargs.keys(): cmap_colour = kwargs['cmap_colour']
+    else: cmap_colour = 'YlGnBu'
 
     if dedim:
         # if flag is true, this is how we scale the axis. Simple.
@@ -89,6 +89,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
     if log_norm:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        imshow_kw = {'cmap': cmap_colour, 'norm': mpl.colors.LogNorm()}
     else:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax}
 
@@ -927,11 +928,11 @@ if __name__ == '__main__':
     """
     dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
     #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T), 'cmap_scale' : 'YlGnBu']}
+    contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)], 'cmap_colour' : 'YlGnBu'}
 
     plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
 
     dictionary_SI = pd.SI_RATIOS; contour_args_SI = {'cmap_colour' : 'PuBu'}
-    plot_dictionary_ratio(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=True, contour_args=contour_args_SI)
 
 #heatmap_ratios()
