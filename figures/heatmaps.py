@@ -919,6 +919,23 @@ if __name__ == '__main__':
     #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
     counter_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)]}
 
+<<<<<<< HEAD
     plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+=======
+    contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
+    subdir_2_use = 'supplementary'
+
+    all_heatmaps_ratio(pd.SI_RATIOS, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    #plotting_all_functions(subdir_2_use, contour_args)
+
+    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    #heatmap_mode1_error_x()
+    #figure_2_combined_cross_sections()
+
+    #heatmap_combined_error_c()
+    #heatmap_combined_error_koff()
+    #heatmap_KPr_error_c()
+    #heatmap_KPr_error_koff()
+>>>>>>> a45bff31da8ee5da6c37c09b79603fdd85ccf4a3
 
 #heatmap_ratios()
