@@ -37,7 +37,6 @@ if __name__ == '__main__':
     # trace equation and eigenvalue equations
     with open(python_equation_file,'a+') as g:
 
-        g.write("\n\ndef dedimRelError%(estimate)s%(model)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return KP*T*RelError%(estimate)s%(model)s(c, koff, kon, T, KF, KP)" %{'estimate' : 'X', 'model' : '1NoTrace'})
 
         # dedim relative errors
         for model in ['2', '3', '4', '2NoTrace','3NoTrace','4NoTrace']:
@@ -49,7 +48,7 @@ if __name__ == '__main__':
 
             for estimate in ['C', 'K']:
                 # dedimensionalized error (scaled by kp t)
-                g.write("\n\ndef dedimRelError%(estimate)s%(model)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return KP*T*RelError%(estimate)s%(model)s(c, koff, kon, T, KF, KP)" %{'estimate' : estimate, 'model' : model})
+                g.write("\n\ndef dedimRelErr%(estimate)s%(model)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return KP*T*RelErr%(estimate)s%(model)s(c, koff, kon, T, KF, KP)" %{'estimate' : estimate, 'model' : model})
 
         for model in ['1NoTrace']:
             for estimate in ['X']:

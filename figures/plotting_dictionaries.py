@@ -12,7 +12,7 @@ def eigenvalues(diagonal1, diagonal2, determinant, c, koff, kon=KON, T=T, KF=KF,
 
 # Ratios
 
-DIAGANDTRACE_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : True,
+DIAGANDTRACE_RATIO = { 'subdir2' : 'diagonal_ratio', 'log' : True,
                    'plots' : {
                                'ratioTraceSigma2' : { 'num' : eqns.traceSigmacrlb2NoTrace, 'denom' : eqns.traceSigmacrlb2, 'label' : r'Model 2 tr($\Sigma^A$) / tr($\Sigma^B$)'},
                                'ratioTraceSigma3' : { 'num' : eqns.traceSigmacrlb3NoTrace, 'denom' : eqns.traceSigmacrlb3, 'label' : r'Model 3 tr($\Sigma^A$) / tr($\Sigma^B$)'},
@@ -27,7 +27,7 @@ DIAGANDTRACE_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : True,
                              }
                   }
 
-DETANDEVAL_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : True, #some of the eigenvalues are 0!
+DETANDEVAL_RATIO = { 'subdir2' : 'determinant_ratio', 'log' : True, #some of the eigenvalues are 0!
                    'plots' : {
                                 'ratioEval1Sigma2' : { 'num' : eqns.evalplusSigmacrlb2NoTrace, 'denom' : eqns.evalplusSigmacrlb2, 'label' : r'Model 2 $\lambda_{+}$ / ${\lambda_{+}}_{crlb}$'},
                                 'ratioEval2Sigma2' : { 'num' : eqns.evalminusSigmacrlb2NoTrace, 'denom' : eqns.evalminusSigmacrlb2, 'label' : r'Model 2 $\lambda_{-}$ / ${\lambda_{-}}_{crlb}$'},
@@ -42,7 +42,7 @@ DETANDEVAL_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : True, #some 
                   }
 
 
-COV_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : False,
+COV_RATIO = { 'subdir2' : 'cov_ratio', 'log' : False,
                    'plots' : {
                                'ratioSigmacrlbCK2': { 'num' : eqns.SigmacrlbCK2NoTrace, 'denom' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle{\delta c \delta k_{off}}\rangle$ / $\langle{\delta c \delta k_{off}}_{crlb}\rangle$'},
                                'ratioSigmacrlbCK3': { 'num' : eqns.SigmacrlbCK3NoTrace, 'denom' : eqns.SigmacrlbCK3, 'label' : r'Model 2 $\langle{\delta c \delta k_{off}}\rangle$ / $\langle{\delta c \delta k_{off}}_{crlb}\rangle$'},
@@ -53,7 +53,7 @@ COV_RATIO = { 'subdir2' : 'ratio_notrace_over_full', 'log' : False,
 
 ############################ No ratios No Trace ######################################
 
-RELERRANDTRACE_NOTRACE = { 'subdir2' : 'notrace', 'log' : True,
+RELERRANDTRACE_NOTRACE = { 'subdir2' : 'relerror_notrace', 'log' : True,
                    'plots' : {
                                'relErrX1': { 'eqn' : eqns.RelErrorX1NoTrace, 'label' : r'Model 1 $\langle\delta x^{2}\rangle /x^{2}$'},
                                'relErrC2': { 'eqn' : eqns.RelErrC2NoTrace, 'label' : r'Model 2 $\langle\delta c^{2}\rangle /c^{2}$'},
@@ -74,7 +74,7 @@ RELERRANDTRACE_NOTRACE = { 'subdir2' : 'notrace', 'log' : True,
                              }
                   }
 
-DETANDEVAL_NOTRACE = { 'subdir2' : 'notrace', 'log' : True,
+DETANDEVAL_NOTRACE = { 'subdir2' : 'det_notrace', 'log' : True,
                    'plots' : {
                                'detSigma2': {'eqn' : eqns.DetSigmacrlb2NoTrace, 'label' : r'Model 2 Det($\Sigma^A$)'},
                                'detSigma3': {'eqn' : eqns.DetSigmacrlb3NoTrace, 'label' : r'Model 3 Det($\Sigma^A$)'},
@@ -92,7 +92,7 @@ DETANDEVAL_NOTRACE = { 'subdir2' : 'notrace', 'log' : True,
                   }
 
 
-COV_NOTRACE = { 'subdir2' : 'notrace', 'log' : False,
+COV_NOTRACE = { 'subdir2' : 'cov_notrace', 'log' : False,
                    'plots' : {
                                'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle \delta c \delta k_{off} \rangle$'},
                                'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Model 3 $\langle \delta c \delta k_{off} \rangle$ '},
@@ -153,7 +153,7 @@ COV_FULL = { 'subdir2' : 'full', 'log' : False,
 
 ############################ Supplemen ######################################
 
-SI_RATIOS = { 'subdir2' : 'ratios', 'log' : True,
+SI_RATIOS = { 'subdir2' : 'SI_ratios', 'log' : True,
                    'plots' : {
                               'ratioSigmaX1' : { 'num' : eqns.Sigmacrlb1NoTrace, 'denom' : eqns.Sigmacrlb1, 'label' : r'Model 1 $\langle\delta x^{2}\rangle^A$/$\langle\delta x^{2}\rangle^B$'},
                               'ratioSigmaC2' : { 'num' : eqns.SigmacrlbC2NoTrace, 'denom' : eqns.SigmacrlbC2, 'label' : r'Model 2 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
@@ -164,10 +164,13 @@ SI_RATIOS = { 'subdir2' : 'ratios', 'log' : True,
                               'ratioSigmaK4' : { 'num' : eqns.SigmacrlbK4NoTrace, 'denom' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
                               'ratioDetSigma2': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Model 2 $| \Sigma^A |$/$| \Sigma^B |$'},
                               'ratioDetSigma3': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb3, 'label' : r'Model 3 $| \Sigma^A |$/$| \Sigma^B |$'},
-                              'ratioDetSigma4': { 'num' : eqns.DetSigmacrlb4NoTrace, 'denom' : eqns.DetSigmacrlb4, 'label' : r'Model 4 $| \Sigma^A |$/$| \Sigma^B |$'}
+                              'ratioDetSigma4': { 'num' : eqns.DetSigmacrlb4NoTrace, 'denom' : eqns.DetSigmacrlb4, 'label' : r'Model 4 $| \Sigma^A |$/$| \Sigma^B |$'},
+                              'ratioDetSigma2DetSima3_NoTrace': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb3NoTrace, 'label' : r'Model 2 $| \Sigma^A |$ / Model 3 $| \Sigma^A |$'},
+                              'ratioDetSigma2DetSima3': { 'num' : eqns.DetSigmacrlb2, 'denom' : eqns.DetSigmacrlb3, 'label' : r'Model 2 $| \Sigma^B |$ / Model 3 $| \Sigma^B |$'},
+                              'ratioDetSigma3DetSima4_NoTrace': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb4NoTrace, 'label' : r'Model 3 $| \Sigma^A |$ / Model 4 $| \Sigma^A |$'},
+                              'ratioDetSigma3DetSima4': { 'num' : eqns.DetSigmacrlb3, 'denom' : eqns.DetSigmacrlb4, 'label' : r'Model 3 $| \Sigma^B |$ / Model 4 $| \Sigma^B |$'}
                              }
                   }
-
 
 ##################### Figures Main############
 

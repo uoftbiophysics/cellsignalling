@@ -93,8 +93,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     # plot setup
     f = plt.figure()
     if log_norm:
-        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
-        #imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
     else:
         imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
         #imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
@@ -915,27 +915,11 @@ if __name__ == '__main__':
     There are 2 types of dictionaries: ratiosor 1 equation. Depending on what type of dictionary you create, you will want to use the respoective plotting function above (ether plot_dictionary_one_equation or plot_dictionary_ratio)
     You have to specify some arguments, check equations above should be obvious.
     """
-    dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
+    dictionary = pd.SI_RATIOS; want_dedim = True; subdir_2_use = 'heatmaps'
     #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    counter_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)]}
+    contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)]}
+    contour_args = {'None' : None}
 
-<<<<<<< HEAD
-    plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-=======
-    contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    subdir_2_use = 'supplementary'
-
-    all_heatmaps_ratio(pd.SI_RATIOS, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-    #plotting_all_functions(subdir_2_use, contour_args)
-
-    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
-    #heatmap_mode1_error_x()
-    #figure_2_combined_cross_sections()
-
-    #heatmap_combined_error_c()
-    #heatmap_combined_error_koff()
-    #heatmap_KPr_error_c()
-    #heatmap_KPr_error_koff()
->>>>>>> a45bff31da8ee5da6c37c09b79603fdd85ccf4a3
+    plot_dictionary_ratio(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
 
 #heatmap_ratios()

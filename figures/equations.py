@@ -314,9 +314,6 @@ def RelDetSigmacrlb3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
 def RelDetSigmacrlb4NoTraceLongTimeHighG(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return ( DetSigmacrlb4NoTraceLongTimeHighG(c, koff, kon, T, KF, KP) )/( c**2 * koff**2 )
 
-def dedimRelErrorX1NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorX1NoTrace(c, koff, kon, T, KF, KP)
-
 def traceSigmacrlb2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC2(c, koff, kon, T, KF, KP)+SigmacrlbK2(c, koff, kon, T, KF, KP))
 
@@ -328,11 +325,11 @@ def evalminusSigmacrlb2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     tr = traceSigmacrlb2(c, koff, kon, T, KF, KP); det = DetSigmacrlb2(c, koff, kon, T, KF, KP);
     return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )
 
-def dedimRelErrorC2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorC2(c, koff, kon, T, KF, KP)
+def dedimRelErrC2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrC2(c, koff, kon, T, KF, KP)
 
-def dedimRelErrorK2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorK2(c, koff, kon, T, KF, KP)
+def dedimRelErrK2(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrK2(c, koff, kon, T, KF, KP)
 
 def traceSigmacrlb3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC3(c, koff, kon, T, KF, KP)+SigmacrlbK3(c, koff, kon, T, KF, KP))
@@ -345,11 +342,11 @@ def evalminusSigmacrlb3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     tr = traceSigmacrlb3(c, koff, kon, T, KF, KP); det = DetSigmacrlb3(c, koff, kon, T, KF, KP);
     return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )
 
-def dedimRelErrorC3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorC3(c, koff, kon, T, KF, KP)
+def dedimRelErrC3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrC3(c, koff, kon, T, KF, KP)
 
-def dedimRelErrorK3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorK3(c, koff, kon, T, KF, KP)
+def dedimRelErrK3(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrK3(c, koff, kon, T, KF, KP)
 
 def traceSigmacrlb4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC4(c, koff, kon, T, KF, KP)+SigmacrlbK4(c, koff, kon, T, KF, KP))
@@ -362,11 +359,11 @@ def evalminusSigmacrlb4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     tr = traceSigmacrlb4(c, koff, kon, T, KF, KP); det = DetSigmacrlb4(c, koff, kon, T, KF, KP);
     return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )
 
-def dedimRelErrorC4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorC4(c, koff, kon, T, KF, KP)
+def dedimRelErrC4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrC4(c, koff, kon, T, KF, KP)
 
-def dedimRelErrorK4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorK4(c, koff, kon, T, KF, KP)
+def dedimRelErrK4(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrK4(c, koff, kon, T, KF, KP)
 
 def traceSigmacrlb2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC2NoTrace(c, koff, kon, T, KF, KP)+SigmacrlbK2NoTrace(c, koff, kon, T, KF, KP))
@@ -379,11 +376,11 @@ def evalminusSigmacrlb2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     tr = traceSigmacrlb2NoTrace(c, koff, kon, T, KF, KP); det = DetSigmacrlb2NoTrace(c, koff, kon, T, KF, KP);
     return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )
 
-def dedimRelErrorC2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorC2NoTrace(c, koff, kon, T, KF, KP)
+def dedimRelErrC2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrC2NoTrace(c, koff, kon, T, KF, KP)
 
-def dedimRelErrorK2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorK2NoTrace(c, koff, kon, T, KF, KP)
+def dedimRelErrK2NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrK2NoTrace(c, koff, kon, T, KF, KP)
 
 def traceSigmacrlb3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC3NoTrace(c, koff, kon, T, KF, KP)+SigmacrlbK3NoTrace(c, koff, kon, T, KF, KP))
@@ -396,11 +393,11 @@ def evalminusSigmacrlb3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     tr = traceSigmacrlb3NoTrace(c, koff, kon, T, KF, KP); det = DetSigmacrlb3NoTrace(c, koff, kon, T, KF, KP);
     return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )
 
-def dedimRelErrorC3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorC3NoTrace(c, koff, kon, T, KF, KP)
+def dedimRelErrC3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrC3NoTrace(c, koff, kon, T, KF, KP)
 
-def dedimRelErrorK3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorK3NoTrace(c, koff, kon, T, KF, KP)
+def dedimRelErrK3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrK3NoTrace(c, koff, kon, T, KF, KP)
 
 def traceSigmacrlb4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (SigmacrlbC4NoTrace(c, koff, kon, T, KF, KP)+SigmacrlbK4NoTrace(c, koff, kon, T, KF, KP))
@@ -413,11 +410,11 @@ def evalminusSigmacrlb4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     tr = traceSigmacrlb4NoTrace(c, koff, kon, T, KF, KP); det = DetSigmacrlb4NoTrace(c, koff, kon, T, KF, KP);
     return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )
 
-def dedimRelErrorC4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorC4NoTrace(c, koff, kon, T, KF, KP)
+def dedimRelErrC4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrC4NoTrace(c, koff, kon, T, KF, KP)
 
-def dedimRelErrorK4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
-    return KP*T*RelErrorK4NoTrace(c, koff, kon, T, KF, KP)
+def dedimRelErrK4NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
+    return KP*T*RelErrK4NoTrace(c, koff, kon, T, KF, KP)
 
 def dedimRelErrorX1NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return KP*T*RelErrorX1NoTrace(c, koff, kon, T, KF, KP)
