@@ -10,6 +10,29 @@ def eigenvalues(diagonal1, diagonal2, determinant, c, koff, kon=KON, T=T, KF=KF,
     tr = trace(diagonal1, diagonal2, c, koff, kon, T, KF, KP); det = determinant(c, koff, kon, T, KF, KP);
     return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) ), ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )
 
+"""
+Here there are 2 types of dictionaries: ratios and 1 equation.
+
+ratios have keywords:
+    'subdir2': which subdir to create and put figures in
+    'log': whether or not it is to be plotted in log-scales
+    'plots': all the plots to use
+        'name_of_figure': you can change this name
+            'num': numerator of ratio
+            'denom': denominator of ratio
+            'label': what to label the colorbar
+
+1 equation dictionary have keywords:
+    'subdir2': which subdir to create and put figures in
+    'log': whether or not it is to be plotted in log-scales
+    'plots': all the plots to use
+        'name_of_figure': you can change this name
+            'eqn': the equation to plot 
+            'label': what to label the colorbar
+
+Essentially very similar, however in one you declare the numerator and denominator equation, in the other 1 equation will suffice.
+"""
+
 # Ratios
 
 DIAGANDTRACE_RATIO = { 'subdir2' : 'diagonal_ratio', 'log' : True,
