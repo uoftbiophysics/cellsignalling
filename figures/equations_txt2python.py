@@ -36,24 +36,22 @@ if __name__ == '__main__':
 
     # trace equation and eigenvalue equations
     with open(python_equation_file,'a+') as g:
-        # trace equations
-        g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : '2'})
-        g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : '3'})
-        g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : '4'})
-        g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : '2NoTrace'})
-        g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : '3NoTrace'})
-        g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : '4NoTrace'})
-        # relative covariances
-        # eigenvalues
-        g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '2'})
-        g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '2'})
-        g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '3'})
-        g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '3'})
-        g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '4'})
-        g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '4'})
-        g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '2NoTrace'})
-        g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '2NoTrace'})
-        g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '3NoTrace'})
-        g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '3NoTrace'})
-        g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '4NoTrace'})
-        g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : '4NoTrace'})
+
+        g.write("\n\ndef dedimRelError%(estimate)s%(model)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return KP*T*RelError%(estimate)s%(model)s(c, koff, kon, T, KF, KP)" %{'estimate' : 'X', 'model' : '1NoTrace'})
+
+        # dedim relative errors
+        for model in ['2', '3', '4', '2NoTrace','3NoTrace','4NoTrace']:
+            # trace
+            g.write("\n\ndef traceSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return (SigmacrlbC%(name)s(c, koff, kon, T, KF, KP)+SigmacrlbK%(name)s(c, koff, kon, T, KF, KP))" %{'name' : model})
+            # high and low eigenvalue
+            g.write("\n\ndef evalplusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr + 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : model})
+            g.write("\n\ndef evalminusSigmacrlb%(name)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    tr = traceSigmacrlb%(name)s(c, koff, kon, T, KF, KP); det = DetSigmacrlb%(name)s(c, koff, kon, T, KF, KP);\n    return ( 0.5*tr - 0.5*np.sqrt( tr**2-4*det ) )" %{'name' : model})
+
+            for estimate in ['C', 'K']:
+                # dedimensionalized error (scaled by kp t)
+                g.write("\n\ndef dedimRelError%(estimate)s%(model)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return KP*T*RelError%(estimate)s%(model)s(c, koff, kon, T, KF, KP)" %{'estimate' : estimate, 'model' : model})
+
+        for model in ['1NoTrace']:
+            for estimate in ['X']:
+                # edimensionalized error for X1 (scaled by kp t)
+                g.write("\n\ndef dedimRelError%(estimate)s%(model)s(c, koff, kon=KON, T=T, KF=KF, KP=KP):\n    return KP*T*RelError%(estimate)s%(model)s(c, koff, kon, T, KF, KP)" %{'estimate' : estimate, 'model' : model})

@@ -21,7 +21,7 @@ c0 = KP/KON
 alpha = KP*T
 
 # plot params
-FS = 16
+FS = 20
 SHOW = False
 
 # axes
@@ -48,6 +48,16 @@ vmin_obs = 0.00022000016528925625
 
 
 def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False, **kwargs):
+    """
+    crange: range of values for c
+    koffrange: range of koff values
+    fname: file saved as pdf and eps format with this name
+    show: shows plots
+    save: saves plots
+    log_norm: heatmap is log, should almost always be the case
+    dedim: makes the axis dedimensionalized. scales them (see by how much below)
+    kwargs: a variety of keyword args are used below. They are mostly used for contour plot lines if I understand correctly. Using Duncan's default ones mostly, but we can talk about it.
+    """
     xy_label = [r'${c}$', r'${k}_{off}$']
     # default parameters
     if 'levels' in kwargs.keys(): levels = kwargs['levels']
@@ -69,9 +79,10 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     else: contour_lindewidths = None
 
     if dedim == True:
+        # if flag is true, this is how we scale the axis. Simple.
         crange = crange*KON/KP;
         koffrange = koffrange/KP;
-        xy_label = [r'$\tilde{c}$', r'$\tilde{k}_{off}$'];
+        xy_label = [r'$k_{on}c/k_{p}$', r'$k_{off}/k_{p}$'];
 
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
@@ -82,12 +93,11 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     # plot setup
     f = plt.figure()
     if log_norm:
-        #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
-        imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
+        #imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
     else:
-        #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
-        imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
-    #imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin_obs, 'vmax': vmax_obs, 'norm': mpl.colors.LogNorm()}
+        imshow_kw = {'cmap': 'YlGnBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
+        #imshow_kw = {'cmap': 'PuBu', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
     im = plt.imshow(arr, interpolation='spline36', **imshow_kw)
 
     # axes setup
@@ -210,7 +220,7 @@ def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_c', label)
     return
 
-def heatmap_combined_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
+def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE,
                              scale_factor=alpha, label_style=0):
 
     def combined_error_koff(ctilde, z, scale_factor=scale_factor):
@@ -851,7 +861,7 @@ def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrang
     plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm, dedim=dedim, **contour_args)
     return 0
 
-def all_heatmaps_ratio(dict_ratio, dedim=False, subdir1='heatmaps', longtime=False, highG=False, contour_args=None):
+def plot_dictionary_ratio(dict_ratio, dedim=False, subdir1='heatmaps', longtime=False, highG=False, contour_args=None):
 
     if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2']):
         os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2'])
@@ -860,7 +870,7 @@ def all_heatmaps_ratio(dict_ratio, dedim=False, subdir1='heatmaps', longtime=Fal
         heatmap_ratio(dict_ratio['plots'][ratio]['num'], dict_ratio['plots'][ratio]['denom'], dict_ratio['plots'][ratio]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + ratio, dict_ratio['log'], dedim=dedim, contour_args=contour_args)
     return 0
 
-def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, kon=KON, T=T, KF=KF, KP=KP, contour_args=None):
+def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, kon=KON, T=T, KF=KF, KP=KP, contour_args={'None' : None}):
     print("Plotting equation:",equation)
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
@@ -873,61 +883,42 @@ def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, kof
     plot_heatmap(arr, crange, koffrange, filename, label, dedim=dedim, log_norm=log_norm, **contour_args)
     return 0
 
-def all_heatmaps_one_equation(dict_ratio, subdir1='heatmaps', longtime=False, highG=False, dedim=False, contour_args=None):
+def plot_dictionary_one_equation(dict_eqns, subdir1='heatmaps', longtime=False, highG=False, dedim=False, contour_args={'None' : None}):
 
-    if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2']):
-        os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_ratio['subdir2'])
+    if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_eqns['subdir2']):
+        os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + dict_eqns['subdir2'])
 
-    for name_eqn in dict_ratio['plots']:
-        heatmap_one_equation(dict_ratio['plots'][name_eqn]['eqn'], dict_ratio['plots'][name_eqn]['label'], subdir1 + os.sep + dict_ratio['subdir2'] + os.sep + name_eqn, dict_ratio['log'], dedim=dedim, contour_args=contour_args)
+    for name_eqn in dict_eqns['plots']:
+        heatmap_one_equation(dict_eqns['plots'][name_eqn]['eqn'], dict_eqns['plots'][name_eqn]['label'], subdir1 + os.sep + dict_eqns['subdir2'] + os.sep + name_eqn, dict_eqns['log'], dedim=dedim, contour_args=contour_args)
     return 0
 
-def plotting_all_functions(subdir_2_use, contour_args=None):
-        all_heatmaps_ratio(pd.EVALS_RATIO, subdir1=subdir_2_use, contour_args=contour_args)
+def dk_plotting():
+    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    heatmap_mode1_error_x()
+    figure_2_combined_cross_sections()
 
-        all_heatmaps_one_equation(pd.RELERRANDTRACE_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
-        print("\n\n\n\n\n\nDONE 1\n\n\n\n\n\n")
-        all_heatmaps_one_equation(pd.DETANDEVAL_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
-        print("\n\n\n\n\n\nDONE 2\n\n\n\n\n\n")
-        all_heatmaps_one_equation(pd.COV_NOTRACE, subdir1=subdir_2_use, contour_args=contour_args)
+    heatmap_combined_error_c()
+    heatmap_combined_error_koff()
+    heatmap_kpr_error_c()
+    heatmap_kpr_error_koff()
 
-        print("\n\n\n\n\n\nDONE NOTRACE\n\n\n\n\n\n")
-
-        all_heatmaps_one_equation(pd.DIAGANDTRACE_FULL, subdir1=subdir_2_use, contour_args=contour_args)
-        print("\n\n\n\n\n\nDONE 3\n\n\n\n\n\n")
-        all_heatmaps_one_equation(pd.DETANDEVAL_FULL, subdir1=subdir_2_use, contour_args=contour_args)
-
-        print("\n\n\n\n\n\nDONE 4\n\n\n\n\n\n")
-        all_heatmaps_one_equation(pd.COV_FULL, subdir1=subdir_2_use, contour_args=contour_args)
-
-        print("\n\n\n\n\n\n\DONE FULL\n\n\n\n\n\n")
-
-        all_heatmaps_ratio(pd.DIAGANDTRACE_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-        print("\n\n\n\n\n\nDONE 5\n\n\n\n\n\n")
-        all_heatmaps_ratio(pd.DETANDEVAL_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-        print("\n\n\n\n\n\nDONE 6\n\n\n\n\n\n")
-        all_heatmaps_ratio(pd.COV_RATIO, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-        return 0
-
+    heatmap_kpr2_error_c()
+    heatmap_kpr2_error_koff()
+    heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
+    return 0
 
 if __name__ == '__main__':
+    """
+    This is how I use the code generally.
+    I create a dictionary with a bunch of equations I want to plot in dictionary plttoing (see equations.py).
+    These equations are all taken from mathematica or rescaled versions of these (see equations_txt2python for some rescaled equations, trace and eigenvalue )
+    There are 2 types of dictionaries: ratiosor 1 equation. Depending on what type of dictionary you create, you will want to use the respoective plotting function above (ether plot_dictionary_one_equation or plot_dictionary_ratio)
+    You have to specify some arguments, check equations above should be obvious.
+    """
+    dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
+    #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
+    counter_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)]}
 
-    contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    subdir_2_use = 'supplementary
+    plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
 
-    all_heatmaps_ratio(pd.SI_RATIOS, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
-    #plotting_all_functions(subdir_2_use, contour_args)
-
-    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
-    #heatmap_mode1_error_x()
-    #figure_2_combined_cross_sections()
-
-    #heatmap_combined_error_c()
-    #heatmap_combined_error_koff()
-    #heatmap_KPr_error_c()
-    #heatmap_KPr_error_koff()
-
-    #heatmap_kpr2_error_c()
-    #heatmap_kpr2_error_koff()
-    #heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
 #heatmap_ratios()
