@@ -86,7 +86,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
         imshow_kw = {'cmap': cmap_colour, 'norm': mpl.colors.LogNorm()}
     else:
-        imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax}
+        imshow_kw = {'cmap': 'viridis', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
 
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
@@ -627,10 +627,11 @@ def truncate(f, n):
     i, p, d = s.partition('.')
     return float('.'.join([i, (d+'0'*n)[:n]]))
 
-def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
+def heatmap_figure_4():
     nobs = 0.1 * KP * T # 100
     mobs = 0.15 * KP * T # 150
-    def mode1_plot():
+    def mode1_plot(crange=[truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5.0 * KON / KP + 0.005, 0.005))[1:]],
+                   koffrange=[truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]):
         figname = 'heatmap_log_posterior_mode1'
         def log_posterior_x(c, koff, n):
             if c==0:
@@ -649,9 +650,11 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
                 arr[i, j] = log_posterior_x(cval * KP/KON, koffval * KP, nobs)
 
         label = r'ln $P(c, k_{off}|n)$'
+        #log_contours = [-i for i in list(np.logspace(-3, 4,num=20))[::-1]]
+        linear_contours = list(range(-500, 0, 50))
 
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
-                               levels=list(range(-500, 0, 50)), vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
+                               levels=linear_contours, vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
 
         ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
         ax.set_ylabel(r'$\tilde{k}_{off}$', fontsize=FS)
@@ -667,9 +670,7 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
         koff_star = [ax.get_ylim()[1] * (heuristic_estimate((ctilde - (crange[1]-crange[0])) * KP/KON, nobs)/KP -
                                          (koffrange[1]-koffrange[0]))/max(koffrange) for ctilde in crange]
         ax.plot([i+ax.get_xlim()[0] for i in xpts], [i-ax.get_ylim()[0] for i in koff_star], 'k--')
-        print(list(ax.get_xticklabels()))
-        print(list(ax.get_xticks()))
-        exit()
+
         # save figure
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
@@ -677,7 +678,8 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     # ------------------
     # Repeat for Model 2
     # ------------------
-    def mode2_plot():
+    def mode2_plot(crange=[truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5 * KON / KP + 0.005, 0.005))[1:]],
+                   koffrange=[truncate(f, 2) for f in list(np.arange(0.0 / KP, 50 / KP + 0.05, 0.05))[1:]]):
         figname = 'heatmap_log_posterior_combined'
 
         def log_posterior_c_koff(c, koff, n, m):
@@ -697,29 +699,34 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
         arr = np.zeros((len(koffrange), len(crange)))
         for i, koffval in enumerate(koffrange):
             for j, cval in enumerate(crange):
-                arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
+                arr[i, j] = log_posterior_c_koff(cval * KP/KON, koffval * KP, nobs, mobs)
 
-        label = r'$ln(P(c, k_{off}|n, m))$'
+        label = r'ln $P(c, k_{off}|n, m)$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
-                               levels=list(range(-100, 0, 10)), vmin=-200, vmax=0, contour_color='w', contour_linewidths=0.5)
-        ax.set_xlabel(r'$c$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+                               levels=list(range(-1000, 0, 100)), vmin=-1000, vmax=0, contour_color='w', contour_linewidths=0.5)
+        ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
+        ax.set_ylabel(r'$\tilde{k}_{off}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
-            c_est = KP * m / (KP * T - n)
+            c_est = (KP/KON) * m / (KP * T - n)
             return c_est
         def heuristic_estimate_koff(n, m):
             koff_est = KP * m / n
             return koff_est
-        # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
-        xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
-        ypts = np.linspace(ax.get_ylim()[0], ax.get_ylim()[1], len(koffrange))
 
-        koff_star = [ax.get_ylim()[1]/max(koffrange) * heuristic_estimate_koff(nobs, mobs) for _ in range(len(xpts))]
-        c_star = [ax.get_xlim()[1] / max(crange) * heuristic_estimate_c(nobs, mobs) for _ in range(len(ypts))]
-        ax.plot(xpts, koff_star, 'k--')
-        ax.plot(c_star, ypts, 'k--')
+        # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+        ypts = np.linspace(float(ax.get_yticklabels()[0].get_text()),
+                           float(ax.get_yticklabels()[-1].get_text()), len(koffrange))
+        koff_star = [ax.get_ylim()[-1] * (heuristic_estimate_koff(nobs, mobs) / KP) / max(koffrange) for _ in crange]
+        ax.plot(list(np.linspace(ax.get_xlim()[0], ax.get_xlim()[-1], len(koffrange)))[:-1],
+                [i + ax.get_ylim()[0] for i in koff_star][:-1], 'k--')
+
+        c_star = [ax.get_xlim()[-1] * (heuristic_estimate_c(nobs, mobs) * KON/KP) / max(crange) for _ in koffrange]
+        ax.plot([i + ax.get_xlim()[0] for i in c_star][:-1],
+                list(np.linspace(ax.get_ylim()[0], ax.get_ylim()[-1], len(crange)))[:-1],
+                'k--')
+
         # save figure
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
@@ -727,7 +734,7 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     # ------------------
     # Repeat for Model 3
     # ------------------
-    def KPR1_plot(crange=crange, koffrange=koffrange):
+    def KPR1_plot(crange=[], koffrange=[]):
         figname = 'heatmap_log_posterior_KPR1'
 
         def log_posterior_c_koff(c, koff, n, m):
@@ -809,7 +816,7 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     # ------------------
     n1obs = nobs * 0.1
     n2obs = mobs * 0.5
-    def KPR2_plot(crange=crange, koffrange=koffrange):
+    def KPR2_plot(crange=[], koffrange=[]):
         figname = 'heatmap_log_posterior_KPR2'
 
         def log_posterior_c_koff(c, koff, n1, n2):
@@ -891,8 +898,8 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         # fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
-    mode1_plot()
-    #mode2_plot()
+    #mode1_plot()
+    mode2_plot()
     #KPR1_plot()
     #KPR2_plot()
     return 0
@@ -965,7 +972,7 @@ def dk_plotting():
     ctildePosterior = [truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5.0 * KON / KP + 0.005, 0.005))[1:]]
     kofftildePosterior = [truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]
 
-    heatmap_figure_4(crange=ctildePosterior, koffrange=kofftildePosterior)
+    heatmap_figure_4()
 
     return 0
 
