@@ -5,6 +5,7 @@ import os
 
 import plotting_dictionaries as pd
 import equations as eqns
+from decimal import Decimal
 
 #from load_inputs import DATADICT
 from settings import DIR_OUTPUT, DIR_INPUT
@@ -45,7 +46,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     fname: file saved as pdf and eps format with this name
     show: shows plots
     save: saves plots
-    log_norm: heatmap is log, should almost always be the case
+    log_norm: heatmap is log, this is only used when plotting the posterior
     dedim: makes the axis dedimensionalized. scales them (see by how much below)
     kwargs: a variety of keyword args are used below. They are mostly used for contour plot lines if I understand correctly. Using Duncan's default ones mostly, but we can talk about it.
     """
@@ -101,18 +102,38 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     fig = plt.gcf(); ax = plt.gca()
 
     # method 1
-    ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
-    ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
-    ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
-    ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
-    """
     if log_norm:
+        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
+        ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
         ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
         ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
     else:
-        ax.set_xticklabels(["{:10.2f}".format(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
-        ax.set_yticklabels(["{:10.2f}".format(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
-    """
+        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
+        ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
+
+        # Exhausting process to make ticks look nice
+        nice_ticks = ["{}".format(cval) for cval in crange if Decimal(str(cval)) % Decimal(str(crange[-1] / 5)) == 0]
+        ctilde_ticks = []
+        for i in range(len(nice_ticks)):
+            if i % 2 == 0:
+                ctilde_ticks.append("")
+            else:
+                ctilde_ticks.append(nice_ticks.pop(0))
+        ctilde_ticks = ["0"] + ctilde_ticks
+
+        nice_ticks = ["0"] + ["{}".format(koffval) for koffval in koffrange if
+                              Decimal(str(koffval)) % Decimal(str(koffrange[-1] / 5)) == 0]
+        kofftilde_ticks = []
+        for i in range(len(nice_ticks)):
+            if i % 2 == 0:
+                kofftilde_ticks.append("")
+            else:
+                kofftilde_ticks.append(nice_ticks.pop(0))
+        kofftilde_ticks = ["0"] + kofftilde_ticks
+
+        ax.set_xticklabels(ctilde_ticks, fontsize=FS)
+        ax.set_yticklabels(kofftilde_ticks, fontsize=FS)
+
     ax.invert_yaxis()
     ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
 
@@ -140,8 +161,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         plt.show()
 
     plt.close()
-    #return fig, ax
-    return 0
+    return fig, ax
 
 
 def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=True, make_panel=False,
@@ -589,12 +609,27 @@ def heatmap_ratios(crange=CTILDERANGE, koffrange=ZRANGE,
                  r'Model 3 $\langle \sigma^{2}_{c^{*}}\rangle$/ Model 1 $\langle \sigma_{c^{*}}\rangle$',
                  levels=[0.1, 0.5, 0.99], save=False, show=True)
 
+def truncate(f, n):
+    '''
+    Truncates/pads a float f to n decimal places without rounding
+    Source: https://stackoverflow.com/questions/783897/truncating-floats-in-python
+    '''
+    s = '{}'.format(f)
+    if 'e' in s or 'E' in s:
+        return '{0:.{1}f}'.format(f, n)
+    i, p, d = s.partition('.')
+    return float('.'.join([i, (d+'0'*n)[:n]]))
+
 def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
     nobs = 0.1 * KP * T # 100
     mobs = 0.15 * KP * T # 150
     def mode1_plot():
         figname = 'heatmap_log_posterior_mode1'
         def log_posterior_x(c, koff, n):
+            if c==0:
+                c=5E-4
+            if koff==0:
+                koff==5E-4
             x = KON * c / koff
             mu = KP * T * x / (1 + x)
             var = (KP * T * x)/(1 + x) + (2 * KP**2 * T * x)/(koff * (1 + x)**3) *(1 + (np.exp(-T * koff * (1 + x)) - 1)/(T * koff * (1 + x)))
@@ -604,26 +639,27 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
         arr = np.zeros((len(koffrange), len(crange)))
         for i, koffval in enumerate(koffrange):
             for j, cval in enumerate(crange):
-                arr[i, j] = log_posterior_x(cval, koffval, nobs)
+                arr[i, j] = log_posterior_x(cval * KP/KON, koffval * KP, nobs)
 
-        label = r'$ln(P(x|n))$'
+        label = r'$ln P(c, k_{off}|n)$'
+
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
-                               levels=list(range(-50, 0, 5)), vmin=-60, vmax=0, contour_color='w', contour_linewidths=0.5)
-        ax.set_xlabel(r'$c$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+                               levels=list(range(-500, 0, 50)), vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
+        ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
+        ax.set_ylabel(r'$\tilde{k}_{off}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate(c, n):
             koff_est = ((KP * T - n) * KON * c) / n
             return koff_est
 
-        estimate_line = []
-        for c in crange:
-            estimate_line.append(heuristic_estimate(c, nobs))
         # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
         xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
-        ypts = [ax.get_ylim()[1] * koff / max(koffrange) for koff in estimate_line]
-        ax.plot(xpts, ypts, 'k--')
+
+        koff_star = [ax.get_ylim()[1] / max(koffrange) * heuristic_estimate(ctilde * KP/KON, nobs) for ctilde in
+                     range(len(xpts))]
+        #ax.plot(xpts, koff_star, 'k--')
+
         # save figure
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
@@ -845,11 +881,11 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         # fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
-    #mode1_plot()
+    mode1_plot()
     #mode2_plot()
     #KPR1_plot()
-    KPR2_plot()
-    return
+    #KPR2_plot()
+    return 0
 
 def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrange=KOFFRANGE, dedim=False, contour_args=None):
     print("Plotting equations:",eqn1,eqn2)
@@ -904,17 +940,22 @@ def dk_plotting():
     """
     Duncan you can still run any/all of these by running dk_plotting in main
     """
-    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
-    heatmap_mode1_error_x()
-    figure_2_combined_cross_sections()
+    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    #heatmap_mode1_error_x()
+    #figure_2_combined_cross_sections()
 
-    heatmap_combined_error_c()
-    heatmap_combined_error_koff()
-    heatmap_kpr_error_c()
-    heatmap_kpr_error_koff()
+    #heatmap_combined_error_c()
+    #heatmap_combined_error_koff()
+    #heatmap_kpr_error_c()
+    #heatmap_kpr_error_koff()
 
-    heatmap_kpr2_error_c()
-    heatmap_kpr2_error_koff()
+    #heatmap_kpr2_error_c()
+    #heatmap_kpr2_error_koff()
+
+    ctildePosterior = [truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5.0 * KON / KP + 0.005, 0.005))[1:]]
+    kofftildePosterior = [truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]
+
+    heatmap_figure_4(crange=ctildePosterior, koffrange=kofftildePosterior)
     heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
     return 0
 
@@ -959,9 +1000,9 @@ if __name__ == '__main__':
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
 
-    dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
+    #dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
     #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)], 'cmap_colour' : 'YlGnBu'}
+    #contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)], 'cmap_colour' : 'YlGnBu'}
 
     #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
 
@@ -969,11 +1010,12 @@ if __name__ == '__main__':
     #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=True, contour_args=contour_args_SI)
 
 
-    custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'
-    contour_args_high = {'levels': [1 / (KP * T), 10 / (KP * T), 100 / (KP * T), 1000 / (KP * T), 1E4 / (KP * T)],
-                         'cmap_colour': custom_cmap_colour,
-                         'vmin': 1.0}
-    contour_args_low = {'levels': [1.01, 1.1, 2.0, 10.0, 50.0],
-                        'cmap_colour': custom_cmap_colour,
-                        'vmin': 1.0}
-    custom_ratio_diagram(contour_args=contour_args_low)
+    #custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'
+    #contour_args_high = {'levels': [1 / (KP * T), 10 / (KP * T), 100 / (KP * T), 1000 / (KP * T), 1E4 / (KP * T)],
+    #                     'cmap_colour': custom_cmap_colour,
+    #                     'vmin': 1.0}
+    #contour_args_low = {'levels': [1.01, 1.1, 2.0, 10.0, 50.0],
+    #                    'cmap_colour': custom_cmap_colour,
+    #                    'vmin': 1.0}
+    #custom_ratio_diagram(contour_args=contour_args_low)
+    dk_plotting()
