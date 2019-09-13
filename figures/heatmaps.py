@@ -2,7 +2,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from functools import partial
 
 import plotting_dictionaries as pd
 import equations as eqns
@@ -25,28 +24,21 @@ SHOW = False
 
 # axes
 POINTS_BETWEEN_TICKS = 10
-LOG_START_C = -1
-LOG_END_C = 3
+LOG_START_C = -2
+LOG_END_C = 4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
-LOG_START_KOFF = -1
-LOG_END_KOFF = 3
+LOG_START_KOFF = -2
+LOG_END_KOFF = 4
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
 
 CTILDERANGE = np.divide(list(CRANGE), c0)
 ZRANGE = np.divide(list(KOFFRANGE), KP)
 
-# global vmax and vmin
-assert LOG_START_KOFF == -1
-assert LOG_END_KOFF == 3
-assert LOG_START_C == -1
-assert LOG_END_C == 3
-vmax_obs = 1000003020
-vmin_obs = 0.00022000016528925625
 
-
-def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False, **kwargs):
+def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False,
+                 xy_label_force=None, **kwargs):
     """
     crange: range of values for c
     koffrange: range of koff values
@@ -84,7 +76,10 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         crange = crange*KON/KP;
         koffrange = koffrange/KP;
         xy_label = [r'$k_{on}c/k_{p}$', r'$k_{off}/k_{p}$'];
-    else: xy_label = [r'${c}$', r'${k}_{off}$']
+    else:
+        xy_label = [r'${c}$', r'${k}_{off}$']
+    if xy_label_force is not None:
+        xy_label = xy_label_force
 
     if log_norm:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
@@ -122,13 +117,20 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
 
     # create colorbar
-    cbar = fig.colorbar(im)
-    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
-    cbar.ax.minorticks_off(); cbar.update_ticks()
+    cbar = fig.colorbar(im, norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax))
+    cbar.ax.tick_params(labelsize=FS)
+    #cbar.ax.minorticks_off();
+    cbar.update_ticks()
+    plt.clim(vmin, vmax)  # weird line to force min and max of the cbar ticks; seems to break the cbar label though
+    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20)
+    """
+    print(vmin, vmax)
+    cbar.set_ticks([1.0, 10.0, 100.0])
+    cbar.set_ticklabels([1.0, 10.0, 100.0])
+    """
 
     # TODO IDK why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
-    # contour line for value 1.0
     plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
 
     # save
@@ -917,9 +919,9 @@ def dk_plotting():
     return 0
 
 
-def custom_ratio_diagram(plotdict, subdir1='heatmaps', dedim=True, contour_args=None):
-    if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + plotdict['subdir2']):
-        os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + plotdict['subdir2'])
+def custom_ratio_diagram(subdir1='heatmaps', subdir2='', dedim=True, contour_args=None):
+    if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
+        os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
 
     eps = 10**(-10)
     # params
@@ -929,25 +931,21 @@ def custom_ratio_diagram(plotdict, subdir1='heatmaps', dedim=True, contour_args=
     fix_T = 1000
 
     ax1label = r'$k_{f}/k_{p}$'
-    ax1range = np.logspace(-1, 3, TOTAL_POINTS_KOFF) / KP
+    ax1range = np.logspace(-2, 4, TOTAL_POINTS_KOFF) / KP
     ax2label = r'$k_{off}/k_{p}$'
     ax2range = ZRANGE
-
-    # form is like (c, koff, kon=KON, T=T, KF=KF, KP=KP): -- leave kf / koff unspecified
-    num_fast = partial(eqns.DetSigmacrlb3NoTrace, fix_C, kon=fix_KON, T=fix_T, KP=fix_KP)
-    den_fast = partial(eqns.DetSigmacrlb2NoTrace, fix_C, kon=fix_KON, T=fix_T, KP=fix_KP)
-    print num_fast
+    xy_label_force = [ax1label, ax2label]
 
     ratio_arr = np.zeros((len(ax2range), len(ax1range)))
     for i, ival in enumerate(ax2range):
         for j, jval in enumerate(ax1range):
-            num = num_fast(jval, KF=ival)
-            den = den_fast(jval, KF=ival)
+            num = eqns.DetSigmacrlb3(fix_C, ival, kon=fix_KON, T=fix_T, KP=fix_KP, KF=jval)
+            den = eqns.DetSigmacrlb2(fix_C, ival, kon=fix_KON, T=fix_T, KP=fix_KP, KF=jval)
             ratio_arr[i, j] = num/den + eps  #equation(cval, koffval)
-
-    plt.imshow(ratio_arr)
-    plt.show()
-
+    print('custom_ratio_diagram -- min max:', np.min(ratio_arr), np.max(ratio_arr))
+    cbar_label = r'Det $\Sigma^A_3$/Det $\Sigma^A_2$'
+    plot_heatmap(ratio_arr, ax1range, ax2range, 'custom_ratio_det3det2_notrace', cbar_label,
+                 xy_label_force=xy_label_force, show=True, save=True, log_norm=True, dedim=False, **contour_args)
     return
 
 
@@ -970,5 +968,12 @@ if __name__ == '__main__':
     #dictionary_SI = pd.SI_RATIOS_subset; contour_args_SI = {'cmap_colour' : 'PuBu'}
     #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=True, contour_args=contour_args_SI)
 
-    dictionary_SI = pd.SI_RATIOS_subset2; contour_args_SI = {'cmap_colour': 'bone'}  # or pink
-    custom_ratio_diagram(dictionary_SI, contour_args=contour_args_SI)
+
+    custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'
+    contour_args_high = {'levels': [1 / (KP * T), 10 / (KP * T), 100 / (KP * T), 1000 / (KP * T), 1E4 / (KP * T)],
+                         'cmap_colour': custom_cmap_colour,
+                         'vmin': 1.0}
+    contour_args_low = {'levels': [1.01, 1.1, 2.0, 10.0, 50.0],
+                        'cmap_colour': custom_cmap_colour,
+                        'vmin': 1.0}
+    custom_ratio_diagram(contour_args=contour_args_low)
