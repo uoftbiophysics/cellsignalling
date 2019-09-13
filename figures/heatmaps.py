@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import plotting_dictionaries as pd
+import matplotlib.ticker as ticker
 
 #from load_inputs import DATADICT
 from settings import DIR_OUTPUT, DIR_INPUT
@@ -60,7 +61,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     """
     # default parameters
     if 'levels' in kwargs.keys(): levels = kwargs['levels']
-    else: levels = [1, 10, 100, 1000, 1E4]
+    else: levels = [1E0, 1E1, 1E2, 1E3]
 
     if 'vmin' in kwargs.keys(): vmin = kwargs['vmin']
     else: vmin = np.min(arr)
@@ -69,16 +70,20 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     else: vmax = np.max(arr)
 
     if 'contour_linestyle' in kwargs.keys(): contour_linestyle = kwargs['contour_linestyle']
-    else: contour_linestyle = 'solid'
+    else: contour_linestyle = '-'
 
     if 'contour_color' in kwargs.keys(): contour_color = kwargs['contour_color']
-    else: contour_color = None
+    else: contour_color = 'k'
 
     if 'contour_linewidths' in kwargs.keys(): contour_lindewidths = kwargs['contour_linewidths']
-    else: contour_lindewidths = None
+    else: contour_lindewidths = 2
 
     if 'cmap_colour' in kwargs.keys(): cmap_colour = kwargs['cmap_colour']
     else: cmap_colour = 'YlGnBu'
+
+    if 'fmt' in kwargs.keys(): fmt = kwargs['fmt']
+    else: fmt = ticker.LogFormatterMathtext()
+
 
     if dedim:
         # if flag is true, this is how we scale the axis. Simple.
@@ -87,9 +92,10 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         xy_label = [r'$k_{on}c/k_{p}$', r'$k_{off}/k_{p}$'];
     else: xy_label = [r'${c}$', r'${k}_{off}$']
 
+    print(vmin,vmax)
+
     if log_norm:
-        imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm()}
-        imshow_kw = {'cmap': cmap_colour, 'norm': mpl.colors.LogNorm()}
+        imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm(vmin,vmax)}
     else:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax}
 
@@ -124,17 +130,19 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
     # create colorbar
     cbar = fig.colorbar(im)
+    #cbar.locator = ticker.LogLocator(base=10)
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
-    cbar.ax.minorticks_off(); cbar.update_ticks()
+    cbar.ax.minorticks_off();
+    cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001])
+    cbar.update_ticks()
 
     # TODO IDK why do ticks hide sometimes?
-    #for t in cbar.ax.get_yticklabels(): print(t.get_text())
-    # contour line for value 1.0
-    plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
+    CL = plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
+    plt.clabel(CL, CL.levels, inline=True, fmt=fmt)
 
     # save
     if save == True:
-        plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps')
+        plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps'); plt.savefig(DIR_OUTPUT + os.sep + fname + '.png')
     if show:
         plt.show()
 
@@ -862,6 +870,7 @@ def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrang
             arr[i, j] = eqn1(cval, koffval)/eqn2(cval, koffval)
             arr1[i, j] = eqn1(cval, koffval) # these are unnecessary, however good for checks
             arr2[i, j] = eqn2(cval, koffval)
+    print(np.min(arr),np.max(arr))
 
     # call heatmap plotting
     plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm, dedim=dedim, **contour_args)
@@ -926,13 +935,13 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
-    dictionary = pd.MAIN; want_dedim = True; subdir_2_use = 'heatmaps'
-    #contour_args = {'levels' : [0.1, 1., 10.], 'contour_linestyle' : ['dashed','solid','dashed'], 'contour_color' : ['b','w','r'], 'contour_linewidths': [2,2,2]}
-    contour_args = {'levels' : [1/(KP*T), 10/(KP*T), 100/(KP*T), 1000/(KP*T), 1E4/(KP*T)], 'cmap_colour' : 'YlGnBu'}
 
-    plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=True, contour_args=contour_args)
+    dictionary = pd.MAIN; dictionary_SI = pd.SI_ALT_RATIO
+    want_dedim = True; subdir_2_use = 'heatmaps'
 
-    dictionary_SI = pd.SI_RATIOS; contour_args_SI = {'cmap_colour' : 'PuBu'}
-    plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=True, contour_args=contour_args_SI)
+    contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01], 'fmt' : '%.2f'}
+
+    #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
+    plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 
 #heatmap_ratios()
