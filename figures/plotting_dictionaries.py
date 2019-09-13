@@ -1,5 +1,5 @@
 import equations as eqns
-from heatmaps import KON, KP, T, KF
+from settings import KON, KP, T, KF
 
 # TODO other dictionary for long time and high G
 
@@ -199,6 +199,20 @@ SI_ALT_RATIO = { 'subdir2' : 'SI_ratios', 'log' : True,
                                'ratioDetSigma2': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Model 2 det$ (\Sigma^A)$/det$ (\Sigma^B)$'},
                              }
                   }
+
+SI_RATIOS_subset = { 'subdir2' : 'SI_ratios_subset', 'log' : True,
+                     'plots' : {
+                         'ratioDetSigma3DetSima2_NoTrace': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb2NoTrace, 'label' : r'Model 3 $| \Sigma^A |$ / Model 2 $| \Sigma^A |$'},
+                         'ratioDetSigma3DetSima2': { 'num' : eqns.DetSigmacrlb3, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Model 3 $| \Sigma^B |$ / Model 2 $| \Sigma^B |$'},
+                     }}
+
+
+SI_RATIOS_subset2 = { 'subdir2' : 'SI_ratios_subset2', 'log' : True,
+                     'plots' : {
+                         'kf_ratioDetSigma3DetSima2_NoTrace': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb2NoTrace, 'label' : r'Model 3 $| \Sigma^A |$ / Model 2 $| \Sigma^A |$'},
+                         'kf_ratioDetSigma3DetSima2': { 'num' : eqns.DetSigmacrlb3, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Model 3 $| \Sigma^B |$ / Model 2 $| \Sigma^B |$'},
+                     }}
+
 
 ##################### Figures Main############
 
