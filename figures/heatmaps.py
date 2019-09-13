@@ -108,31 +108,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
         ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
     else:
-        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
-        ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
-
-        # Exhausting process to make ticks look nice
-        nice_ticks = ["{}".format(cval) for cval in crange if Decimal(str(cval)) % Decimal(str(crange[-1] / 5)) == 0]
-        ctilde_ticks = []
-        for i in range(len(nice_ticks)):
-            if i % 2 == 0:
-                ctilde_ticks.append("")
-            else:
-                ctilde_ticks.append(nice_ticks.pop(0))
-        ctilde_ticks = ["0"] + ctilde_ticks
-
-        nice_ticks = ["0"] + ["{}".format(koffval) for koffval in koffrange if
-                              Decimal(str(koffval)) % Decimal(str(koffrange[-1] / 5)) == 0]
-        kofftilde_ticks = []
-        for i in range(len(nice_ticks)):
-            if i % 2 == 0:
-                kofftilde_ticks.append("")
-            else:
-                kofftilde_ticks.append(nice_ticks.pop(0))
-        kofftilde_ticks = ["0"] + kofftilde_ticks
-
-        ax.set_xticklabels(ctilde_ticks, fontsize=FS)
-        ax.set_yticklabels(kofftilde_ticks, fontsize=FS)
+        # Set ticks later because for some reason plotting contours messes up the ticks that get set here
+        pass
 
     ax.invert_yaxis()
     ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
@@ -140,10 +117,12 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     # create colorbar
     cbar = fig.colorbar(im, norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax))
     cbar.ax.tick_params(labelsize=FS)
+
     #cbar.ax.minorticks_off();
     cbar.update_ticks()
     plt.clim(vmin, vmax)  # weird line to force min and max of the cbar ticks; seems to break the cbar label though
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20)
+
     """
     print(vmin, vmax)
     cbar.set_ticks([1.0, 10.0, 100.0])
@@ -153,6 +132,34 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     # TODO IDK why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
     plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
+    # now we can set the ticks without them getting messed up
+    if not log_norm:
+        ax = plt.gca()
+        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0] + [len(crange)])
+        ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0] + [len(koffrange)])
+
+        # Exhausting process to make ticks look nice
+        nice_ticks = ["{}".format(cval) for cval in crange if Decimal(str(cval)) % Decimal(str(crange[-1] / 5)) == 0]
+        ctilde_ticks = []
+        for i in range(len(nice_ticks) * 2):
+            if i % 2 == 0:
+                ctilde_ticks.append("")
+            else:
+                ctilde_ticks.append(nice_ticks.pop(0))
+        ctilde_ticks = ["0"] + ctilde_ticks
+
+        nice_ticks = ["{}".format(koffval) for koffval in koffrange if
+                      Decimal(str(koffval)) % Decimal(str(koffrange[-1] / 5)) == 0]
+        kofftilde_ticks = []
+        for i in range(len(nice_ticks) * 2):
+            if i % 2 == 0:
+                kofftilde_ticks.append("")
+            else:
+                kofftilde_ticks.append(nice_ticks.pop(0))
+        kofftilde_ticks = ["0"] + kofftilde_ticks
+
+        ax.set_xticklabels(ctilde_ticks, fontsize=FS)
+        ax.set_yticklabels(kofftilde_ticks, fontsize=FS)
 
     # save
     if save == True:
@@ -641,10 +648,11 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_x(cval * KP/KON, koffval * KP, nobs)
 
-        label = r'$ln P(c, k_{off}|n)$'
+        label = r'ln $P(c, k_{off}|n)$'
 
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-500, 0, 50)), vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
+
         ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
         ax.set_ylabel(r'$\tilde{k}_{off}$', fontsize=FS)
 
@@ -654,12 +662,14 @@ def heatmap_figure_4(crange=CRANGE, koffrange=KOFFRANGE):
             return koff_est
 
         # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
-        xpts = np.linspace(ax.get_xlim()[0], ax.get_xlim()[1], len(crange))
+        xpts = np.linspace(ax.get_xticks()[0], ax.get_xticks()[-1], len(crange))
 
-        koff_star = [ax.get_ylim()[1] / max(koffrange) * heuristic_estimate(ctilde * KP/KON, nobs) for ctilde in
-                     range(len(xpts))]
-        #ax.plot(xpts, koff_star, 'k--')
-
+        koff_star = [ax.get_ylim()[1] * (heuristic_estimate((ctilde - (crange[1]-crange[0])) * KP/KON, nobs)/KP -
+                                         (koffrange[1]-koffrange[0]))/max(koffrange) for ctilde in crange]
+        ax.plot([i+ax.get_xlim()[0] for i in xpts], [i-ax.get_ylim()[0] for i in koff_star], 'k--')
+        print(list(ax.get_xticklabels()))
+        print(list(ax.get_xticks()))
+        exit()
         # save figure
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
@@ -956,7 +966,7 @@ def dk_plotting():
     kofftildePosterior = [truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]
 
     heatmap_figure_4(crange=ctildePosterior, koffrange=kofftildePosterior)
-    heatmap_figure_4(crange=np.linspace(0.0001, 5, 80), koffrange=np.linspace(0.0001, 50, 80))
+
     return 0
 
 
