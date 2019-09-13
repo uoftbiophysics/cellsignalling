@@ -4,12 +4,10 @@ import numpy as np
 import os
 
 import plotting_dictionaries as pd
-<<<<<<< HEAD
 import matplotlib.ticker as ticker
-=======
 import equations as eqns
 from decimal import Decimal
->>>>>>> 8ddac3d99cfd2b0ba6fa1eac0b2b4fe624a0d9ee
+
 
 #from load_inputs import DATADICT
 from settings import DIR_OUTPUT, DIR_INPUT
@@ -79,7 +77,6 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     if 'fmt' in kwargs.keys(): fmt = kwargs['fmt']
     else: fmt = ticker.LogFormatterMathtext()
 
-
     if dedim:
         # if flag is true, this is how we scale the axis. Simple.
         crange = crange*KON/KP;
@@ -124,25 +121,18 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
 
     # create colorbar
-<<<<<<< HEAD
     cbar = fig.colorbar(im)
     #cbar.locator = ticker.LogLocator(base=10)
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
     cbar.ax.minorticks_off();
-    cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001])
+    # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
+    #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001])
     cbar.update_ticks()
 
     # TODO IDK why do ticks hide sometimes?
     CL = plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
     plt.clabel(CL, CL.levels, inline=True, fmt=fmt)
-=======
-    cbar = fig.colorbar(im, norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax))
-    cbar.ax.tick_params(labelsize=FS)
 
-    #cbar.ax.minorticks_off();
-    cbar.update_ticks()
-    plt.clim(vmin, vmax)  # weird line to force min and max of the cbar ticks; seems to break the cbar label though
-    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20)
 
     """
     print(vmin, vmax)
@@ -181,7 +171,6 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
         ax.set_xticklabels(ctilde_ticks, fontsize=FS)
         ax.set_yticklabels(kofftilde_ticks, fontsize=FS)
->>>>>>> 8ddac3d99cfd2b0ba6fa1eac0b2b4fe624a0d9ee
 
     # save
     if save == True:
@@ -1056,4 +1045,5 @@ if __name__ == '__main__':
     #                    'cmap_colour': custom_cmap_colour,
     #                    'vmin': 1.0}
     #custom_ratio_diagram(contour_args=contour_args_low)
-    dk_plotting()
+
+    #dk_plotting()

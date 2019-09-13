@@ -66,20 +66,29 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
 def plot_hist(moment_times, data_observations, step, model, state_label='n', theory_mean=None, theory_var=None, show=True):
     time = moment_times[step]
     hist_data = data_observations[step, :]
-    hist_bins = np.arange(0, hist_data.max() + 1.5) - 0.5
+    #hist_bins = np.arange(0, hist_data.max() + 1.5) - 0.5
+    hist_bins = np.linspace(0, hist_data.max(), 50)
+    points = np.linspace(0, hist_data.max(), 1000)
     num_traj = len(hist_data)
-    plt.close()
-    count, bins, _ = plt.hist(data_observations[step, :]+0.01, bins=hist_bins)  # TODO cleanup
     if theory_mean is not None:
         assert theory_var is not None
         mu = theory_mean[step]
         sigma = np.sqrt(theory_var[step])
-        normal_at_bins = 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu)**2 / (2 * sigma**2))
-        plt.plot(bins, num_traj * normal_at_bins, '--k')
-    plt.title('Histogram (%d traj) for %s, %s at step:%d, time:%.2f' % (num_traj, model, state_label, step, time))
-    plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%s_%d_%.2f.png' % (model, state_label, step, time))
+        hist_bins = np.arange(int(mu-3.5*sigma), int(mu+3.5*sigma), int(7*sigma/50))
+        points = np.linspace(mu-3.5*sigma, mu+3.5*sigma, 1000)
+        normal_at_bins = 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (points - mu)**2 / (2 * sigma**2))
+        plt.plot(points, normal_at_bins, 'k')
+    count, bins, _ = plt.hist(data_observations[step, :]+0.01, bins=hist_bins, color="#3F5D7D", normed=True, ec='k')  # TODO cleanup
+    #plt.title(r'Histogram of Gillespie Algorithm (%d traj), time:%.2f' % (num_traj, time))
+    plt.title(r'Histogram of Gillespie Algorithm (%d traj)' % (num_traj))
+    plt.xlabel(r'%s' %(state_label))
+    plt.ylabel(r'probability')
+    plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%sf.png' % (model, state_label))
+    #plt.title('Histogram (%d traj) for %s, %s at step:%d, time:%.2f' % (num_traj, model, state_label, step, time))
+    #plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%s_%d_%.2f.png' % (model, state_label, step, time))
     if show:
         plt.show()
+    plt.close()
     return plt.gca()
 
 

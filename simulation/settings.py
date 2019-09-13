@@ -20,11 +20,11 @@ if not os.path.exists(FOLDER_OUTPUT):
 # model parameters
 GLOB_C = 1.0
 GLOB_K_ON = 1.0
-GLOB_K_OFF = 2.0
+GLOB_K_OFF = 50.0
 GLOB_K_P = 80.0
 GLOB_DEG_N = 0.0
 GLOB_DEG_M = 0.0
-GLOB_K_F = 5.5
+GLOB_K_F = 10.0
 
 # defined
 GLOB_X = GLOB_C * GLOB_K_ON / GLOB_K_OFF

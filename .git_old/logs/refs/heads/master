@@ -1,0 +1,6 @@
+0000000000000000000000000000000000000000 a7fc611bd1a26ec0fec9cb8918bcaff5c7235005 jbrothschild <jerben.rothschild@gmail.com> 1568290400 -0400	clone: from git@github.com:uoftbiophysics/cellsignalling.git
+a7fc611bd1a26ec0fec9cb8918bcaff5c7235005 106cb78e32d18a050f07ba5d6c87ed4a3fd4d247 jbrothschild <jerben.rothschild@gmail.com> 1568291297 -0400	commit: Added useful comments and 1 cmap_colour flag.
+106cb78e32d18a050f07ba5d6c87ed4a3fd4d247 94ac6ae4218a5e9deb07451210dc02daddce7933 jbrothschild <jerben.rothschild@gmail.com> 1568299683 -0400	commit: Small changes to heatmaps. Mostly plotting histograms for gillespie simulation.
+94ac6ae4218a5e9deb07451210dc02daddce7933 ad3f2557d3a21f89e7bc8f78f56b41a02109a500 jbrothschild <jerben.rothschild@gmail.com> 1568411647 -0400	commit: New contour plots (with contour line values.
+ad3f2557d3a21f89e7bc8f78f56b41a02109a500 7cc2aa8af1460cf530251414ac64f7fca46e6931 jbrothschild <jerben.rothschild@gmail.com> 1568411853 -0400	commit (merge): Combined duncan and my commits.
+7cc2aa8af1460cf530251414ac64f7fca46e6931 e461e91eddd87c27e1ac11a365132229b4563fbf jbrothschild <jerben.rothschild@gmail.com> 1568414305 -0400	commit: Fixed some differences between Duncan edits and what Jeremy had up.

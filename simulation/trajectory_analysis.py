@@ -7,6 +7,7 @@ from settings import GLOB_PSS_BOUND
 from trajectory_plotting import plot_traj_and_mean_sd, plot_means, plot_vars, plot_hist, plot_estimation
 from trajectory_simulate import multitraj
 
+plt.style.use('parameters.mplstyle')
 
 def get_state_at_t(traj, times, t, last_step=0):
     step = last_step
@@ -145,109 +146,131 @@ def get_moment_timeseries(traj_array, times_array, params):
 
 if __name__ == '__main__':
     # settings
-    model = 'kpr'
-    num_traj = 500
-    num_steps = 1000
-    init_bound = 0.0
-    # model specification
-    params = DEFAULT_PARAMS
-    # simulate trajectories
-    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model, params=params)
-    # compute moments from data
-    simdata, moment_times = get_moment_timeseries(traj_array, times_array, params)
-    # expectations from theory
-    theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model, p=params)
+    model = 'mode_1'
+    #model = 'mode_2'
+    #model = 'combined'
+    #model = 'kpr'
 
-    # specify histogram timepoints
-    num_points = 20
-    hist_steps = [i*num_steps/num_points for i in xrange(num_points)]
+    #for model in ['mode_1', 'mode_2', 'combined', 'kpr']:
+    for model in ['kpr']:
+        print(model)
 
-    # model dependent plotting
-    if model == 'mode_1':
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
-                              data_mean=simdata['mean_n'], data_var=simdata['var_n'],
-                              theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
-                              title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
-                   title='%s <n>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
-                  title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
-        plot_estimation(moment_times, simdata['estimate_x'], model, params, theory_curves, theory=True, est='x')
-        plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, est='c')
-        plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, est='k_off')
-        for step in hist_steps:
-            plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
-                      theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
+        num_traj =10000
+        num_steps = 1000
+        init_bound = 0.0
+        # model specification
+        params = DEFAULT_PARAMS
+        # simulate trajectories
+        traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model, params=params)
+        # compute moments from data
+        simdata, moment_times = get_moment_timeseries(traj_array, times_array, params)
+        # expectations from theory
+        theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model, p=params)
 
-    elif model == 'mode_2':
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=1,
-                              data_mean=simdata['mean_m'], data_var=simdata['var_m'],
-                              theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
-                              title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
-                   title='%s <m>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
-                  title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
-        plot_estimation(moment_times, simdata['estimate_x'], model, params, theory_curves, est='x')
-        plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, est='c')
-        plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, est='k_off')
-        for step in hist_steps:
-            plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
-                      theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+        # specify histogram timepoints
+        num_points = 20
+        hist_steps = [i*num_steps/num_points for i in xrange(num_points)]
+        hist_steps = [-1]
 
-    elif model == 'combined':
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
-                              data_mean=simdata['mean_n'], data_var=simdata['var_n'],
-                              theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
-                              title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=2,
-                              data_mean=simdata['mean_m'], data_var=simdata['var_m'],
-                              theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
-                              title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
-                   title='%s <n>(t) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
-                   title='%s <m>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
-                  title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
-                  title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
-                  title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
-        plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, theory=True, est='c')
-        plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, theory=True, est='k_off')
-        for step in hist_steps:
-            plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
-                      theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
-            plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
-                      theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
-    else:
-        assert model == 'kpr'
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=2,
-                              data_mean=simdata['mean_n'], data_var=simdata['var_n'],
-                              theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
-                              title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=3,
-                              data_mean=simdata['mean_m'], data_var=simdata['var_m'],
-                              theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
-                              title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
-                   title='%s <n>(t) for %d trajectories' % (model, num_traj))
-        plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
-                   title='%s <m>(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
-                  title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
-                  title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
-        plot_vars(moment_times, simdata['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
-                  title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
-        # TODO
-        """
-        #plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, theory=True, est='c')
-        #plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, theory=True, est='k_off')
-        for step in hist_steps:
-            plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
-                      theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
-            plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
-                      theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
-        """
+        # model dependent plotting
+        if model == 'mode_1':
+            """
+            plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
+                                  data_mean=simdata['mean_n'], data_var=simdata['var_n'],
+                                  theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
+                                  title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+            plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
+                       title='%s <n>(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
+                      title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
+            plot_estimation(moment_times, simdata['estimate_x'], model, params, theory_curves, theory=True, est='x')
+            plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, est='c')
+            plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, est='k_off')
+            """
+            for step in hist_steps:
+                plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
+                          theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
+
+        elif model == 'mode_2':
+            """
+            plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=1,
+                                  data_mean=simdata['mean_m'], data_var=simdata['var_m'],
+                                  theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
+                                  title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+            plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
+                       title='%s <m>(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
+                      title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
+            plot_estimation(moment_times, simdata['estimate_x'], model, params, theory_curves, est='x')
+            plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, est='c')
+            plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, est='k_off')
+            """
+            for step in hist_steps:
+                plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
+                          theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+
+        elif model == 'combined':
+            """
+            plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=1,
+                                  data_mean=simdata['mean_n'], data_var=simdata['var_n'],
+                                  theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
+                                  title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+            plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=2,
+                                  data_mean=simdata['mean_m'], data_var=simdata['var_m'],
+                                  theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
+                                  title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+            plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
+                       title='%s <n>(t) for %d trajectories' % (model, num_traj))
+            plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
+                       title='%s <m>(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
+                      title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
+                      title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
+                      title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
+            plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, theory=True, est='c')
+            plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, theory=True, est='k_off')
+            """
+            for step in hist_steps:
+                plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
+                          theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
+                plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
+                          theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+        else:
+            assert model == 'kpr'
+            """
+            plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='n', state_idx=2,
+                                  data_mean=simdata['mean_n'], data_var=simdata['var_n'],
+                                  theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'],
+                                  title='%s <n>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+            plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, state_label='m', state_idx=3,
+                                  data_mean=simdata['mean_m'], data_var=simdata['var_m'],
+                                  theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'],
+                                  title='%s <m>(t) +- sqrt(var(t)) for %d trajectories' % (model, num_traj))
+            plot_means(moment_times, simdata['mean_n'], model, theory_mean=theory_curves['mean_n'], state_label='n',
+                       title='%s <n>(t) for %d trajectories' % (model, num_traj))
+            plot_means(moment_times, simdata['mean_m'], model, theory_mean=theory_curves['mean_m'], state_label='m',
+                       title='%s <m>(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['var_n'], model, theory_var=theory_curves['var_n'], state_label='n',
+                      title='%s Var(n)(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['var_m'], model, theory_var=theory_curves['var_m'], state_label='m',
+                      title='%s Var(m)(t) for %d trajectories' % (model, num_traj))
+            plot_vars(moment_times, simdata['cov_nm'], model, theory_var=theory_curves['cov_nm'], state_label='nm',
+                      title='%s Cov(n,m)(t) for %d trajectories' % (model, num_traj))
+            """
+            for step in hist_steps:
+                plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
+                          theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
+                plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
+                          theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+            # TODO
+            """
+            #plot_estimation(moment_times, simdata['estimate_c'], model, params, theory_curves, theory=True, est='c')
+            #plot_estimation(moment_times, simdata['estimate_k_off'], model, params, theory_curves, theory=True, est='k_off')
+            for step in hist_steps:
+                plot_hist(moment_times, simdata['distribution_n'], step, model, state_label='n',
+                          theory_mean=theory_curves['mean_n'], theory_var=theory_curves['var_n'], show=False)
+                plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
+                          theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
+            """

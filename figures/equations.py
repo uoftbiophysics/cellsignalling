@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from settings import KON, KP, T, KF
+from heatmaps import KON, KP, T, KF
 
 def SigmacrlbC3NoTrace(c, koff, kon=KON, T=T, KF=KF, KP=KP):
     return (c*(1 + (c*kon)/koff)*(koff*((c**2*kon**2)/koff + KP)*T + (2*koff*(KP - c*koff*kon*T + koff*KP*T))/KF + (koff**2*(koff**2*T + KP*(2*(1 + (c*kon)/koff) + koff*(2 + (2*c*kon)/koff + (c**2*kon**2)/koff**2)*T)))/KF**2))/(koff*(1 + koff/KF)*kon*KP*T**2)
