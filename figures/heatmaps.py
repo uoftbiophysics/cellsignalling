@@ -142,7 +142,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
     # TODO IDK why do ticks hide sometimes?
     #for t in cbar.ax.get_yticklabels(): print(t.get_text())
-    plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
+    #plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
     # now we can set the ticks without them getting messed up
     if not log_norm:
         ax = plt.gca()
@@ -989,7 +989,7 @@ def dk_plotting():
     return 0
 
 
-def custom_ratio_diagram(subdir1='heatmaps', subdir2='', dedim=True, contour_args=None):
+def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
     if not os.path.exists(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2):
         os.makedirs(DIR_OUTPUT + os.sep + subdir1 + os.sep + subdir2)
 
@@ -1013,7 +1013,7 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', dedim=True, contour_arg
             den = eqns.DetSigmacrlb2(fix_C, ival, kon=fix_KON, T=fix_T, KP=fix_KP, KF=jval)
             ratio_arr[i, j] = num/den + eps  #equation(cval, koffval)
     print('custom_ratio_diagram -- min max:', np.min(ratio_arr), np.max(ratio_arr))
-    cbar_label = r'Det $\Sigma^A_3$/Det $\Sigma^A_2$'
+    cbar_label = r'det$(\Sigma^{KPR})$/det$(\Sigma)$'
     plot_heatmap(ratio_arr, ax1range, ax2range, 'custom_ratio_det3det2_notrace', cbar_label,
                  xy_label_force=xy_label_force, show=True, save=True, log_norm=True, dedim=False, **contour_args)
     return
