@@ -1032,18 +1032,16 @@ if __name__ == '__main__':
     dictionary = pd.MAIN; dictionary_SI = pd.SI_ALT_RATIO
     want_dedim = True; subdir_2_use = 'heatmaps'
 
-    contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01], 'fmt' : '%.2f'}
+    contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01, 1.1, 10.0, 100.0, 1000.0], 'fmt' : '%.2f'}
 
     #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
-    plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
+    #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 
     #custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'
     #contour_args_high = {'levels': [1 / (KP * T), 10 / (KP * T), 100 / (KP * T), 1000 / (KP * T), 1E4 / (KP * T)],
     #                     'cmap_colour': custom_cmap_colour,
     #                     'vmin': 1.0}
-    #contour_args_low = {'levels': [1.01, 1.1, 2.0, 10.0, 50.0],
-    #                    'cmap_colour': custom_cmap_colour,
-    #                    'vmin': 1.0}
-    #custom_ratio_diagram(contour_args=contour_args_low)
+
+    custom_ratio_diagram(contour_args=contour_args_SI)
 
     #dk_plotting()
