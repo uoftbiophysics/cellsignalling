@@ -215,13 +215,13 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
         figname = 'mode1_error_c_cross_section'
         curve1 = cross_section_mode1_error_c()
         # plot
-        plt.figure(figsize=(4, 3))
+        plt.figure(figsize=(3.25*0.8, 3*0.8))
         #plt.figure()
         plt.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label='Simple Fisher', zorder=1)
         # axis
         if label_style == 0:
-            plt.title('Mode 1: MLE relative error comparison \n'+r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
-            plt.ylabel(r'$\alpha \langle\delta c^{2}\rangle$/$c^{2}$')
+            #plt.title('Mode 1: MLE relative error comparison \n'+r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
+            plt.ylabel(r'$k_{p} t \langle\delta c^{2}\rangle$/$c^{2}$')
         elif label_style == 1:
             plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
             plt.ylabel(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
@@ -229,8 +229,8 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
         plt.xlabel(r'$\tilde{c}_0$')
 
         plt.gca().set_xscale('log')
-        plt.xlim([CTILDERANGE[0], CTILDERANGE[-1]])
-        plt.ylim([0, alpha])
+        plt.xlim([0.03, 10])
+        plt.ylim([0, 100])
         plt.xscale('log')
         #plt.legend()
         # save figure
@@ -969,7 +969,8 @@ def dk_plotting():
     """
     Duncan you can still run any/all of these by running dk_plotting in main
     """
-    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    return 0
     #heatmap_mode1_error_x()
     #figure_2_combined_cross_sections()
 
@@ -1028,7 +1029,8 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
-
+    dk_plotting()
+    exit()
     dictionary = pd.MAIN; dictionary_SI = pd.SI_ALT_RATIO
     want_dedim = True; subdir_2_use = 'heatmaps'
 
