@@ -226,7 +226,7 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
             plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
             plt.ylabel(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
 
-        plt.xlabel(r'$\tilde{c}_0$')
+        plt.xlabel(r'$k_{on}c/k_{p}$')
 
         plt.gca().set_xscale('log')
         plt.xlim([0.03, 10])
@@ -336,7 +336,7 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
         plt.ylabel(r'$\langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
 
     # axis
-    ax1.set_xlabel(r'$c$')
+    ax1.set_xlabel(r'$k_{on}c/k_{p}$')
     #ax2.set_xlabel(r'$k_{off}$')
 
     ax1.set_xscale('log')
@@ -667,8 +667,8 @@ def heatmap_figure_4():
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=linear_contours, vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
 
-        ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
-        ax.set_ylabel(r'$\tilde{k}_{off}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate(c, n):
@@ -715,8 +715,8 @@ def heatmap_figure_4():
         label = r'ln $P(c, k_{off}|n, m)$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-1000, 0, 100)), vmin=-1000, vmax=0, contour_color='w', contour_linewidths=0.5)
-        ax.set_xlabel(r'$\tilde{c}$', fontsize=FS)
-        ax.set_ylabel(r'$\tilde{k}_{off}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
@@ -795,8 +795,8 @@ def heatmap_figure_4():
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
                                contour_linewidths=0.5)
-        ax.set_xlabel(r'$c$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
@@ -882,8 +882,8 @@ def heatmap_figure_4():
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
                                contour_linewidths=0.5)
-        ax.set_xlabel(r'$c$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n1, n2):
