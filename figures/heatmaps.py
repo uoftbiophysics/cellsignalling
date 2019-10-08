@@ -256,7 +256,7 @@ def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
             arr[i, j] = combined_error_c(cval, koffval)
 
     if label_style == 0:
-        label = r'$\alpha \langle\delta c^{2}\rangle$/$c^{2}$'
+        label = r'$k_{p}t \langle\delta c^{2}\rangle$/$c^{2}$'
     elif label_style == 1:
         label = r'$\langle\delta c^{2}\rangle$/$c^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_c', label)
@@ -280,7 +280,7 @@ def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE,
             arr[i, j] = combined_error_koff(cval, koffval)
 
     if label_style == 0:
-        label = r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$k_{p}t \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
     elif label_style == 1:
         label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_koff', label)
@@ -325,10 +325,10 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
     ax2 = ax1.twiny()
 
     if label_style == 0:
-        ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$k_{p}t \delta c^{2}/c^{2}$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{p}t \delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
+        ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$c$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{off}$', zorder=1)
         #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
-        plt.ylabel(r'$\alpha \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
+
     elif label_style == 1:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
         ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
@@ -337,17 +337,18 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
 
     # axis
     ax1.set_xlabel(r'$k_{on}c/k_{p}$')
+    ax1.set_ylabel(r'$k_{p}t \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
     #ax2.set_xlabel(r'$k_{off}$')
 
     ax1.set_xscale('log')
     ax2.set_xscale('log')
-    ax1.set_xlim([1E-2, 1E1])
-    ax2.set_xlim([1E-2, 1E1])
+    ax1.set_xlim([1E-2, 1E2])
+    ax2.set_xlim([1E-2, 1E2])
     plt.ylim([0, 0.01*alpha])
 
     lns = ln1 + ln2
     labs = [l.get_label() for l in lns]
-    #ax1.legend(lns, labs)
+    ax1.legend(lns, labs)
 
     plt.tight_layout()
     # save figure
@@ -969,10 +970,10 @@ def dk_plotting():
     """
     Duncan you can still run any/all of these by running dk_plotting in main
     """
-    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
-    #return 0
+    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+
     #heatmap_mode1_error_x()
-    #figure_2_combined_cross_sections()
+    figure_2_combined_cross_sections()
 
     #heatmap_combined_error_c()
     #heatmap_combined_error_koff()
@@ -985,7 +986,7 @@ def dk_plotting():
     ctildePosterior = [truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5.0 * KON / KP + 0.005, 0.005))[1:]]
     kofftildePosterior = [truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]
 
-    heatmap_figure_4()
+    #heatmap_figure_4()
 
     return 0
 
