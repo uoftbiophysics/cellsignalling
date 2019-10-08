@@ -325,9 +325,9 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
     ax2 = ax1.twiny()
 
     if label_style == 0:
-        ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\alpha \delta c^{2}/c^{2}$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$\alpha \delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
-        plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
+        ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$k_{p}t \delta c^{2}/c^{2}$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{p}t \delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
+        #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
         plt.ylabel(r'$\alpha \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
     elif label_style == 1:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
@@ -341,13 +341,13 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
 
     ax1.set_xscale('log')
     ax2.set_xscale('log')
-    #ax1.set_xlim([1E-3, 1E3])
-    #ax2.set_xlim([1E-3, 1E3])
-    plt.ylim([0, 0.1*alpha])
+    ax1.set_xlim([1E-2, 1E1])
+    ax2.set_xlim([1E-2, 1E1])
+    plt.ylim([0, 0.01*alpha])
 
     lns = ln1 + ln2
     labs = [l.get_label() for l in lns]
-    ax1.legend(lns, labs)
+    #ax1.legend(lns, labs)
 
     plt.tight_layout()
     # save figure
@@ -909,7 +909,7 @@ def heatmap_figure_4():
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
         # fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
-    #mode1_plot()
+    mode1_plot()
     mode2_plot()
     #KPR1_plot()
     #KPR2_plot()
@@ -969,8 +969,8 @@ def dk_plotting():
     """
     Duncan you can still run any/all of these by running dk_plotting in main
     """
-    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
-    return 0
+    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    #return 0
     #heatmap_mode1_error_x()
     #figure_2_combined_cross_sections()
 
@@ -1046,4 +1046,3 @@ if __name__ == '__main__':
 
     custom_ratio_diagram(contour_args=contour_args_SI)
 
-    #dk_plotting()
