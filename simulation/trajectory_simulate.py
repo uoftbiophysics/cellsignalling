@@ -46,6 +46,23 @@ def propensities(state, model, params=DEFAULT_PARAMS):
         propensities[4] = p.k_p * state[1]                                # produce n
         propensities[5] = p.d_n * state[2]                                # degradation n molecule
         propensities[6] = p.d_m * state[3]
+    elif model == 'two_ligand_kpr':
+    # state[0] is P0, etc.
+    # state[3] and state[4] are for the second ligand
+        zero_state_indicator = (1 - state[1]) * (1 - state[2]) * (1 - state[3]) * (1 - state[4])
+        propensities[0] = p.k_on * p.c1 * zero_state_indicator			  # binding of ligand #1
+        propensities[1] = p.k_on * p.c2 * zero_state_indicator			  # binding of ligand #2		
+        propensities[2] = p.k_off_1 * state[1] 				              # unbinding of ligand #1 from P1
+        propensities[3] = p.k_p * state[1]                                # produce n1
+        propensities[4] = p.k_f * state[1]                                # kpr forward step + GPCR event
+        propensities[5] = p.k_off_1 * state[2]                            # unbinding of ligand #1 from P2
+        propensities[6] = p.k_p * state[2]                                # produce n2
+        propensities[7] = p.k_off_2 * state[3]                            # unbinding of ligand #2 from P1
+        propensities[8] = p.k_p * state[3]                                # produce n1
+        propensities[9] = p.k_f * state[3]                                # kpr forward step + GPCR event
+        propensities[10] = p.k_off_2 * state[2]                           # fall off
+        propensities[11] = p.k_p * state[2]                               # produce n2
+
     return propensities
 
 
@@ -110,12 +127,13 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
 
 if __name__ == '__main__':
     # settings
-    model = 'kpr'
-    num_traj = 200
+    model = 'two_ligand_kpr'
+    num_traj = 100
     num_steps = 100
     init_bound = 0.0
     # compute
-    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model='kpr')
+    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
+
     # plot trajectories
     for k in xrange(num_traj):
         times_k = times_array[:, k]
@@ -124,6 +142,6 @@ if __name__ == '__main__':
     # decorate
     plt.title('Model: %s - %d trajectories' % (model, num_traj))
     plt.xlabel('time')
-    plt.ylabel('kpr fraction')
+    plt.ylabel(r'$\langle n_1 \rangle$')
     plt.legend()
     plt.show()
