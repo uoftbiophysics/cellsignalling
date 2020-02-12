@@ -40,7 +40,7 @@ assert GLOB_BOUND_BOOL in [0, 1]
 NUM_STEPS = 100
 
 # models
-VALID_MODELS = ['mode_1', 'mode_2', 'combined', 'kpr', 'two_ligand_kpr']
+VALID_MODELS = ['mode_1', 'mode_2', 'combined', 'kpr', 'two_ligand_kpr', 'two_ligand_kpr_JR']
 DEFAULT_MODEL = 'mode_1'
 
 # model structures
@@ -48,18 +48,21 @@ NUM_RXN = {'mode_1': 4,
            'mode_2': 3,
            'combined': 5,
            'kpr': 7,
-           'two_ligand_kpr': 12}
+           'two_ligand_kpr': 12,
+           'two_ligand_kpr_JR': 10}
 STATE_SIZE = {'mode_1': 2,
               'mode_2': 2,
               'combined': 3,
               'kpr': 4,
-              'two_ligand_kpr': 5}
+              'two_ligand_kpr': 5,
+              'two_ligand_kpr_JR': 8}
 # init cond for each model
 INIT_CONDS = {'mode_1': [GLOB_BOUND_BOOL, GLOB_N0],
               'mode_2': [GLOB_BOUND_BOOL, GLOB_M0],
               'combined': [GLOB_BOUND_BOOL, GLOB_N0, GLOB_M0],
               'kpr': [GLOB_BOUND_BOOL, 0, GLOB_N0, GLOB_M0],  # TODO handle init cond for kpr
-              'two_ligand_kpr': [GLOB_BOUND_BOOL, GLOB_N0, GLOB_M0, GLOB_N0, GLOB_M0]}
+              'two_ligand_kpr': [GLOB_BOUND_BOOL, GLOB_N0, GLOB_M0, GLOB_N0, GLOB_M0],
+              'two_ligand_kpr_JR': [GLOB_BOUND_BOOL, 0, 0, 0, GLOB_N0, GLOB_M0, GLOB_N0, GLOB_M0]}
 # reaction event update dictionary for each model
 UPDATE_DICTS = {
     'mode_1': {0: np.array([1.0, 0.0]),  # binding
@@ -94,5 +97,18 @@ UPDATE_DICTS = {
          8: np.array([0.0, 1.0, 0.0, 0.0, 0.0]),  # produce n1
          9: np.array([1.0, 0.0, 0.0, 0.0, 1.0]),  # kpr forward step + GPCR event
          10: np.array([-4.0, 0.0, 0.0, 0.0, 0.0]),  # unbinding of ligand #2 from P2
-         11: np.array([0.0, 0.0, 0.0, 1.0, 0.0])}  # produce n2
+         11: np.array([0.0, 0.0, 0.0, 1.0, 0.0])},  # produce n2
+    'two_ligand_kpr_JR':
+    #			     [  1,   2,   3,   4,  n1,  m1,  n2,  m2 ]
+        {0: np.array([1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),   # ligand #1 binding
+         1: np.array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),   # ligand #2 binding
+         2: np.array([-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),  # unbinding of ligand #1 from state 1
+         3: np.array([0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0]),  # unbinding of ligand #2 from state 3
+         4: np.array([0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),   # produce n1
+         5: np.array([-1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),  # kpr forward step + GPCR event ligand #1
+         6: np.array([0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0]),  # kpr forward step + GPCR event ligand #2
+         7: np.array([0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),  # unbinding of ligand #1 from 2
+         8: np.array([0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0]),  # unbinding of ligand #2 from 4
+         9: np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])}   # produce n2
+
 }

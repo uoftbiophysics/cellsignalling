@@ -49,9 +49,9 @@ def propensities(state, model, params=DEFAULT_PARAMS):
     elif model == 'two_ligand_kpr':
     # state[0] is P0, etc.
     # state[3] and state[4] are for the second ligand
-        zero_state_indicator = (1 - state[1]) * (1 - state[2]) * (1 - state[3]) * (1 - state[4])
+        zero_state_indicator = (1 - state[1]) * (1 - state[2]) * (1 - state[3]) * (1 - state[4]) # isn't this just state[0]??
         propensities[0] = p.k_on * p.c1 * zero_state_indicator			  # binding of ligand #1
-        propensities[1] = p.k_on * p.c2 * zero_state_indicator			  # binding of ligand #2		
+        propensities[1] = p.k_on * p.c2 * zero_state_indicator			  # binding of ligand #2
         propensities[2] = p.k_off_1 * state[1] 				              # unbinding of ligand #1 from P1
         propensities[3] = p.k_p * state[1]                                # produce n1
         propensities[4] = p.k_f * state[1]                                # kpr forward step + GPCR event
@@ -62,6 +62,18 @@ def propensities(state, model, params=DEFAULT_PARAMS):
         propensities[9] = p.k_f * state[3]                                # kpr forward step + GPCR event
         propensities[10] = p.k_off_2 * state[2]                           # fall off
         propensities[11] = p.k_p * state[2]                               # produce n2
+    elif model == 'two_ligand_kpr_JR':
+        zero_indic = (1 -state[0]) * (1 -state[1]) * (1 -state[2]) * (1 -state[3])
+        propensities[0] = p.k_on * p.c1 * zero_indic                      # binding of ligand #1
+        propensities[1] = p.k_on * p.c2 * zero_indic                      # binding of ligand #2
+        propensities[2] = p.k_off_1 * state[0]				              # unbinding of ligand #1 from state 1
+        propensities[3] = p.k_off_2 * state[2]                            # unbinding of ligand #2 from state 3
+        propensities[4] = p.k_p * ( state[0] + state[2] )                 # produce n1
+        propensities[5] = p.k_f * state[0]                                # kpr forward step + GPCR event ligand #1
+        propensities[6] = p.k_f * state[2]                                # kpr forward step + GPCR event ligand #2
+        propensities[7] = p.k_off_1 * state[1]                            # unbinding of ligand #1 from 2
+        propensities[8] = p.k_off_2 * state[3]                            # unbinding of ligand #2 from 4
+        propensities[9] = p.k_p * ( state[1] + state[3] )                 # produce n2
 
     return propensities
 
@@ -128,8 +140,8 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
 if __name__ == '__main__':
     # settings
     model = 'two_ligand_kpr'
-    num_traj = 100
-    num_steps = 100
+    num_traj = 5000
+    num_steps = 1500
     init_bound = 0.0
     # compute
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)

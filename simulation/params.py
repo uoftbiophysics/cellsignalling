@@ -19,7 +19,7 @@ class Params:
         self.c1 = c
         self.c2 = 0.2 * c
         self.k_off_1 = k_off
-        self.k_off_2 = k_off * 1.33
+        self.k_off_2 = k_off * 3.00
 
     def unpack(self):
         return self.c, self.k_on, self.k_off, self.k_p, self.x, self.pss, self.r, self.d_n, self.d_m, self.k_f
