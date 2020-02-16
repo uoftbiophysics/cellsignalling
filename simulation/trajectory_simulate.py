@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from params import DEFAULT_PARAMS
-from settings import DEFAULT_MODEL, VALID_MODELS, NUM_RXN, UPDATE_DICTS, NUM_STEPS, INIT_CONDS, STATE_SIZE
+from settings import DEFAULT_MODEL, VALID_MODELS, NUM_RXN, UPDATE_DICTS, NUM_STEPS, INIT_CONDS, STATE_SIZE, RECEPTOR_STATE_SIZE
 
 
 def update_state(state_timeseries, rxn_idx, step, model):
@@ -47,22 +47,6 @@ def propensities(state, model, params=DEFAULT_PARAMS):
         propensities[5] = p.d_n * state[2]                                # degradation n molecule
         propensities[6] = p.d_m * state[3]
     elif model == 'two_ligand_kpr':
-    # state[0] is P0, etc.
-    # state[3] and state[4] are for the second ligand
-        zero_state_indicator = (1 - state[1]) * (1 - state[2]) * (1 - state[3]) * (1 - state[4]) # isn't this just state[0]??
-        propensities[0] = p.k_on * p.c1 * zero_state_indicator			  # binding of ligand #1
-        propensities[1] = p.k_on * p.c2 * zero_state_indicator			  # binding of ligand #2
-        propensities[2] = p.k_off_1 * state[1] 				              # unbinding of ligand #1 from P1
-        propensities[3] = p.k_p * state[1]                                # produce n1
-        propensities[4] = p.k_f * state[1]                                # kpr forward step + GPCR event
-        propensities[5] = p.k_off_1 * state[2]                            # unbinding of ligand #1 from P2
-        propensities[6] = p.k_p * state[2]                                # produce n2
-        propensities[7] = p.k_off_2 * state[3]                            # unbinding of ligand #2 from P1
-        propensities[8] = p.k_p * state[3]                                # produce n1
-        propensities[9] = p.k_f * state[3]                                # kpr forward step + GPCR event
-        propensities[10] = p.k_off_2 * state[2]                           # fall off
-        propensities[11] = p.k_p * state[2]                               # produce n2
-    elif model == 'two_ligand_kpr_JR':
         zero_indic = (1 -state[0]) * (1 -state[1]) * (1 -state[2]) * (1 -state[3])
         propensities[0] = p.k_on * p.c1 * zero_indic                      # binding of ligand #1
         propensities[1] = p.k_on * p.c2 * zero_indic                      # binding of ligand #2
@@ -89,7 +73,12 @@ def simulate_traj(num_steps=NUM_STEPS, init_cond=None, model=DEFAULT_MODEL, para
     traj = np.zeros((num_steps, STATE_SIZE[model]))
     # setup init conds
     if init_cond is not None:
-        assert len(init_cond) == STATE_SIZE[model]
+        try:
+            assert len(init_cond) == STATE_SIZE[model]
+        except AssertionError:
+            print "len(init_cond) = " + str(len(init_cond))
+            print "STATE_SIZE[model] = " + str(STATE_SIZE[model])
+            assert len(init_cond) == STATE_SIZE[model]
     else:
         init_cond = INIT_CONDS[model]
     traj[0, :] = init_cond
@@ -117,7 +106,8 @@ def simulate_traj(num_steps=NUM_STEPS, init_cond=None, model=DEFAULT_MODEL, para
     return traj, times
 
 
-def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_MODEL, params=DEFAULT_PARAMS):
+def multitraj(num_traj, num_steps=NUM_STEPS, bound_probabilities=0.0, model=DEFAULT_MODEL, params=DEFAULT_PARAMS,
+              init_cond_input=[]):
     """
     Return:
     - traj_array: num_steps x STATE_SIZE[model] x num_traj
@@ -125,15 +115,24 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
     """
     traj_array = np.zeros((num_steps, STATE_SIZE[model], num_traj), dtype=int)
     times_array = np.zeros((num_steps, num_traj))
-    # prep init cond of varying bound states (such that average is bound_fraction
-    init_cond_base = INIT_CONDS[model]
-    draws = np.random.binomial(1, bound_fraction, num_traj)
+    # prep init cond of varying bound states (such that average I.C. matches bound_probabilities)
+    if init_cond_input == []:
+        init_cond_base = INIT_CONDS[model]
+    else:
+        init_cond_base = init_cond_input
+    if type(bound_probabilities) == float: # for legacy purposes
+        bound_probabilities = [1.0 - bound_probabilities, bound_probabilities]
+    draws = np.random.choice(np.arange(0, RECEPTOR_STATE_SIZE[model]), size=num_traj, p=bound_probabilities)
+    #draws = np.random.binomial(1, bound_probabilities, num_traj)
     # simulate k trajectories
     for k in xrange(num_traj):
-        init_cond_base[0] = draws[k]
+        init_vector = np.zeros(RECEPTOR_STATE_SIZE[model])
+        init_vector[draws[k]] = 1
+        init_cond_base[:RECEPTOR_STATE_SIZE[model]-1] = init_vector[1:] # init_cond_base does not contain unbound state
         traj, times = simulate_traj(num_steps=num_steps, init_cond=init_cond_base, model=model, params=params)
         traj_array[:, :, k] = traj
         times_array[:, k] = times
+
     return traj_array, times_array
 
 
@@ -144,7 +143,7 @@ if __name__ == '__main__':
     num_steps = 1500
     init_bound = 0.0
     # compute
-    traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
+    traj_array, times_array = multitraj(num_traj, bound_probabilities=init_bound, num_steps=num_steps, model=model)
 
     # plot trajectories
     for k in xrange(num_traj):

@@ -53,17 +53,17 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
                 var_term_1 = r ** 2 * ((1 - np.exp(-r * t)) * k_off * bound_fraction +
                                        c ** 2 * k_on ** 2 * (init_p0 + bound_fraction) * t +
                                        c * k_on * (k_off * bound_fraction * t + init_p0 * (
-                                    -1 + np.exp(-r * t) + k_off * t)))
+                                -1 + np.exp(-r * t) + k_off * t)))
                 var_term_2 = k_p * ((1 - np.exp(-r * t)) * k_off * bound_fraction + c ** 2 * k_on ** 2 * (
-                            init_p0 + bound_fraction) * t +
+                        init_p0 + bound_fraction) * t +
                                     c * k_on * (k_off * bound_fraction * t + init_p0 * (
-                                    -1 + np.exp(-r * t) + k_off * t))) ** 2
+                                -1 + np.exp(-r * t) + k_off * t))) ** 2
                 var_term_3 = (c * k_on) ** 4 * (init_p0 + bound_fraction) * t ** 2 - 2 * k_off ** 2 * bound_fraction * (
                         np.exp(-r * t) - 1 + np.exp(-r * t) * k_off * t)
                 var_term_4 = 2 * (k_on * c) ** 3 * t * (k_off * bound_fraction * t + init_p0 * (-1 + k_off * t))
                 var_term_5 = 2 * c * k_off * k_on * (
                         init_p0 * (
-                            2 * np.exp(-r * t) + k_off * t * np.exp(-r * t) + (-2 + k_off * t)) + bound_fraction * (
+                        2 * np.exp(-r * t) + k_off * t * np.exp(-r * t) + (-2 + k_off * t)) + bound_fraction * (
                                 2 * np.exp(-r * t) - k_off * t * np.exp(-r * t) + 2 * (-1 + k_off * t)))
                 var_term_6 = (k_on * c) ** 2 * (
                         k_off * bound_fraction * t * (4 + k_off * t) + init_p0 * (
@@ -85,22 +85,22 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             x2 = k_on * c * (k_on * c - k_on * c * np.exp(-r * t) + k_off ** 2 * t + c * k_off * k_on * t)
             # variance
             var_term_1 = c * k_on * (
-                        -k_off + np.exp(-r * t) * k_off - c * k_on + c * k_on * np.exp(-r * t)) * bound_fraction / (
-                                     r ** 2)
+                    -k_off + np.exp(-r * t) * k_off - c * k_on + c * k_on * np.exp(-r * t)) * bound_fraction / (
+                                 r ** 2)
             var_term_2 = c * k_on * (c * k_on - c * k_on * np.exp(-r * t) + k_off ** 2 * t + c * k_off * k_on * t) / (
-                        r ** 2)
+                    r ** 2)
             var_term_3 = c * k_on * (
-                        -k_off + np.exp(-r * t) * k_off - c * k_on + c * np.exp(-r * t) * k_on) * bound_fraction / (
-                                     r ** 2)
+                    -k_off + np.exp(-r * t) * k_off - c * k_on + c * np.exp(-r * t) * k_on) * bound_fraction / (
+                                 r ** 2)
             var_term_4 = c * k_on * (c * k_on - c * k_on * np.exp(-r * t) + k_off ** 2 * t + c * k_off * k_on * t) / (
-                        r ** 2)
+                    r ** 2)
             var_term_5 = k_off ** 3 * t ** 2 - 2 * c * k_on * (-1 + bound_fraction) * (
-                        2 * np.exp(-r * t) + c * k_on * np.exp(-r * t) * t + (-2 + c * k_on * t))
+                    2 * np.exp(-r * t) + c * k_on * np.exp(-r * t) * t + (-2 + c * k_on * t))
             var_term_6 = k_off * (-2 * np.exp(-r * t) + 2 * np.exp(-r * t) * c * k_on * t - 4 * np.exp(
                 -r * t) * bound_fraction * (1 + c * k_on * t) + (
-                                              2 + (c * k_on * t) ** 2 + bound_fraction * (4 - 4 * c * k_on * t)))
+                                          2 + (c * k_on * t) ** 2 + bound_fraction * (4 - 4 * c * k_on * t)))
             var_term_7 = 2 * k_off ** 2 * t * (
-                        -bound_fraction * np.exp(-r * t) + (-1 - bound_fraction + c * k_on * t)) + var_term_6
+                    -bound_fraction * np.exp(-r * t) + (-1 - bound_fraction + c * k_on * t)) + var_term_6
             var_term_8 = (k_on * c) ** 2 * k_off / (r ** 4) * (var_term_5 + var_term_7)
 
             theory_curves['mean_m'][idx] = (x1 * bound_fraction + x2) / (r ** 2)
@@ -118,33 +118,34 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             # mean n
             x1 = (1 - np.exp(-r * t)) * k_off
             x2 = (k_on * c) ** 2 * t + c * k_on * (
-                        k_off * bound_fraction * t + init_p0 * (-1 + np.exp(-r * t) + k_off * t))
+                    k_off * bound_fraction * t + init_p0 * (-1 + np.exp(-r * t) + k_off * t))
             # mean m
             y1 = k_on * c * np.exp(-r * t) * (-c * k_on + k_off * bound_fraction + c * k_on * bound_fraction) / (r ** 2)
             y2 = c * k_on * (
-                        c * k_on - k_off * bound_fraction + k_off ** 2 * t + c * k_off * k_on * t - c * k_on * bound_fraction) / (
-                             r ** 2)
+                    c * k_on - k_off * bound_fraction + k_off ** 2 * t + c * k_off * k_on * t - c * k_on * bound_fraction) / (
+                         r ** 2)
             # variance n
-            varN_val_1 = (np.exp(-2 * r * t) * k_p /(r ** 4))*(-c ** 2 * k_on ** 2 * k_p * init_p0 ** 2 + 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - k_off ** 2 * k_p * bound_fraction ** 2)
-            varN_val_2 = varN_val_1 + (k_p /(r ** 4)) * (
-                        -c * k_off ** 2 * k_on - 2 * c ** 2 * k_off * k_on ** 2 - c ** 3 * k_on ** 3 - 4 * c * k_off * k_on * k_p + c ** 2 * k_on ** 2 * k_p + k_off ** 3 * bound_fraction + 3 * c * k_off ** 2 * k_on * bound_fraction + 3 * c ** 2 * k_off * k_on ** 2 * bound_fraction)
+            varN_val_1 = (np.exp(-2 * r * t) * k_p / (r ** 4)) * (
+                    -c ** 2 * k_on ** 2 * k_p * init_p0 ** 2 + 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - k_off ** 2 * k_p * bound_fraction ** 2)
+            varN_val_2 = varN_val_1 + (k_p / (r ** 4)) * (
+                    -c * k_off ** 2 * k_on - 2 * c ** 2 * k_off * k_on ** 2 - c ** 3 * k_on ** 3 - 4 * c * k_off * k_on * k_p + c ** 2 * k_on ** 2 * k_p + k_off ** 3 * bound_fraction + 3 * c * k_off ** 2 * k_on * bound_fraction + 3 * c ** 2 * k_off * k_on ** 2 * bound_fraction)
             varN_val_25 = c ** 3 * k_on ** 3 * bound_fraction + 2 * k_off ** 2 * k_p * bound_fraction + 2 * c * k_off * k_on * k_p * bound_fraction - k_off ** 2 * k_p * bound_fraction ** 2
             varN_val_3 = varN_val_2 + (1 / r ** 4) * k_p * (
-                        varN_val_25 - 2 * c * k_off * k_on * k_p * bound_fraction ** 2 - c ** 2 * k_on ** 2 * k_p * bound_fraction ** 2 + c * k_off ** 3 * k_on * t + 3 * c ** 2 * k_off ** 2 * k_on ** 2 * t + 3 * c ** 3 * k_off * k_on ** 3 * t + c ** 4 * k_on ** 4 * t + 2 * c * k_off ** 2 * k_on * k_p * t + 2 * c ** 2 * k_off * k_on ** 2 * k_p * t)
+                    varN_val_25 - 2 * c * k_off * k_on * k_p * bound_fraction ** 2 - c ** 2 * k_on ** 2 * k_p * bound_fraction ** 2 + c * k_off ** 3 * k_on * t + 3 * c ** 2 * k_off ** 2 * k_on ** 2 * t + 3 * c ** 3 * k_off * k_on ** 3 * t + c ** 4 * k_on ** 4 * t + 2 * c * k_off ** 2 * k_on * k_p * t + 2 * c ** 2 * k_off * k_on ** 2 * k_p * t)
             varN_val_35 = 4 * c * k_off * k_on * k_p - 2 * c ** 2 * k_on ** 2 * k_p + c * k_off ** 2 * k_on * init_p0 + 2 * c ** 2 * k_off * k_on ** 2 * init_p0 + c ** 3 * k_on ** 3 * init_p0
             varN_val_36 = 2 * c ** 2 * k_on ** 2 * k_p * init_p0 - k_off ** 3 * bound_fraction - 2 * c * k_off ** 2 * k_on * bound_fraction - c ** 2 * k_off * k_on ** 2 * bound_fraction - 2 * k_off ** 2 * k_p * bound_fraction
             varN_val_37 = -2 * c * k_off * k_on * k_p * bound_fraction + 2 * c ** 2 * k_on ** 2 * k_p * bound_fraction - 2 * c * k_off * k_on * k_p * init_p0 * bound_fraction - 2 * c ** 2 * k_on ** 2 * k_p * init_p0 * bound_fraction
             varN_val_38 = 2 * k_off ** 2 * k_p * bound_fraction ** 2 + 2 * c * k_off * k_on * k_p * bound_fraction ** 2 + 2 * c * k_off ** 2 * k_on * k_p * t + 2 * c ** 2 * k_off * k_on ** 2 * k_p * t - 2 * c ** 2 * k_off * k_on ** 2 * k_p * init_p0 * t
             varN_val_4 = varN_val_3 + (np.exp(-r * t) * k_p / (r ** 4)) * (
-                        varN_val_35 + varN_val_36 + varN_val_37 + varN_val_38 - 2 * c ** 3 * k_on ** 3 * k_p * init_p0 * t - 2 * k_off ** 3 * k_p * bound_fraction * t - 2 * c * k_off ** 2 * k_on * k_p * bound_fraction * t)
+                    varN_val_35 + varN_val_36 + varN_val_37 + varN_val_38 - 2 * c ** 3 * k_on ** 3 * k_p * init_p0 * t - 2 * k_off ** 3 * k_p * bound_fraction * t - 2 * c * k_off ** 2 * k_on * k_p * bound_fraction * t)
             # variance m
             varM_val_1 = np.exp(-r * t) * r ** 2 * (c * k_on * (-1 + bound_fraction) + k_off * bound_fraction)
             varM_val_2 = c * k_on * (c * k_on - k_off * bound_fraction - c * k_on * bound_fraction + np.exp(-r * t) * (
-                        c * k_on * (
-                            -1 + bound_fraction) + k_off * bound_fraction) + k_off ** 2 * t + c * k_off * k_on * t) ** 2
+                    c * k_on * (
+                    -1 + bound_fraction) + k_off * bound_fraction) + k_off ** 2 * t + c * k_off * k_on * t) ** 2
             varM_val_3 = r ** 2 * (k_off * (-bound_fraction + k_off * t) + c * k_on * (1 - bound_fraction + k_off * t))
             varM_val_4 = k_off ** 3 * t ** 2 - 2 * c * k_on * (-1 + bound_fraction) * (
-                        2 * np.exp(-r * t) + c * k_on * t * np.exp(-r * t) + (-2 + c * k_on * t))
+                    2 * np.exp(-r * t) + c * k_on * t * np.exp(-r * t) + (-2 + c * k_on * t))
             varM_val_5 = 2 * k_off ** 2 * t * (-bound_fraction * np.exp(-r * t) + (-1 - bound_fraction + c * k_on * t))
             varM_val_6 = k_off * ((-2 + 2 * c * k_on * t - 4 * bound_fraction * (1 + c * k_on * t)) * np.exp(
                 -r * t) + 2 + c ** 2 * k_on ** 2 * t ** 2 + bound_fraction * (4 - 4 * c * k_on * t))
@@ -158,11 +159,61 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             theory_curves['var_n'][idx] = varN_val_4
             theory_curves['mean_m'][idx] = y1 + y2
             theory_curves['var_m'][idx] = c * k_on / (r ** 4) * (
-                        varM_val_1 - varM_val_2 + varM_val_3 + c * k_off * k_on * (
-                            varM_val_4 + varM_val_5 + varM_val_6))
+                    varM_val_1 - varM_val_2 + varM_val_3 + c * k_off * k_on * (
+                    varM_val_4 + varM_val_5 + varM_val_6))
             theory_curves['cov_nm'][idx] = -c * k_on * k_p * np.exp(-2 * r * t) / (r ** 4) * (
                 cov_val_1) - c * k_on * k_p / (r ** 4) * (cov_val_2) - c * k_on * k_p * np.exp(-r * t) / (r ** 4) * (
-                                                       cov_val_3 + cov_val_4)
+                                                   cov_val_3 + cov_val_4)
+
+    elif model == 'two_ligand_kpr':
+        c1 = p.c1
+        c2 = p.c2
+        k_off_1 = p.k_off_1
+        k_off_2 = p.k_off_2
+
+        # Steady state receptor occupancies
+        D1 = (k_off_1 * k_off_2 + c2 * k_off_1 * k_on + c1 * k_off_2 * k_on)
+        P0 = k_off_1 * k_off_2 / D1
+        P1 = c1 * k_off_1 * k_off_2 * k_on / ((k_f + k_off_1) * D1)
+        P2 = c1 * k_f * k_off_2 * k_on / ((k_f + k_off_1) * D1)
+        P3 = c2 * k_off_1 * k_off_2 * k_on / ((k_f + k_off_2) * D1)
+        P4 = 1 - P0 - P1 - P2 - P3
+
+        theory_curves['mean_n1'] = np.zeros(moment_times.shape[0])
+        theory_curves['var_n1'] = np.zeros(moment_times.shape[0])
+        theory_curves['mean_n2'] = np.zeros(moment_times.shape[0])
+        theory_curves['var_n2'] = np.zeros(moment_times.shape[0])
+
+        theory_curves['mean_m1'] = np.zeros(moment_times.shape[0])
+        theory_curves['var_m1'] = np.zeros(moment_times.shape[0])
+        theory_curves['mean_m2'] = np.zeros(moment_times.shape[0])
+        theory_curves['var_m2'] = np.zeros(moment_times.shape[0])
+
+        theory_curves['cov_n1m1'] = np.zeros(moment_times.shape[0])
+        theory_curves['cov_n1m2'] = np.zeros(moment_times.shape[0])
+        theory_curves['cov_n2m1'] = np.zeros(moment_times.shape[0])
+        theory_curves['cov_n2m2'] = np.zeros(moment_times.shape[0])
+        theory_curves['cov_n1n2'] = np.zeros(moment_times.shape[0])
+        theory_curves['cov_m1m2'] = np.zeros(moment_times.shape[0])
+
+        for idx, t in enumerate(moment_times):
+            theory_curves['mean_n1'][idx] = k_p * t * (P1 + P3)
+            theory_curves['mean_m1'][idx] = k_on * (c1 + c2) * t * P0
+            theory_curves['mean_n2'][idx] = k_p * t * (P2 + P4)
+            theory_curves['mean_m2'][idx] = (k_f * t) * (P1 + P3)
+
+            theory_curves['var_n1'][idx] = k_off_1 * k_off_2 * k_on * k_p * t * \
+                                           (c2 * (k_f + k_off_1) + c1 * (k_f + k_off_2)) * \
+                                           (- k_off_1 * k_off_2 * (
+                                                   c2 * (k_f + k_off_1) + c1 * (k_f + k_off_2)) * k_on * k_p * t + (
+                                                    k_f + k_off_1) * (k_f + k_off_2) * (
+                                                    c1 * k_off_2 * k_on + k_off_1 * (k_off_2 + c2 * k_on)) * (
+                                                    k_p * t - 1)) / ((k_f + k_off_1) ** 2 * (k_f + k_off_2) ** 2 *
+                                                                     (c1 * k_off_2 * k_on + k_off_1 * (
+                                                                             k_off_2 + c2 * k_on)) ** 2)
+
+
+
     else:
         assert method == 'generating'
         assert model == 'kpr'
@@ -174,25 +225,24 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
 
         g = k_off / k_f
         for idx, t in enumerate(moment_times):
-
             theory_curves['mean_n'][idx] = (k_f * k_p * t) / (k_f + k_off) * x / (1 + x)
             theory_curves['mean_m'][idx] = (k_f * k_off * t) / (k_f + k_off) * x / (1 + x)
 
             A1 = k_p * x * ((1 + g) ** 4 * k_off ** 2 * (1 + x) ** 4) ** (-1.0)
-            A2 = (1+g)**3 * k_off**2 * t * (1+x)**3
+            A2 = (1 + g) ** 3 * k_off ** 2 * t * (1 + x) ** 3
             A30 = -1 + k_off * t * (1 + x)
             A31 = g ** 3 * (-1 + k_off * t) * (1 + x) ** 3
             A32 = g * (3 + x) * A30
-            A33 = g**2 * A30 * (3 + x * (3 + x))
-            theory_curves['var_n'][idx] = A1 * (A2 + 2*k_p * (A30 + A31 + A32 + A33))
+            A33 = g ** 2 * A30 * (3 + x * (3 + x))
+            theory_curves['var_n'][idx] = A1 * (A2 + 2 * k_p * (A30 + A31 + A32 + A33))
 
             A = x / ((1 + g) ** 4 * (1 + x) ** 4)
-            B = (1 + g) * k_off * t * (1 + x) * (1 + 2 * g + x**2 + g**2 * (1 + x)**2)
+            B = (1 + g) * k_off * t * (1 + x) * (1 + 2 * g + x ** 2 + g ** 2 * (1 + x) ** 2)
             C = 2 * x * (1 + g * (3 + x + g * (3 + x * (3 + x))))
-            theory_curves['var_m'][idx] = A *(B + C)
+            theory_curves['var_m'][idx] = A * (B + C)
 
             A = k_p * x / ((1 + g) ** 4 * (1 + x) ** 4 * k_off)
-            B = -1 + x + g**3 * (-1 + k_off * t) * (1 + x)**3
+            B = -1 + x + g ** 3 * (-1 + k_off * t) * (1 + x) ** 3
             C = k_off * (t - t * x ** 2) - g * (-1 + x) * (3 + x) * (-1 + k_off * t * (1 + x))
             D = g ** 2 * (-3 + x ** 2 * (2 + x) + k_off * t * (1 + x) * (3 + x))
             theory_curves['cov_nm'][idx] = A * (B + C + D)
@@ -200,11 +250,11 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
 
 
 def est_x_from_n(n, params, t):
-    return n/(params.k_p * t - n)
+    return n / (params.k_p * t - n)
 
 
 def est_c_from_n(n, params, t):
-    return n/(params.k_p * t - n) * (params.k_off / params.k_on)
+    return n / (params.k_p * t - n) * (params.k_off / params.k_on)
 
 
 def est_k_off_from_n(n, params, t):
@@ -214,11 +264,11 @@ def est_k_off_from_n(n, params, t):
 def est_x_from_m(m, params, t):
     # TODO issue that this depends on k_off? x contains k_off info...
     print "warning... inferring x = k_on c / k_off using information about k_off see formulae.py, est_x_from_m(...)"
-    return m/(params.k_off * t - m)
+    return m / (params.k_off * t - m)
 
 
 def est_c_from_m(m, params, t):
-    return m/(params.k_off * t - m) * (params.k_off / params.k_on)
+    return m / (params.k_off * t - m) * (params.k_off / params.k_on)
 
 
 def est_k_off_from_m(m, params, t):
@@ -227,7 +277,7 @@ def est_k_off_from_m(m, params, t):
 
 
 def est_k_d_from_nm(n, m, params, t):
-    return (m / n) * (params.k_p / params.k_on)   # note k_d = k_off / k_on
+    return (m / n) * (params.k_p / params.k_on)  # note k_d = k_off / k_on
 
 
 def est_k_off_from_nm(n, m, params, t):
@@ -238,15 +288,15 @@ def est_k_off_from_nm(n, m, params, t):
 
 
 def est_c_from_nm(n, m, params, t):
-    #k_off_guess = est_k_off_from_nm(n, m, params, t)
-    #return (k_off_guess / params.k_on) * float(n) / (params.k_p * t - float(n))
+    # k_off_guess = est_k_off_from_nm(n, m, params, t)
+    # return (k_off_guess / params.k_on) * float(n) / (params.k_p * t - float(n))
     c_star = (1.0 / params.k_on) * (m / t) / (1 - n / (params.k_p * t))
     return c_star
 
 
 def estimate_general(state, params, t, model, est):
     assert model in VALID_MODELS
-    assert est in ['x','c','k_off']
+    assert est in ['x', 'c', 'k_off']
     if model == 'mode_1':
         if est == 'x':
             est = est_x_from_n(state[1], params, t)

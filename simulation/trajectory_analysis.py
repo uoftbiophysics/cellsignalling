@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from formulae import theory_moments, estimate_general
-from params import DEFAULT_PARAMS
+from params import Params, DEFAULT_PARAMS
 from settings import GLOB_PSS_BOUND
 from trajectory_plotting import plot_traj_and_mean_sd, plot_means, plot_vars, plot_hist, plot_estimation
 from trajectory_simulate import multitraj
 
 plt.style.use('parameters.mplstyle')
+
 
 def get_state_at_t(traj, times, t, last_step=0):
     step = last_step
@@ -107,8 +108,9 @@ def get_moment_timeseries(traj_array, times_array, params):
                                            moment_curves['mean_n'][idx] * moment_curves['mean_m'][idx]
 
     elif model == 'two_ligand_kpr':
-        moment_curves = {key: np.zeros(len(moment_times)) for key in ['mean_n1', 'mean_m1', 'var_n1', 'var_m1', 'cov_nm1',
-                                                                      'mean_n2', 'mean_m2', 'var_n2', 'var_m2', 'cov_nm2']}
+        moment_curves = {key: np.zeros(len(moment_times)) for key in ['mean_n1', 'mean_m1', 'var_n1', 'var_m1', 'cov_n1m1',
+                                                                      'mean_n2', 'mean_m2', 'var_n2', 'var_m2', 'cov_n2m2',
+                                                                      'cov_n1m2', 'cov_n1n2', 'cov_n2m1', 'cov_m1m2']}
         moment_curves['distribution_n1'] = np.zeros((len(moment_times), num_traj), dtype=int)
         moment_curves['distribution_m1'] = np.zeros((len(moment_times), num_traj), dtype=int)
         moment_curves['distribution_n2'] = np.zeros((len(moment_times), num_traj), dtype=int)
@@ -126,66 +128,13 @@ def get_moment_timeseries(traj_array, times_array, params):
             statesum_m2 = 0.0
             statesquaresum_m1 = 0.0
             statesquaresum_m2 = 0.0
-            stateprod_nm1 = 0.0
-            stateprod_nm2 = 0.0
-            for k in xrange(num_traj):
-                state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
-                last_step[k] = step
-                statesum_n1 += state_at_t[1]
-                statesum_n2 += state_at_t[3]
-                statesquaresum_n1 += state_at_t[1] ** 2
-                statesquaresum_n2 += state_at_t[3] ** 2
-                statesum_m1 += state_at_t[2]
-                statesum_m2 += state_at_t[4]
-                statesquaresum_m1 += state_at_t[2] ** 2
-                statesquaresum_m2 += state_at_t[4] ** 2
-                stateprod_nm1 += state_at_t[1] * state_at_t[2]
-                stateprod_nm2 += state_at_t[2] * state_at_t[4]
-                # store n(t) and m(t) for each trajectory to get histogram evolution
-                moment_curves['distribution_n1'][idx][k] = state_at_t[1]
-                moment_curves['distribution_m1'][idx][k] = state_at_t[2]
-                moment_curves['distribution_n2'][idx][k] = state_at_t[3]
-                moment_curves['distribution_m2'][idx][k] = state_at_t[4]
+            stateprod_n1m1 = 0.0
+            stateprod_n1m2 = 0.0
+            stateprod_n2m1 = 0.0
+            stateprod_n2m2 = 0.0
+            stateprod_n1n2 = 0.0
+            stateprod_m1m2 = 0.0
 
-                # estimate x from mode_1 and mode_2 current "data" n(t) or m(t)
-                #moment_curves['estimate_c'][idx][k] = estimate_general(state_at_t, params, t, model, 'c')
-                #moment_curves['estimate_k_off'][idx][k] = estimate_general(state_at_t, params, t, model, 'k_off')
-
-            moment_curves['mean_n1'][idx] = statesum_n1 / num_traj
-            moment_curves['mean_m1'][idx] = statesum_m1 / num_traj
-            moment_curves['mean_n2'][idx] = statesum_n2 / num_traj
-            moment_curves['mean_m2'][idx] = statesum_m2 / num_traj
-            moment_curves['var_n1'][idx] = statesquaresum_n1 / num_traj - moment_curves['mean_n1'][idx] ** 2
-            moment_curves['var_m1'][idx] = statesquaresum_m1 / num_traj - moment_curves['mean_m1'][idx] ** 2
-            moment_curves['var_n2'][idx] = statesquaresum_n2 / num_traj - moment_curves['mean_n2'][idx] ** 2
-            moment_curves['var_m2'][idx] = statesquaresum_m2 / num_traj - moment_curves['mean_m2'][idx] ** 2
-            moment_curves['cov_nm1'][idx] = stateprod_nm1 / num_traj - \
-                                           moment_curves['mean_n1'][idx] * moment_curves['mean_m1'][idx]
-            moment_curves['cov_nm2'][idx] = stateprod_nm2 / num_traj - \
-                                           moment_curves['mean_n2'][idx] * moment_curves['mean_m2'][idx]
-
-    elif model == 'two_ligand_kpr_JR':
-        moment_curves = {key: np.zeros(len(moment_times)) for key in ['mean_n1', 'mean_m1', 'var_n1', 'var_m1', 'cov_nm1',
-                                                                      'mean_n2', 'mean_m2', 'var_n2', 'var_m2', 'cov_nm2']}
-        moment_curves['distribution_n1'] = np.zeros((len(moment_times), num_traj), dtype=int)
-        moment_curves['distribution_m1'] = np.zeros((len(moment_times), num_traj), dtype=int)
-        moment_curves['distribution_n2'] = np.zeros((len(moment_times), num_traj), dtype=int)
-        moment_curves['distribution_m2'] = np.zeros((len(moment_times), num_traj), dtype=int)
-
-        moment_curves['estimate_c'] = np.zeros((len(moment_times), num_traj))
-        moment_curves['estimate_k_off'] = np.zeros((len(moment_times), num_traj))
-
-        for idx, t in enumerate(moment_times):
-            statesum_n1 = 0.0
-            statesum_n2 = 0.0
-            statesquaresum_n1 = 0.0
-            statesquaresum_n2 = 0.0
-            statesum_m1 = 0.0
-            statesum_m2 = 0.0
-            statesquaresum_m1 = 0.0
-            statesquaresum_m2 = 0.0
-            stateprod_nm1 = 0.0
-            stateprod_nm2 = 0.0
             for k in xrange(num_traj):
                 state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
                 last_step[k] = step
@@ -197,8 +146,13 @@ def get_moment_timeseries(traj_array, times_array, params):
                 statesum_m2 += state_at_t[7]
                 statesquaresum_m1 += state_at_t[6] ** 2
                 statesquaresum_m2 += state_at_t[7] ** 2
-                stateprod_nm1 += state_at_t[4] * state_at_t[6]
-                stateprod_nm2 += state_at_t[5] * state_at_t[7]
+                stateprod_n1m1 += state_at_t[4] * state_at_t[6]
+                stateprod_n1m2 += state_at_t[4] * state_at_t[7]
+                stateprod_n2m1 += state_at_t[5] * state_at_t[6]
+                stateprod_n2m2 += state_at_t[5] * state_at_t[7]
+                stateprod_n1n2 += state_at_t[4] * state_at_t[5]
+                stateprod_m1m2 += state_at_t[6] * state_at_t[7]
+
                 # store n(t) and m(t) for each trajectory to get histogram evolution
                 moment_curves['distribution_n1'][idx][k] = state_at_t[4]
                 moment_curves['distribution_m1'][idx][k] = state_at_t[6]
@@ -217,10 +171,18 @@ def get_moment_timeseries(traj_array, times_array, params):
             moment_curves['var_m1'][idx] = statesquaresum_m1 / num_traj - moment_curves['mean_m1'][idx] ** 2
             moment_curves['var_n2'][idx] = statesquaresum_n2 / num_traj - moment_curves['mean_n2'][idx] ** 2
             moment_curves['var_m2'][idx] = statesquaresum_m2 / num_traj - moment_curves['mean_m2'][idx] ** 2
-            moment_curves['cov_nm1'][idx] = stateprod_nm1 / num_traj - \
+            moment_curves['cov_n1m1'][idx] = stateprod_n1m1 / num_traj - \
                                            moment_curves['mean_n1'][idx] * moment_curves['mean_m1'][idx]
-            moment_curves['cov_nm2'][idx] = stateprod_nm2 / num_traj - \
+            moment_curves['cov_n1m2'][idx] = stateprod_n1m2 / num_traj - \
+                                           moment_curves['mean_n1'][idx] * moment_curves['mean_m2'][idx]
+            moment_curves['cov_n2m1'][idx] = stateprod_n2m1 / num_traj - \
+                                           moment_curves['mean_n2'][idx] * moment_curves['mean_m1'][idx]
+            moment_curves['cov_n2m2'][idx] = stateprod_n2m2 / num_traj - \
                                            moment_curves['mean_n2'][idx] * moment_curves['mean_m2'][idx]
+            moment_curves['cov_n1n2'][idx] = stateprod_n1n2 / num_traj - \
+                                           moment_curves['mean_n1'][idx] * moment_curves['mean_n2'][idx]
+            moment_curves['cov_m1m2'][idx] = stateprod_m1m2 / num_traj - \
+                                           moment_curves['mean_m1'][idx] * moment_curves['mean_m2'][idx]
 
     else:
         assert model == 'kpr'
@@ -266,24 +228,40 @@ if __name__ == '__main__':
     #model = 'mode_2'
     #model = 'combined'
     #model = 'kpr'
-    model = 'two_ligand_kpr_JR'
+    model = 'two_ligand_kpr'
 
     #for model in ['mode_1', 'mode_2', 'combined', 'kpr']:
     for model in [model]:
         print(model)
 
-        num_traj = 7500
-        num_steps = 2500
+        num_traj = 75
+        num_steps = 25
         init_bound = 0.0
         # model specification
-        params = DEFAULT_PARAMS
+        #params = DEFAULT_PARAMS
+        params = Params(k_on=1.0, k_p=20, k_f=1.0)
+        params.c1 = 10.0
+        params.c2 = 4.0
+        params.k_off_1 = 2.0
+        params.k_off_2 = 1.0
+
+        # Steady state receptor occupancies
+        D1 = (params.k_off_1 * params.k_off_2 + params.c2 * params.k_off_1 * params.k_on + params.c1 * params.k_off_2 * params.k_on)
+        P0 = params.k_off_1 * params.k_off_2 / D1
+        P1 = params.c1 * params.k_off_1 * params.k_off_2 * params.k_on / ((params.k_f + params.k_off_1) * D1)
+        P2 = params.c1 * params.k_f * params.k_off_2 * params.k_on / ((params.k_f + params.k_off_1) * D1)
+        P3 = params.c2 * params.k_off_1 * params.k_off_2 * params.k_on / ((params.k_f + params.k_off_2) * D1)
+        P4 = 1 - P0 - P1 - P2 - P3
+
         # simulate trajectories
-        traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model, params=params)
+        #   default for bound_probabilities is to just input init_bound
+        two_ligand_test_case = [P0, P1, P2, P3, P4]
+        traj_array, times_array = multitraj(num_traj, num_steps=num_steps, model=model, params=params,
+                                            bound_probabilities=two_ligand_test_case)
         # compute moments from data
         simdata, moment_times = get_moment_timeseries(traj_array, times_array, params)
         # expectations from theory
-        if model != 'two_ligand_kpr' and model != 'two_ligand_kpr_JR':
-            theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model, p=params)
+        theory_curves = theory_moments(moment_times, init_bound, method="generating", model=model, p=params)
 
         # specify histogram timepoints
         num_points = 20
@@ -356,16 +334,22 @@ if __name__ == '__main__':
                 plot_hist(moment_times, simdata['distribution_m'], step, model, state_label='m',
                           theory_mean=theory_curves['mean_m'], theory_var=theory_curves['var_m'], show=False)
 
-        elif model== 'two_ligand_kpr' or model== 'two_ligand_kpr_JR':
-            for step in hist_steps:
-                plot_hist(moment_times, simdata['distribution_n1'], step, model, state_label='n1',
-                          theory_mean=None, theory_var=None, show=False)
-                plot_hist(moment_times, simdata['distribution_m1'], step, model, state_label='m1',
-                          theory_mean=None, theory_var=None, show=False)
-                plot_hist(moment_times, simdata['distribution_n2'], step, model, state_label='n2',
-                          theory_mean=None, theory_var=None, show=False)
-                plot_hist(moment_times, simdata['distribution_m2'], step, model, state_label='m2',
-                          theory_mean=None, theory_var=None, show=False)
+        elif model == 'two_ligand_kpr':
+            plot_hist_flag = False
+            plot_cov_traj_flag = True
+            if plot_hist_flag == True:
+                for step in hist_steps:
+                    plot_hist(moment_times, simdata['distribution_n1'], step, model, state_label='n1',
+                              theory_mean=None, theory_var=None, show=False)
+                    plot_hist(moment_times, simdata['distribution_m1'], step, model, state_label='m1',
+                              theory_mean=None, theory_var=None, show=False)
+                    plot_hist(moment_times, simdata['distribution_n2'], step, model, state_label='n2',
+                              theory_mean=None, theory_var=None, show=False)
+                    plot_hist(moment_times, simdata['distribution_m2'], step, model, state_label='m2',
+                              theory_mean=None, theory_var=None, show=False)
+            if plot_cov_traj_flag == True:
+                plot_vars(moment_times, simdata['var_n1'], model, theory_var=theory_curves['var_n1'],
+                          title='Variance in n1 for two ligands', state_label='n1', show=True, save=False)
 
         else:
             assert model == 'kpr'

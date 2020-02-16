@@ -49,7 +49,7 @@ def plot_means(moment_times, data_mean, model, theory_mean=None, title='', state
     return plt.gca()
 
 
-def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_label='n', show=True):
+def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_label='n', show=True, save=True):
     plt.plot(moment_times, data_var, '--k', lw=2, label="data")
     if theory_var is not None:
         plt.plot(moment_times, theory_var, '--r', lw=2, label="generating")
@@ -57,7 +57,8 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
     plt.xlabel('time')
     plt.ylabel('Var(%s)' % state_label)
     plt.legend()
-    plt.savefig(FOLDER_OUTPUT + os.sep + 'traj_%s_var_%s.png' % (model, state_label))
+    if save:
+        plt.savefig(FOLDER_OUTPUT + os.sep + 'traj_%s_var_%s.png' % (model, state_label))
     if show:
         plt.show()
     return plt.gca()
