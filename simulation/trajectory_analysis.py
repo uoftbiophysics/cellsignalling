@@ -234,16 +234,16 @@ if __name__ == '__main__':
     for model in [model]:
         print(model)
 
-        num_traj = 75
-        num_steps = 25
+        num_traj = 20
+        num_steps = 10
         init_bound = 0.0
         # model specification
         #params = DEFAULT_PARAMS
         params = Params(k_on=1.0, k_p=20, k_f=1.0)
-        params.c1 = 10.0
-        params.c2 = 4.0
-        params.k_off_1 = 2.0
-        params.k_off_2 = 1.0
+        params.c1 = 4.0
+        params.c2 = 3.0
+        params.k_off_1 = 3.0
+        params.k_off_2 = 5.0
 
         # Steady state receptor occupancies
         D1 = (params.k_off_1 * params.k_off_2 + params.c2 * params.k_off_1 * params.k_on + params.c1 * params.k_off_2 * params.k_on)
@@ -349,7 +349,26 @@ if __name__ == '__main__':
                               theory_mean=None, theory_var=None, show=False)
             if plot_cov_traj_flag == True:
                 plot_vars(moment_times, simdata['var_n1'], model, theory_var=theory_curves['var_n1'],
-                          title='Variance in n1 for two ligands', state_label='n1', show=True, save=False)
+                          title='Two Ligand Var N1', state_label='n1', show=False)
+                plot_vars(moment_times, simdata['var_n2'], model, theory_var=theory_curves['var_n2'],
+                          title='Two Ligand Var N2', state_label='n2', show=False)
+                plot_vars(moment_times, simdata['var_m1'], model, theory_var=None,
+                          title='Two Ligand Var M1', state_label='m1', show=False)
+                plot_vars(moment_times, simdata['var_m2'], model, theory_var=None,
+                          title='Two Ligand Var M2', state_label='m2', show=False)
+
+                plot_vars(moment_times, simdata['cov_n1m1'], model, theory_var=None,
+                          title='Two Ligand Cov N1M1', state_label='N1M1', show=False)
+                plot_vars(moment_times, simdata['cov_n1m2'], model, theory_var=None,
+                          title='Two Ligand Cov N1M2', state_label='N1M2', show=False)
+                plot_vars(moment_times, simdata['cov_n2m1'], model, theory_var=None,
+                          title='Two Ligand Cov N2M1', state_label='N2M1', show=False)
+                plot_vars(moment_times, simdata['cov_n2m2'], model, theory_var=None,
+                          title='Two Ligand Cov N2M2', state_label='N2M2', show=False)
+                plot_vars(moment_times, simdata['cov_n1n2'], model, theory_var=None,
+                          title='Two Ligand Cov N1N2', state_label='N1N2', show=False)
+                plot_vars(moment_times, simdata['cov_m1m2'], model, theory_var=None,
+                          title='Two Ligand Cov M1M2', state_label='M1M2', show=False)
 
         else:
             assert model == 'kpr'
