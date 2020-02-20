@@ -196,22 +196,54 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
         theory_curves['cov_n1n2'] = np.zeros(moment_times.shape[0])
         theory_curves['cov_m1m2'] = np.zeros(moment_times.shape[0])
 
+        import os
+        covariance_fnames = ["CovN1N1.txt", "CovN1M1.txt", "CovN1N2.txt", "CovN1M2.txt", "CovM1M1.txt",
+                             "CovN2M1.txt", "CovM1M2.txt", "CovN2N2.txt", "CovN2M2.txt", "CovM2M2.txt"]
+        theory_expression_strings = {'var_n1':"", 'cov_n1m1':"", 'cov_n1n2':"", 'cov_n1m2':"", 'var_m1':"",
+                                'cov_n2m1':"", 'cov_m1m2':"", 'var_n2':"", 'cov_n2m2':"", 'var_m2':""}
+        theory_expression_strings_ordered_keys = ['var_n1', 'cov_n1m1', 'cov_n1n2', 'cov_n1m2', 'var_m1',
+                                                  'cov_n2m1', 'cov_m1m2', 'var_n2', 'cov_n2m2', 'var_m2']
+        for i in range(10):
+            with open(os.join(os.getcwd(), "CovarianceExpressions", covariance_fnames[i])) as f:
+                theory_expression_strings[theory_expression_strings_ordered_keys[i]] = f.read()
+
         for idx, t in enumerate(moment_times):
             theory_curves['mean_n1'][idx] = k_p * t * (P1 + P3)
             theory_curves['mean_m1'][idx] = k_on * (c1 + c2) * t * P0
             theory_curves['mean_n2'][idx] = k_p * t * (P2 + P4)
             theory_curves['mean_m2'][idx] = (k_f * t) * (P1 + P3)
 
-            theory_curves['var_n1'][idx] = k_off_1 * k_off_2 * k_on * k_p * t * \
-                                           (c2 * (k_f + k_off_1) + c1 * (k_f + k_off_2)) * \
-                                           (- k_off_1 * k_off_2 * (
-                                                   c2 * (k_f + k_off_1) + c1 * (k_f + k_off_2)) * k_on * k_p * t + (
-                                                    k_f + k_off_1) * (k_f + k_off_2) * (
-                                                    c1 * k_off_2 * k_on + k_off_1 * (k_off_2 + c2 * k_on)) * (
-                                                    k_p * t - 1)) / ((k_f + k_off_1) ** 2 * (k_f + k_off_2) ** 2 *
-                                                                     (c1 * k_off_2 * k_on + k_off_1 * (
-                                                                             k_off_2 + c2 * k_on)) ** 2)
+            # From Mathematica
+            x1 = k_on * c1 / k_off_1
+            g1 = k_off_1 / k_f
+            x2 = k_on * c2 / k_off_2
+            g2 = k_off_2 / k_f
 
+
+            theory_curves['var_n1'][idx] = eval(theory_expression_strings['var_n1'])
+
+                #k_p * t*((c1 * k_off_1 * k_off_2 * k_on) / ((k_f + k_off_1)*(c1 * k_off_2 * k_on + k_off_1 * (k_off_2 + c2 * k_on))) +
+                #    (c2 * k_off_1 * k_off_2 * k_on) / ((k_f + k_off_2)*(c1 * k_off_2 * k_on + k_off_1 * (k_off_2 + c2 * k_on))) -
+                #    (k_off_1**2 * k_off_2**2 * (c2 * (k_f + k_off_1) + c1 * (k_f + k_off_2))**2 * k_on**2 * k_p * t) /
+                #    ((k_f + k_off_1)**2 * (k_f + k_off_2)**2 * (c1 * k_off_2 * k_on + k_off_1 * (k_off_2 + c2 * k_on))**2) +
+                #    (k_p * t * (g1 * (1 + g2) * x1 + (1 + g1) * g2 *x2)**2) / ((1 + g1)**2 * (1 + g2)**2 * (1 + x1 + x2)**2) +
+                #    (1 / (g1 * (1 + g1)**3 * g2 * (1 + g2)**3 * k_f * (1 + x1 + x2)**3)) * 2 *k_p * (g2**3 * (1 + g2) * x1 * x2**2 + g1**4 * x2 *(
+                #        (1 + g2)*(g2**2 + g2 * (-1 + x1) * x1 + x1**2) + g2 * (g2 + x1 + 2 * g2 * x1) * x2 + g2**2 * x2**2) +
+                #    g1**2 * g2 * ((1 + g2)**3 * x1 * (1 + x1 + x1**2) + (1 + g2)*(x1 + g2 * (3 + x1 * (5 - g2 + 2*(2 + g2) * x1))) * x2 +
+                #                  (3 * g2 + (2 + 4 * g2 + g2**3) * x1) * x2**2 + 3 * g2 * x2**3) + g1**3 * (g2*(1 + g2)**3 * x1 +
+                #                                                                                          (1 + g2)*(x1**2 + g2**2 * (3 + 4 * x1)) * x2 +
+                #                                                                                          3 * g2 * (g2 + x1 + 2 *g2 * x1) * x2**2 + 3 *g2**2 * x2**3) +
+                #   g1 * g2**2 * x2 * (1 + x1 + 2 *x1**2 + x2 + x2**2 + g2**2 * x1 * (-1 + x1 + 2 * x2) + g2(1 + x1 * (3 * x1 + x2)))))
+
+            theory_curves['var_n2'][idx] = eval(theory_expression_strings['var_n2'])
+            theory_curves['var_m1'][idx] = eval(theory_expression_strings['var_m1'])
+            theory_curves['var_m2'][idx] = eval(theory_expression_strings['var_m2'])
+            theory_curves['cov_n1m1'][idx] = eval(theory_expression_strings['cov_n1m1'])
+            theory_curves['cov_n1m2'][idx] = eval(theory_expression_strings['cov_n1m2'])
+            theory_curves['cov_n1n2'][idx] = eval(theory_expression_strings['cov_n1n2'])
+            theory_curves['cov_n2m1'][idx] = eval(theory_expression_strings['cov_n2m1'])
+            theory_curves['cov_n2m2'][idx] = eval(theory_expression_strings['cov_n2m2'])
+            theory_curves['cov_m1m2'][idx] = eval(theory_expression_strings['cov_m1m2'])
 
 
     else:

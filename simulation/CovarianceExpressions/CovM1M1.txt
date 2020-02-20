@@ -1,0 +1,1 @@
+(k_off_1*k_off_2*t*(c1*k_off_2*k_on + k_off_1*(k_off_2 + c2*k_on - (c1 + c2)**2*k_off_2*k_on**2*t)))/(c1*k_off_2*k_on + k_off_1*(k_off_2 + c2*k_on))**2
