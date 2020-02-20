@@ -145,7 +145,7 @@ def get_moment_timeseries(traj_array, times_array, params):
 
                 last_step[k] = step
                 statesum_n1 += n1_at_t
-                statesum_n2 += n2_at_t[5]
+                statesum_n2 += n2_at_t
                 statesquaresum_n1 += n1_at_t ** 2
                 statesquaresum_n2 += n2_at_t ** 2
                 statesum_m1 += m1_at_t
@@ -357,7 +357,7 @@ if __name__ == '__main__':
                 plot_vars(moment_times, simdata['var_n1'], model, theory_var=theory_curves['var_n1'],
                           title='Two Ligand Var N1', state_label='n1', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['var_n2'], model, theory_var=theory_curves['var_n2'],
+                plot_vars(moment_times, simdata['var_n2'], model, theory_var=False,
                           title='Two Ligand Var N2', state_label='n2', show=False)
                 plt.close()
                 plot_vars(moment_times, simdata['var_m1'], model, theory_var=None,
