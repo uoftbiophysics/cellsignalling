@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 from params import DEFAULT_PARAMS
 from settings import DEFAULT_MODEL, VALID_MODELS
@@ -204,7 +205,7 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
         theory_expression_strings_ordered_keys = ['var_n1', 'cov_n1m1', 'cov_n1n2', 'cov_n1m2', 'var_m1',
                                                   'cov_n2m1', 'cov_m1m2', 'var_n2', 'cov_n2m2', 'var_m2']
         for i in range(10):
-            with open(os.join(os.getcwd(), "CovarianceExpressions", covariance_fnames[i])) as f:
+            with open(os.path.join(os.getcwd(), "CovarianceExpressions", covariance_fnames[i])) as f:
                 theory_expression_strings[theory_expression_strings_ordered_keys[i]] = f.read()
 
         for idx, t in enumerate(moment_times):
@@ -218,7 +219,6 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
             g1 = k_off_1 / k_f
             x2 = k_on * c2 / k_off_2
             g2 = k_off_2 / k_f
-
 
             theory_curves['var_n1'][idx] = eval(theory_expression_strings['var_n1'])
 

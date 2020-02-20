@@ -135,7 +135,7 @@ if __name__ == '__main__':
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
 
     # plot trajectories
-    for k in xxrange(num_traj):
+    for k in xrange(num_traj):
         times_k = times_array[:, k]
         traj_k = traj_array[:, 1, k]
         plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)

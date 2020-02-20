@@ -240,10 +240,10 @@ if __name__ == '__main__':
         # model specification
         #params = DEFAULT_PARAMS
         params = Params(k_on=1.0, k_p=20, k_f=1.0)
-        params.c1 = 4.0
-        params.c2 = 3.0
-        params.k_off_1 = 3.0
-        params.k_off_2 = 5.0
+        params.c1 = 10.0
+        params.c2 = 4.0
+        params.k_off_1 = 2.0
+        params.k_off_2 = 1.0
 
         # Steady state receptor occupancies
         D1 = (params.k_off_1 * params.k_off_2 + params.c2 * params.k_off_1 * params.k_on + params.c1 * params.k_off_2 * params.k_on)
