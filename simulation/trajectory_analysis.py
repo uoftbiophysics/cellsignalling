@@ -240,7 +240,7 @@ if __name__ == '__main__':
     for model in [model]:
         print(model)
 
-        num_traj = 2000
+        num_traj = 20000
         num_steps = 1000
         init_bound = 0.0
         # model specification
@@ -357,31 +357,31 @@ if __name__ == '__main__':
                 plot_vars(moment_times, simdata['var_n1'], model, theory_var=theory_curves['var_n1'],
                           title='Two Ligand Var N1', state_label='n1', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['var_n2'], model, theory_var=False,
+                plot_vars(moment_times, simdata['var_n2'], model, theory_var=theory_curves['var_n2'],
                           title='Two Ligand Var N2', state_label='n2', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['var_m1'], model, theory_var=None,
+                plot_vars(moment_times, simdata['var_m1'], model, theory_var=theory_curves['var_m1'],
                           title='Two Ligand Var M1', state_label='m1', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['var_m2'], model, theory_var=None,
+                plot_vars(moment_times, simdata['var_m2'], model, theory_var=theory_curves['var_m2'],
                           title='Two Ligand Var M2', state_label='m2', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['cov_n1m1'], model, theory_var=None,
+                plot_vars(moment_times, simdata['cov_n1m1'], model, theory_var=theory_curves['cov_n1m1'],
                           title='Two Ligand Cov N1M1', state_label='N1M1', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['cov_n1m2'], model, theory_var=None,
+                plot_vars(moment_times, simdata['cov_n1m2'], model, theory_var=theory_curves['cov_n1m2'],
                           title='Two Ligand Cov N1M2', state_label='N1M2', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['cov_n2m1'], model, theory_var=None,
+                plot_vars(moment_times, simdata['cov_n2m1'], model, theory_var=theory_curves['cov_n2m1'],
                           title='Two Ligand Cov N2M1', state_label='N2M1', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['cov_n2m2'], model, theory_var=None,
+                plot_vars(moment_times, simdata['cov_n2m2'], model, theory_var=theory_curves['cov_n2m2'],
                           title='Two Ligand Cov N2M2', state_label='N2M2', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['cov_n1n2'], model, theory_var=None,
+                plot_vars(moment_times, simdata['cov_n1n2'], model, theory_var=theory_curves['cov_n1n2'],
                           title='Two Ligand Cov N1N2', state_label='N1N2', show=False)
                 plt.close()
-                plot_vars(moment_times, simdata['cov_m1m2'], model, theory_var=None,
+                plot_vars(moment_times, simdata['cov_m1m2'], model, theory_var=theory_curves['cov_m1m2'],
                           title='Two Ligand Cov M1M2', state_label='M1M2', show=False)
                 plt.close()
 

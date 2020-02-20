@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import sqrt, exp
 import os
 
 from params import DEFAULT_PARAMS
@@ -206,7 +207,8 @@ def theory_moments(moment_times, bound_fraction, method='generating', init_n=0.0
                                                   'cov_n2m1', 'cov_m1m2', 'var_n2', 'cov_n2m2', 'var_m2']
         for i in range(10):
             with open(os.path.join(os.getcwd(), "CovarianceExpressions", covariance_fnames[i])) as f:
-                theory_expression_strings[theory_expression_strings_ordered_keys[i]] = f.read()
+                expression = f.read().replace("Sqrt", "sqrt")
+                theory_expression_strings[theory_expression_strings_ordered_keys[i]] = expression
 
         for idx, t in enumerate(moment_times):
             theory_curves['mean_n1'][idx] = k_p * t * (P1 + P3)
