@@ -137,27 +137,33 @@ def get_moment_timeseries(traj_array, times_array, params):
 
             for k in xrange(num_traj):
                 state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
+
+                n1_at_t = state_at_t[4];
+                n2_at_t = state_at_t[6];
+                m1_at_t = state_at_t[5];
+                m2_at_t = state_at_t[7];
+
                 last_step[k] = step
-                statesum_n1 += state_at_t[4]
-                statesum_n2 += state_at_t[5]
-                statesquaresum_n1 += state_at_t[4] ** 2
-                statesquaresum_n2 += state_at_t[5] ** 2
-                statesum_m1 += state_at_t[6]
-                statesum_m2 += state_at_t[7]
-                statesquaresum_m1 += state_at_t[6] ** 2
-                statesquaresum_m2 += state_at_t[7] ** 2
-                stateprod_n1m1 += state_at_t[4] * state_at_t[6]
-                stateprod_n1m2 += state_at_t[4] * state_at_t[7]
-                stateprod_n2m1 += state_at_t[5] * state_at_t[6]
-                stateprod_n2m2 += state_at_t[5] * state_at_t[7]
-                stateprod_n1n2 += state_at_t[4] * state_at_t[5]
-                stateprod_m1m2 += state_at_t[6] * state_at_t[7]
+                statesum_n1 += n1_at_t
+                statesum_n2 += n2_at_t[5]
+                statesquaresum_n1 += n1_at_t ** 2
+                statesquaresum_n2 += n2_at_t ** 2
+                statesum_m1 += m1_at_t
+                statesum_m2 += m2_at_t
+                statesquaresum_m1 += m1_at_t ** 2
+                statesquaresum_m2 += m2_at_t ** 2
+                stateprod_n1m1 += n1_at_t * m1_at_t
+                stateprod_n1m2 += n1_at_t * m2_at_t
+                stateprod_n2m1 += n2_at_t * m1_at_t
+                stateprod_n2m2 += n2_at_t * m2_at_t
+                stateprod_n1n2 += n1_at_t * n2_at_t
+                stateprod_m1m2 += m1_at_t * m2_at_t
 
                 # store n(t) and m(t) for each trajectory to get histogram evolution
-                moment_curves['distribution_n1'][idx][k] = state_at_t[4]
-                moment_curves['distribution_m1'][idx][k] = state_at_t[6]
-                moment_curves['distribution_n2'][idx][k] = state_at_t[5]
-                moment_curves['distribution_m2'][idx][k] = state_at_t[7]
+                moment_curves['distribution_n1'][idx][k] = n1_at_t
+                moment_curves['distribution_m1'][idx][k] = m1_at_t
+                moment_curves['distribution_n2'][idx][k] = n2_at_t
+                moment_curves['distribution_m2'][idx][k] = m2_at_t
 
                 # estimate x from mode_1 and mode_2 current "data" n(t) or m(t)
                 #moment_curves['estimate_c'][idx][k] = estimate_general(state_at_t, params, t, model, 'c')
