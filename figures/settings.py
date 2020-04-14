@@ -13,9 +13,14 @@ for dirs in [DIR_INPUT, DIR_OUTPUT]:
 
 # globals for heatmaps and equations (to prevent circular imports)
 KON = 1.
-KP = 10.
-T = 1000.
+KP = 100.
+T = 100.
 KF = 1.0
+ALPHA = 0.2
+C1 = 1.0
+C2 = 1.0
+KOFF = 1.0
+KOFF2 = 10.0
 
 # color = plt.cm.get_cmap('Classic', 10)  # unnecessary unless you want different colors
 colour_palette = sns.color_palette("muted", 10)

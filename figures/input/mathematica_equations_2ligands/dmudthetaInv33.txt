@@ -1,0 +1,1 @@
+-(((c1*koff2*kon + koff*(koff2 + c2*kon))*(-3*ALPHA*c2*koff*koff2**2*kon + ALPHA*c2*koff2**3*kon + ALPHA*koff**2*koff2*(2*koff2 + 3*c2*kon) + koff**3*(2*koff2**3 - ALPHA*c2*kon)))/(ALPHA*koff*(koff - koff2)**3*koff2*kon*KP*T))

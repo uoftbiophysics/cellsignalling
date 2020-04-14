@@ -12,7 +12,7 @@ from decimal import Decimal
 #from load_inputs import DATADICT
 from settings import DIR_OUTPUT, DIR_INPUT
 from settings import COLOR_SCHEME as cs
-from settings import KON, KP, T, KF, ALPHA
+from settings import KON, KP, T, KF
 
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
@@ -40,7 +40,7 @@ CTILDERANGE = np.divide(list(CRANGE), c0)
 ZRANGE = np.divide(list(KOFFRANGE), KP)
 
 
-def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False,
+def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, mode=1, dedim=False,
                  xy_label_force=None, **kwargs):
     """
     crange: range of values for c
@@ -81,13 +81,11 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         # if flag is true, this is how we scale the axis. Simple.
         crange = crange*KON/KP;
         koffrange = koffrange/KP;
-        xy_label = [r'$k_{on}c/k_{p}$', r'$k_{off}/k_{p}$'];
+        xy_label = [r'$k_{\mathrm{on}}c/k_{p}$', r'$k_{\mathrm{off}}/k_{p}$'];
     else:
-        xy_label = [r'${c}$', r'${k}_{off}$']
+        xy_label = [r'${c}$', r'${k}_{\mathrm{off}}$']
     if xy_label_force is not None:
         xy_label = xy_label_force
-
-    print(vmin,vmax)
 
     if log_norm:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm(vmin,vmax)}
@@ -145,32 +143,38 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     #plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
     # now we can set the ticks without them getting messed up
     if not log_norm:
-        ax = plt.gca()
-        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0] + [len(crange)])
-        ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0] + [len(koffrange)])
+        if mode==1:
+            ax.set_xticks([i for i in range(len(crange)) if i % POINTS_BETWEEN_TICKS == 0])
+            ax.set_yticks([i for i in range(len(koffrange)) if i % POINTS_BETWEEN_TICKS == 0])
+            ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+            ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+        elif mode==2:
+            ax = plt.gca()
+            ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0] + [len(crange)])
+            ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0] + [len(koffrange)])
 
-        # Exhausting process to make ticks look nice
-        nice_ticks = ["{}".format(cval) for cval in crange if Decimal(str(cval)) % Decimal(str(crange[-1] / 5)) == 0]
-        ctilde_ticks = []
-        for i in range(len(nice_ticks) * 2):
-            if i % 2 == 0:
-                ctilde_ticks.append("")
-            else:
-                ctilde_ticks.append(nice_ticks.pop(0))
-        ctilde_ticks = ["0"] + ctilde_ticks
+            # Exhausting process to make ticks look nice
+            nice_ticks = ["{}".format(cval) for cval in crange if Decimal(str(cval)) % Decimal(str(crange[-1] / 5)) == 0]
+            ctilde_ticks = []
+            for i in range(len(nice_ticks) * 2):
+                if i % 2 == 0:
+                    ctilde_ticks.append("")
+                else:
+                    ctilde_ticks.append(nice_ticks.pop(0))
+            ctilde_ticks = ["0"] + ctilde_ticks
 
-        nice_ticks = ["{}".format(koffval) for koffval in koffrange if
-                      Decimal(str(koffval)) % Decimal(str(koffrange[-1] / 5)) == 0]
-        kofftilde_ticks = []
-        for i in range(len(nice_ticks) * 2):
-            if i % 2 == 0:
-                kofftilde_ticks.append("")
-            else:
-                kofftilde_ticks.append(nice_ticks.pop(0))
-        kofftilde_ticks = ["0"] + kofftilde_ticks
+            nice_ticks = ["{}".format(koffval) for koffval in koffrange if
+                          Decimal(str(koffval)) % Decimal(str(koffrange[-1] / 5)) == 0]
+            kofftilde_ticks = []
+            for i in range(len(nice_ticks) * 2):
+                if i % 2 == 0:
+                    kofftilde_ticks.append("")
+                else:
+                    kofftilde_ticks.append(nice_ticks.pop(0))
+            kofftilde_ticks = ["0"] + kofftilde_ticks
 
-        ax.set_xticklabels(ctilde_ticks, fontsize=FS)
-        ax.set_yticklabels(kofftilde_ticks, fontsize=FS)
+            ax.set_xticklabels(ctilde_ticks, fontsize=FS)
+            ax.set_yticklabels(kofftilde_ticks, fontsize=FS)
 
     # save
     if save == True:
@@ -223,10 +227,10 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
             #plt.title('Mode 1: MLE relative error comparison \n'+r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
             plt.ylabel(r'$k_{p} t \langle\delta c^{2}\rangle$/$c^{2}$')
         elif label_style == 1:
-            plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
+            plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{\mathrm{off}}=k_{\mathrm{on}}=1$)')
             plt.ylabel(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
 
-        plt.xlabel(r'$k_{on}c/k_{p}$')
+        plt.xlabel(r'$k_{\mathrm{on}}c/k_{p}$')
 
         plt.gca().set_xscale('log')
         plt.xlim([0.03, 10])
@@ -280,9 +284,9 @@ def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE,
             arr[i, j] = combined_error_koff(cval, koffval)
 
     if label_style == 0:
-        label = r'$k_{p}t \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$k_{p}t \langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     elif label_style == 1:
-        label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_koff', label)
     return
 
@@ -326,19 +330,19 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
 
     if label_style == 0:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$c$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{off}$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{\mathrm{off}}$', zorder=1)
         #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
 
     elif label_style == 1:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
-        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{\mathrm{off}}^{2}/k_{\mathrm{off}}^{2}$', zorder=1)
+        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{\mathrm{off}}=k_{\mathrm{on}}=1$)')
         plt.ylabel(r'$\langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
 
     # axis
-    ax1.set_xlabel(r'$k_{on}c/k_{p}$')
+    ax1.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$')
     ax1.set_ylabel(r'$k_{p}t \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
-    #ax2.set_xlabel(r'$k_{off}$')
+    #ax2.set_xlabel(r'$k_{\mathrm{off}}$')
 
     ax1.set_xscale('log')
     ax2.set_xscale('log')
@@ -348,7 +352,7 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
 
     lns = ln1 + ln2
     labs = [l.get_label() for l in lns]
-    ax1.legend(lns, labs)
+    ax1.legend(lns, labs, loc='upper right')
 
     plt.tight_layout()
     # save figure
@@ -408,9 +412,9 @@ def heatmap_kpr_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
         for j, cval in enumerate(crange):
             arr[i, j] = kpr_error_koff(cval, koffval)
     if label_style == 0:
-        label = r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\alpha \langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     elif label_style == 1:
-        label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr_heuristic_error_koff', label)
     return
 
@@ -497,9 +501,9 @@ def heatmap_kpr2_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
         for j, cval in enumerate(crange):
             arr[i, j] = kpr2_error_koff(cval, koffval)
     if label_style == 0:
-        label = r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\alpha \langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     elif label_style == 1:
-        label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr2_heuristic_error_koff', label)
     return
 
@@ -642,8 +646,10 @@ def truncate(f, n):
 def heatmap_figure_4():
     nobs = 0.1 * KP * T # 100
     mobs = 0.15 * KP * T # 150
-    def mode1_plot(crange=[truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5.0 * KON / KP + 0.005, 0.005))[1:]],
-                   koffrange=[truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]):
+    def mode1_plot(crange=[i*KON/KP for i in np.logspace(-1,3)],
+                   koffrange=[i/KP for i in np.logspace(-1,3
+
+                   )]):
         figname = 'heatmap_log_posterior_mode1'
         def log_posterior_x(c, koff, n):
             if c==0:
@@ -661,27 +667,28 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_x(cval * KP/KON, koffval * KP, nobs)
 
-        label = r'ln $P(c, k_{off}|n)$'
+        label = r'ln $P(c, k_{\mathrm{off}}|n)$'
         #log_contours = [-i for i in list(np.logspace(-3, 4,num=20))[::-1]]
-        linear_contours = list(range(-500, 0, 50))
+        linear_contours = []#list(range(-500, 0, 50))
 
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=linear_contours, vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
 
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate(c, n):
             koff_est = ((KP * T - n) * KON * c) / n
             return koff_est
+        koff_star = [heuristic_estimate(ctilde * KP/KON, nobs)/KP for ctilde in crange]
 
         # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
-        xpts = np.linspace(ax.get_xticks()[0], ax.get_xticks()[-1], len(crange))
-
-        koff_star = [ax.get_ylim()[1] * (heuristic_estimate((ctilde - (crange[1]-crange[0])) * KP/KON, nobs)/KP -
-                                         (koffrange[1]-koffrange[0]))/max(koffrange) for ctilde in crange]
-        ax.plot([i+ax.get_xlim()[0] for i in xpts], [i-ax.get_ylim()[0] for i in koff_star], 'k--')
+        #ypts = [len(koffrange) * (np.log10(k)/np.log10(max(koffrange)))/np.log10(len(koffrange)) for k in koff_star]
+        #ypts_ylim = [y for y in ypts if y<len(koffrange)]
+        #ax.plot(range(len(ypts_ylim)), ypts_ylim, 'k--')
+        ax.plot(crange, koff_star, 'k--')
 
         # save figure
         fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
@@ -713,11 +720,12 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_c_koff(cval * KP/KON, koffval * KP, nobs, mobs)
 
-        label = r'ln $P(c, k_{off}|n, m)$'
-        fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
-                               levels=list(range(-1000, 0, 100)), vmin=-1000, vmax=0, contour_color='w', contour_linewidths=0.5)
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        label = r'ln $P(c, k_{\mathrm{off}}|n, m)$'
+        contours = []#list(range(-1000, 0, 100))
+        fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False, mode=2,
+                               levels=contours, vmin=-1000, vmax=0, contour_color='w', contour_linewidths=0.5)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
@@ -792,12 +800,12 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
 
-        label = r'$ln(P(c, k_{off}|n, m))$'
+        label = r'$ln(P(c, k_{\mathrm{off}}|n, m))$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
                                contour_linewidths=0.5)
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
@@ -879,12 +887,12 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_c_koff(cval, koffval, n1obs, n2obs)
 
-        label = r'$ln(P(c, k_{off}|n_1, n_2))$'
+        label = r'$ln(P(c, k_{\mathrm{off}}|n_1, n_2))$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
                                contour_linewidths=0.5)
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n1, n2):
@@ -911,7 +919,7 @@ def heatmap_figure_4():
         # fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
     mode1_plot()
-    mode2_plot()
+    #mode2_plot()
     #KPR1_plot()
     #KPR2_plot()
     return 0
@@ -970,10 +978,10 @@ def dk_plotting():
     """
     Duncan you can still run any/all of these by running dk_plotting in main
     """
-    heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
+    #heatmap_mode1_error_x(make_heatmap=False, make_panel=True)
 
     #heatmap_mode1_error_x()
-    figure_2_combined_cross_sections()
+    #figure_2_combined_cross_sections()
 
     #heatmap_combined_error_c()
     #heatmap_combined_error_koff()
@@ -986,7 +994,7 @@ def dk_plotting():
     ctildePosterior = [truncate(f, 3) for f in list(np.arange(0.0 * KON / KP, 5.0 * KON / KP + 0.005, 0.005))[1:]]
     kofftildePosterior = [truncate(f, 2) for f in list(np.arange(0.0 / KP, 50.0 / KP + 0.05, 0.05))[1:]]
 
-    #heatmap_figure_4()
+    heatmap_figure_4()
 
     return 0
 
@@ -1004,7 +1012,7 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
 
     ax1label = r'$k_{f}/k_{p}$'
     ax1range = np.logspace(-2, 4, TOTAL_POINTS_KOFF) / KP
-    ax2label = r'$k_{off}/k_{p}$'
+    ax2label = r'$k_{\mathrm{off}}/k_{p}$'
     ax2range = ZRANGE
     xy_label_force = [ax1label, ax2label]
 
@@ -1030,13 +1038,13 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
-    dk_plotting()
-    exit()
+    #dk_plotting()
+    #exit()
     dictionary = pd.MAIN; dictionary_SI = pd.SI_ALT_RATIO
     want_dedim = True; subdir_2_use = 'heatmaps'
 
     contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01, 1.1, 10.0, 100.0, 1000.0], 'fmt' : '%.2f'}
-
+    heatmap_figure_4()
     #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
     #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 
@@ -1045,4 +1053,4 @@ if __name__ == '__main__':
     #                     'cmap_colour': custom_cmap_colour,
     #                     'vmin': 1.0}
 
-    custom_ratio_diagram(contour_args=contour_args_SI)
+    #custom_ratio_diagram(contour_args=contour_args_SI)
