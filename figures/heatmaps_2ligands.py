@@ -19,18 +19,20 @@ plt.style.use('parameters.mplstyle')  # particularIMporting
 
 # plot params
 FS = 20
-SHOW = True
+SHOW = False
 
 # axes
 POINTS_BETWEEN_TICKS = 10
-LOG_START_C = -2
-LOG_END_C = 2
+LOG_START_C = 0
+LOG_END_C = 4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
-LOG_START_KOFF = -2
-LOG_END_KOFF = 2
+#CRANGE2 = np.logspace(LOG_START_C, LOG_END_C+1, 2*TOTAL_POINTS_C)
+LOG_START_KOFF = 0
+LOG_END_KOFF = 4
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
+KOFFRANGE2 = KOFFRANGE + 0.1
 
 def plot_heatmap(arr, crange, koffrange, fname, xy_label, label, show=SHOW, save=True, log_norm=True,
                  xy_label_force=None, **kwargs):
@@ -72,8 +74,9 @@ def plot_heatmap(arr, crange, koffrange, fname, xy_label, label, show=SHOW, save
 
     if log_norm:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm(vmin,vmax)}
+        print("Logged.")
     else:
-        imshow_kw = {'cmap': 'viridis', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
+        imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax}
 
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
@@ -90,15 +93,11 @@ def plot_heatmap(arr, crange, koffrange, fname, xy_label, label, show=SHOW, save
     # axes setup
     fig = plt.gcf(); ax = plt.gca()
 
-    # method 1
-    if log_norm:
-        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
-        ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
-        ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
-        ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
-    else:
-        # Set ticks later because for some reason plotting contours messes up the ticks that get set here
-        pass
+    # axes log scaled
+    ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
+    ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
+    ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+    ax.set_yticklabels([r'$10^{%d}$' % np.log10(kval) for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
 
     ax.invert_yaxis()
     ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
@@ -118,7 +117,7 @@ def plot_heatmap(arr, crange, koffrange, fname, xy_label, label, show=SHOW, save
 
     # save
     if save == True:
-        plt.savefig(DIR_OUTPUT + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + fname + '.eps'); plt.savefig(DIR_OUTPUT + os.sep + fname + '.png')
+        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
     if show:
         plt.show()
 
@@ -130,36 +129,77 @@ def sigmaEst(c1, koff, c2, koff2):
     A = eqns2l.matrix_dmudthetaInv(c1, c2, koff, koff2)
     B = eqns2l.matrix_sigmadata(c1, c2, koff, koff2)
     Atrans = np.transpose(A)
-    matrix = np.linalg.multi_dot([A, B, Atrans]) # matrix multiplication
+    matrix = np.linalg.multi_dot([A, B, Atrans]) # matrix
 
-    return matrix, np.linalg.det(matrix)
+    rel = np.array([ [c1*c1, c1*koff, c1*c2, c1*koff2], [koff*c1, koff*koff, koff*c2, koff*koff2], [c2*c1, c2*koff, c2*c2, c2*koff2], [koff2*c1, koff2*koff, koff2*c2, koff2*koff2] ])
+    relErrorMatrix = np.divide(matrix,rel)
+
+    return matrix, np.linalg.det(matrix), relErrorMatrix
+
+
+
+def determinants_mathematica(c1, koff, c2, koff2):
+    return np.linalg.det( eqns2l.matrix_sigmadata(c1, c2, koff, koff2) ), np.linalg.det( eqns2l.matrix_dmudthetaInv(c1, c2, koff, koff2) )
 
 
 if __name__ == '__main__':
 
-
     value = [C1, KOFF, C2, KOFF2]
-    label = [r'$c_1$', r'$k_{\text{off}}$', r'$c_2$', r'$k_{\text{off,2}}$']
-    dimension = [CRANGE, KOFFRANGE, CRANGE, KOFFRANGE]
+    label_fig = ['c1', 'koff', 'c2', 'koff2']
+    label = [r'$c_1$', r'$k_{off}$', r'$c_2$', r'$k_{off,2}$']
+    dimension = [CRANGE, KOFFRANGE, CRANGE, KOFFRANGE2]
+
+    # for plotting the dedimensionalized values
+    dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, dimension[3]/KP]
+    dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{p}$']
 
     # choose any of these 2 to be arrays
-    dim = {'x' : 0, 'y' : 2, 'name' : 'c1c2DET2'}
+    dim = {'x' : 1, 'y' : 3}
+    axes = label_fig[dim['x']]+ '_' + label_fig[dim['y']]
 
-    arrSigmaEst = np.zeros( (len(dimension[dim['x']]), len(dimension[dim['y']]), 4, 4) ) # heatmap for any element of sigmaEst(4x4 matrix)
-    arrDetSigmaEst = np.zeros( (len(dimension[dim['x']]), len(dimension[dim['y']]) ) ) # heatmap for the determinant
+    # heatmap for any element of sigmaEst(4x4 matrix)
+    arrSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
+    arrRelErrorEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
+
+    # heatmap for the det estimate covariance
+    arrDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    arrDetSigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    arrDetdmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+
+    # elements of certain matrices
+    #element11SigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    #element31SigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    #element11dmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    #element31dmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
 
     # making our heatmap,
     for i, xi in enumerate( dimension[dim['x']] ):
         value[dim['x']] = xi
         for j, yi in enumerate( dimension[dim['y']] ):
             value[dim['y']] = yi
-            arrSigmaEst[i,j,:,:], arrDetSigmaEst[i,j] = sigmaEst(value[0], value[1], value[2], value[3])
+            arrSigmaEst[j,i,:,:], arrDetSigmaEst[j,i], arrRelErrorEst[j,i,:,:] = sigmaEst(value[0], value[1], value[2], value[3])
+            arrDetSigmaData[j,i], arrDetdmudthetaInv[j,i] = determinants_mathematica(value[0], value[1], value[2], value[3])
+            #element11SigmaData[j,i] = eqns2l.sigmadata11(value[0], value[2], value[1], value[3])
+            #element31SigmaData[j,i] = eqns2l.sigmadata31(value[0], value[2], value[1], value[3])
+            #element11dmudthetaInv[j,i] = eqns2l.dmudthetaInv11(value[0], value[2], value[1], value[3])
+            #element31dmudthetaInv[j,i] = eqns2l.dmudthetaInv31(value[0], value[2], value[1], value[3])
 
-    # for plotting the dedimensionalized values
-    dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[3]*KON/KP, dimension[3]/KP]
-    dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{\text{off}}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{\text{off,2}}/k_{p}$']
+    # Here I have selected the plots I want
+    LOG_SELECT = False
+    plot_heatmap(arrDetSigmaEst[:,:], dedimension[dim['x']], dedimension[dim['y']], 'DetSigmaEst_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Det($\Sigma_{est}$)', log_norm=LOG_SELECT)
+    plot_heatmap(arrDetSigmaData[:,:], dedimension[dim['x']], dedimension[dim['y']], 'detSigmaData_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Det($\Sigma_{data}$)', log_norm=LOG_SELECT)
 
-    # Here I have selected the determinnant to plot. TODO make arr potentially about
-    arr = arrDetSigmaEst[:,:]; label = r'Determinant $\Sigma_{est}$';
+    LOG_SELECT = True
 
-    plot_heatmap(arr, dedimension[dim['x']], dedimension[dim['y']], dim['name'], [ dedimension_label[dim['x']], dedimension_label[dim['y']]], label)
+    plot_heatmap( arrRelErrorEst[:,:,0,0], dedimension[dim['x']], dedimension[dim['y']], 'SigmaEst_00_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=LOG_SELECT)
+    plot_heatmap( arrRelErrorEst[:,:,1,1], dedimension[dim['x']], dedimension[dim['y']], 'SigmaEst_11_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', log_norm=LOG_SELECT)
+    plot_heatmap( arrRelErrorEst[:,:,2,2], dedimension[dim['x']], dedimension[dim['y']], 'SigmaEst_22_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=LOG_SELECT)
+    plot_heatmap( arrRelErrorEst[:,:,3,3], dedimension[dim['x']], dedimension[dim['y']], 'SigmaEst_33_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=LOG_SELECT)
+
+
+    # old plots to check if conversion from matehmatica worked fine
+    #plot_heatmap(arrDetdmudthetaInv[:,:], dedimension[dim['x']], dedimension[dim['y']], 'c1c2detdmudtheta', [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Determinant $d\mu /d \theta^{-1}$')
+    #plot_heatmap(element11SigmaData[:,:], dedimension[dim['x']], dedimension[dim['y']], 'c1c2sigmadata11', [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Determinant $\Sigma_{data,11}$')
+    #plot_heatmap(element31SigmaData[:,:], dedimension[dim['x']], dedimension[dim['y']], 'c1c2sigmadata31', [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Determinant $\Sigma_{data,31}$')
+    #plot_heatmap(element11dmudthetaInv[:,:], dedimension[dim['x']], dedimension[dim['y']], 'c1c2detdmudtheta11', [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Determinant $d\mu /d \theta^{-1}_{11}$')
+    #plot_heatmap(element31dmudthetaInv[:,:], dedimension[dim['x']], dedimension[dim['y']], 'c1c2detdmudtheta31', [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Determinant $d\mu /d \theta^{-1}_{31}$')

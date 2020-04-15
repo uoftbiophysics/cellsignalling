@@ -1,0 +1,1 @@
+Added plotting heatmaps of accuracy and determinant of Hessian of 2 ligand system. These expressions were importedfrom mathematica (see equations_txt2latex.py).
