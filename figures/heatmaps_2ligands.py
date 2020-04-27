@@ -92,7 +92,7 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
     arr = np.ma.array(arr, mask=( arr<=0.0 ) )
     #arr[arr <= ]
 
-    im = ax.imshow(arr, interpolation='hamming', **imshow_kw)
+    im = ax.imshow(arr, interpolation='none', **imshow_kw)
     #im = plt.imshow(arr, **imshow_kw)
 
     # axes setup
