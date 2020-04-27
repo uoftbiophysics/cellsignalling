@@ -28,14 +28,19 @@ LOG_START_C = 0
 LOG_END_C = 4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
-#CRANGE2 = np.logspace(LOG_START_C, LOG_END_C+1, 2*TOTAL_POINTS_C)
+#LOG_START_KOFF = 0
+#LOG_END_KOFF = 2
+#LOG_START_KOFF2 = 2
+#LOG_END_KOFF2 = 4
 LOG_START_KOFF = 0
 LOG_END_KOFF = 2
-LOG_START_KOFF2 = 2
-LOG_END_KOFF2 = 4
+LOG_START_KOFF2 = 0
+LOG_END_KOFF2 = 2
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
-KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 0.1
+KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2)
+KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
+KOFFRANGE2 = 2*KOFFRANGE
 #KOFFRANGE2 = KOFFRANGE + 0.1
 
 def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
@@ -174,6 +179,32 @@ def multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, l
 
     return fig
 
+def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
+    # makes a figure with many subplots.
+
+    fig = plt.figure(figsize=(5,20));
+    ax1 = plt.subplot2grid((4,1), (0,0), colspan=1, rowspan=1);
+    ax2 = plt.subplot2grid((4,1), (1,0), colspan=1, rowspan=1);
+    ax3 = plt.subplot2grid((4,1), (2,0), colspan=1, rowspan=1);
+    ax4 = plt.subplot2grid((4,1), (3,0), colspan=1, rowspan=1);
+
+    # each of the diagonals
+    heatmap(ax1, arrRelErrorEst[:,:,0,0].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
+    heatmap(ax2, arrRelErrorEst[:,:,1,1].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {k_{off,1}}^2 \rangle / {k_{off,1}}^2$', log_norm=log_select)
+    heatmap(ax3, arrRelErrorEst[:,:,2,2].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
+    heatmap( ax4, arrRelErrorEst[:,:,3,3].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
+
+    # save
+    #fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
+    #fig.suptitle(r"T Cell antigen detection $c_2/c_1=1000$", fontsize=int(1.5*FS))
+    plt.tight_layout(h_pad=1, rect=[0,0.03,1,0.95]) # need to change this to not have the title overlap, figuring it out still
+
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+
+    plt.close()
+
+    return fig
+
 
 def sigmaEst(c1, koff, c2, koff2):
     # eqns2l are the equations imported from Mathematica and turned into matrices (function of c1,c2,koff,koff2)
@@ -200,15 +231,21 @@ if __name__ == '__main__':
 
     # axis we'd like to plot
     value = [C1, KOFF, C2, KOFF2]
-    label_fig = ['c1', 'koff', 'c2', 'koff2']
-    label = [r'$c_1$', r'$k_{off}$', r'$c_2$', r'$k_{off,2}$']
+    label_fig = ['c1', 'koff1', 'c2', 'koff2']
+    label = [r'$c_1$', r'$k_{off,1}$', r'$c_2$', r'$k_{off,2}$']
     dimension = [CRANGE, KOFFRANGE, CRANGE, KOFFRANGE2]
     axes = label_fig[dim['x']]+ '_' + label_fig[dim['y']]
     multi_fname = "multi_"+axes
 
     # for plotting the dedimensionalized values
     dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, dimension[3]/KP]
-    dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{p}$']
+    dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{p}$']
+    # ratio
+    #dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, dimension[3]/dimension[1]]
+    #dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{off,1}$']
+    # different
+    #dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, (dimension[3]-dimension[1])/KP]
+    #dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$(k_{off,2}-k_{off,1})/k_{p}$']
 
     # heatmap for any element of sigmaEst(4x4 matrix)
     arrSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
@@ -252,7 +289,8 @@ if __name__ == '__main__':
 
     # make a figure with multiple subplots
     LOG_SELECT = True
-    multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
+    #multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
+    fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
 
 
 
