@@ -17,10 +17,10 @@ KP = 100.
 T = 100.
 KF = 1.0
 ALPHA = 0.2
-C1 = 1.0
-C2 = 1000.0
-KOFF = 101.0
-KOFF2 = 1.01
+C1 = 10.0
+C2 = 1.0
+KOFF = 1.0
+KOFF2 = 10.0
 
 # color = plt.cm.get_cmap('Classic', 10)  # unnecessary unless you want different colors
 colour_palette = sns.color_palette("muted", 10)

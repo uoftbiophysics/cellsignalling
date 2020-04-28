@@ -239,21 +239,22 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
 
     return
 
-def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
-                             scale_factor=alpha, label_style=0):
-    def combined_error_c(ctilde, z, scale_factor=scale_factor):
-        c = ctilde * c0
-        koff = z * KP
-        x = KON * c / koff
-        num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * x ** 2 * (1 + x) ** 3
-        den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
-        val = num / den
-        return scale_factor * val
 
+def combined_error_c(ctilde, z, scale_factor=alpha):
+    c = ctilde * c0
+    koff = z * KP
+    x = KON * c / koff
+    num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * x ** 2 * (1 + x) ** 3
+    den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
+    val = num / den
+    return scale_factor * val
+
+
+def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE, scale_factor=alpha, label_style=0):
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
-            arr[i, j] = combined_error_c(cval, koffval)
+            arr[i, j] = combined_error_c(cval, koffval, scale_factor=scale_factor)
 
     if label_style == 0:
         label = r'$k_{p}t \langle\delta c^{2}\rangle$/$c^{2}$'
@@ -262,22 +263,22 @@ def heatmap_combined_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_c', label)
     return
 
-def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE,
-                             scale_factor=alpha, label_style=0):
 
-    def combined_error_koff(ctilde, z, scale_factor=scale_factor):
-        c = ctilde * c0
-        koff = z * KP
-        x = c * KON / koff
-        num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * (1 + x) ** 3
-        den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
-        val = num / den
-        return scale_factor * val
+def combined_error_koff(ctilde, z, scale_factor=alpha):
+    c = ctilde * c0
+    koff = z * KP
+    x = c * KON / koff
+    num = 2 * KP * x + koff * KP * T * (1 + x) ** 3 + koff**2 * T * (1 + x) ** 3
+    den = koff ** 2 * KP * T**2 * x * (1 + x) ** 2
+    val = num / den
+    return scale_factor * val
 
+
+def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE, scale_factor=alpha, label_style=0):
     arr = np.zeros((len(koffrange), len(crange)))
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
-            arr[i, j] = combined_error_koff(cval, koffval)
+            arr[i, j] = combined_error_koff(cval, koffval, scale_factor=scale_factor)
 
     if label_style == 0:
         label = r'$k_{p}t \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
@@ -285,6 +286,7 @@ def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE,
         label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_koff', label)
     return
+
 
 def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
                              scale_factor=alpha, label_style=0):
@@ -355,8 +357,7 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
-def heatmap_kpr_error_c(crange=CTILDERANGE, koffrange=ZRANGE,
-                        scale_factor=alpha, label_style=0):
+def heatmap_kpr_error_c(crange=CTILDERANGE, koffrange=ZRANGE, scale_factor=alpha, label_style=0):
 
     def kpr_error_c_full(ctilde, z, scale_factor=scale_factor):
         c = ctilde * c0
