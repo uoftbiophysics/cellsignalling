@@ -40,7 +40,7 @@ LOG_START_KOFF2 = 0
 LOG_END_KOFF2 = 2
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
-KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2)
+KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) - 10**(LOG_START_KOFF2-2)
 #KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
 #KOFFRANGE2 = 2*KOFFRANGE
 #KOFFRANGE2 = KOFFRANGE + 0.1
@@ -266,7 +266,7 @@ def fig_2ligands_vs_1ligand_det(arrDetErrorRatio, array_x, array_y, fname, label
 
     # each of the diagonals
     heatmap(ax, arrDetErrorRatio[:, :].astype(np.float64), array_x, array_y, labels,
-            r'$ \frac{det \Sigma_B}{det \Sigma_{A1} det \Sigma_{A2}} $', log_norm=log_select)
+            r'$ \frac{\mathrm{det} \Sigma_B}{\mathrm{det} \Sigma_{A1} \mathrm{det} \Sigma_{A2}} $', log_norm=log_select)#, vmax=10**5)
 
     # save
     # fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
