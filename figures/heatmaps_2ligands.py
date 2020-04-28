@@ -24,7 +24,7 @@ SHOW = False
 
 # axes
 POINTS_BETWEEN_TICKS = 10
-LOG_START_C = 0
+LOG_START_C = -4
 LOG_END_C = 4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
@@ -32,15 +32,15 @@ CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
 #LOG_END_KOFF = 2
 #LOG_START_KOFF2 = 2
 #LOG_END_KOFF2 = 4
-LOG_START_KOFF = 0
-LOG_END_KOFF = 2
-LOG_START_KOFF2 = 0
-LOG_END_KOFF2 = 2
+LOG_START_KOFF = -6
+LOG_END_KOFF = 0
+LOG_START_KOFF2 = -6
+LOG_END_KOFF2 = 0
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
-KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2)
-KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
-KOFFRANGE2 = 2*KOFFRANGE # diff
+KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-4)
+#KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
+#KOFFRANGE2 = 2*KOFFRANGE # diff
 #KOFFRANGE2 = KOFFRANGE + 0.1
 
 def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
@@ -188,11 +188,14 @@ def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labe
     ax3 = plt.subplot2grid((4,1), (2,0), colspan=1, rowspan=1);
     ax4 = plt.subplot2grid((4,1), (3,0), colspan=1, rowspan=1);
 
+    print(T)
+    print(arrRelErrorEst[0,0,0,0])
+
     # each of the diagonals
-    heatmap(ax1, arrRelErrorEst[:,:,0,0].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
-    heatmap(ax2, arrRelErrorEst[:,:,1,1].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {k_{off,1}}^2 \rangle / {k_{off,1}}^2$', log_norm=log_select)
-    heatmap(ax3, arrRelErrorEst[:,:,2,2].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
-    heatmap( ax4, arrRelErrorEst[:,:,3,3].astype(np.float64), array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
+    heatmap(ax1, arrRelErrorEst[:,:,0,0].astype(np.float64)*(KP*T), array_x, array_y, labels, r'$k_{p} t \langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
+    heatmap(ax2, arrRelErrorEst[:,:,1,1].astype(np.float64)*(KP*T), array_x, array_y, labels, r'$k_{p} t \langle \delta {k_{off,1}}^2 \rangle / {k_{off,1}}^2$', log_norm=log_select)
+    heatmap(ax3, arrRelErrorEst[:,:,2,2].astype(np.float64)*(KP*T), array_x, array_y, labels, r'$k_{p} t \langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
+    heatmap( ax4, arrRelErrorEst[:,:,3,3].astype(np.float64)*(KP*T), array_x, array_y, labels, r'$k_{p} t \langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
 
     # save
     #fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
