@@ -41,8 +41,8 @@ LOG_END_KOFF2 = 2
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
 KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2)
-KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
-KOFFRANGE2 = 2*KOFFRANGE
+#KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
+#KOFFRANGE2 = 2*KOFFRANGE
 #KOFFRANGE2 = KOFFRANGE + 0.1
 
 def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
@@ -240,9 +240,9 @@ def fig_2ligands_vs_1ligand_diag(arrErrorRatio, array_x, array_y, fname, labels,
             r'$\langle \delta {c_1}^2 \rangle_B / \langle \delta {c}^2 \rangle_{A1}$', log_norm=log_select)
     heatmap(ax2, arrErrorRatio[:, :, 1, 1].astype(np.float64), array_x, array_y, labels,
             r'$\langle \delta {k_{off,1}}^2 \rangle_B / \langle \delta {k_{off}}^2 \rangle_{A1}$', log_norm=log_select)
-    heatmap(ax4, arrErrorRatio[:, :, 2, 2].astype(np.float64), array_x, array_y, labels,
+    heatmap(ax3, arrErrorRatio[:, :, 2, 2].astype(np.float64), array_x, array_y, labels,
             r'$\langle \delta {c_2}^2 \rangle_B / \langle \delta {c}^2 \rangle_{A2}$', log_norm=log_select)
-    heatmap(ax3, arrErrorRatio[:, :, 3, 3].astype(np.float64), array_x, array_y, labels,
+    heatmap(ax4, arrErrorRatio[:, :, 3, 3].astype(np.float64), array_x, array_y, labels,
             r'$\langle \delta {k_{off,2}}^2 \rangle_B / \langle \delta {k_{off}}^2 \rangle_{A2}$', log_norm=log_select)
 
     # save
@@ -388,10 +388,12 @@ if __name__ == '__main__':
             value[dim['x']] = xval
             for j, yval in enumerate(dimension[dim['y']]):
                 value[dim['y']] = yval
-                rel_err_model_A1_c[j, i] = combined_error_c(value[0], value[1], scale_factor=1)  # scale factor was kp t
-                rel_err_model_A1_koff[j, i] = combined_error_koff(value[0], value[1], scale_factor=1)
-                rel_err_model_A2_c[j, i] = combined_error_koff(value[2], value[3], scale_factor=1)
-                rel_err_model_A2_koff[j, i] = combined_error_koff(value[2], value[3], scale_factor=1)
+
+                rel_err_model_A1_c[j, i] = eqns.RelErrC2NoTrace(value[0], value[1])
+                rel_err_model_A1_koff[j, i] = eqns.RelErrK2NoTrace(value[0], value[1])
+                rel_err_model_A2_c[j, i] = eqns.RelErrC2NoTrace(value[2], value[3])
+                rel_err_model_A2_koff[j, i] = eqns.RelErrK2NoTrace(value[2], value[3])
+
                 det_err_A1[j, i] = eqns.DetSigmacrlb2NoTrace(value[0], value[1], kon=KON, T=T, KP=KP, KF=None)
                 det_err_A2[j, i] = eqns.DetSigmacrlb2NoTrace(value[2], value[3], kon=KON, T=T, KP=KP, KF=None)
 
