@@ -40,7 +40,7 @@ LOG_END_KOFF2 = 4
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 TOTAL_POINTS_KOFF2 = (LOG_END_KOFF2 - LOG_START_KOFF2) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
-KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF2) - 10**(LOG_START_KOFF2-4)
+KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF2)# - 10**(LOG_START_KOFF2-4)
 #KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
 #KOFFRANGE2 = 2*KOFFRANGE # diff
 #KOFFRANGE2 = KOFFRANGE + 0.1
@@ -155,7 +155,7 @@ def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=
     plt.close()
     return fig, ax
 
-def multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
+def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
     # makes a figure with many subplots.
 
     fig = plt.figure(figsize=(24,10));
@@ -167,7 +167,7 @@ def multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, l
 
     # Determinant plot
     #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
-    heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
+    heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
 
     # each of the diagonals
     heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
@@ -411,7 +411,7 @@ if __name__ == '__main__':
         """
 
         # make a figure with multiple subplots
-        multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
+        multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
         # fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
         """
