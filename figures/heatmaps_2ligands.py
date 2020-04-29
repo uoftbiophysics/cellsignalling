@@ -220,11 +220,8 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
 
     def build_dcov_dtheta_idx(theta_idx):
 
-        # label_data = {0: 'N1', 1:'M1', 2:'N2', 3:'M2'}
-        # label_theta = {0: 'c1', 1:'koff', 2:'c2', 3:'koff2'}
-
-        label_data = {0: '1', 1: '2', 2: '3', 3: '4'}
-        label_theta = {0: '1', 1: '2', 2: '3', 3: '4'}
+        label_data = {0: 'N1', 1:'M1', 2:'N2', 3:'M2'}
+        label_theta = {0: 'c1', 1:'koff', 2:'c2', 3:'koff2'}
 
         def fetch_eqn(i, j):
             # TODO this is the text label is it the eqn label though
@@ -356,6 +353,7 @@ if __name__ == '__main__':
     flag_general = False
     flag_compare_2ligands_vs_1ligand = True
     ADD_TRACE_TERM = True
+    LOG_SELECT = True
 
     # choose any of these 2 to be arrays [0: c1, 1: koff, 2: c2, 3: koff2], they will be your axes
     dim = {'x' : 2, 'y' : 3}
@@ -396,6 +394,9 @@ if __name__ == '__main__':
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
 
+    ver = "new_"
+    multi_fname = "multi_" + ver + axes
+
     if flag_general:
         # Here I have selected the plots I want, when we are making individual heatmaps. LOG_SELECT is kinda old, used to be for when we didn't want log colorbar, but we nearly always want it now
         """
@@ -405,9 +406,6 @@ if __name__ == '__main__':
         """
 
         # make a figure with multiple subplots
-        LOG_SELECT = True
-        ver = "new_"
-        multi_fname = "multi_" + ver + axes
         multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
         # fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
@@ -477,7 +475,7 @@ if __name__ == '__main__':
                 arrErrorRatio[j, i, 1, 1] = arrRelErrorEst[j, i, 1, 1] / rel_err_model_A1_koff[j, i]
                 arrErrorRatio[j, i, 2, 2] = arrRelErrorEst[j, i, 2, 2] / rel_err_model_A2_c[j, i]
                 arrErrorRatio[j, i, 3, 3] = arrRelErrorEst[j, i, 3, 3] / rel_err_model_A2_koff[j, i]
-                arrDetErrorRatio[j, i] = arrDetSigmaEst[j, i] / (det_err_A1[j, i] * det_err_A2[j, i])  # TODO denom
+                arrDetErrorRatio[j, i] = arrDetSigmaEst[j, i] / (det_err_A1[j, i] * det_err_A2[j, i])
 
         axis_labels = [dedimension_label[dim['x']], dedimension_label[dim['y']]]
         fig_2ligands_vs_1ligand_diag(arrErrorRatio, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
