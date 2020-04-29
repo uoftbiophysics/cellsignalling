@@ -12,15 +12,15 @@ for dirs in [DIR_INPUT, DIR_OUTPUT]:
         os.makedirs(dirs)
 
 # globals for heatmaps and equations (to prevent circular imports)
-KON = 1E5
-KP = 1.
-T = 1E3
-KF = None
+KON = 1.
+KP = 100.
+T = 100.
+KF = 1.0
 ALPHA = 20.0
-C1 = 1E-6 # concentration nano to micro molar
-C2 = 1E-6
-KOFF = 1E-2 # roughly 10^-2
-KOFF2 = 1E0
+C1 = 100.0
+C2 = 1000.0
+KOFF = 0.01
+KOFF2 = 1.01
 
 # color = plt.cm.get_cmap('Classic', 10)  # unnecessary unless you want different colors
 colour_palette = sns.color_palette("muted", 10)
