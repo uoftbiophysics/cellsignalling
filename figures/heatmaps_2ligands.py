@@ -24,7 +24,7 @@ FS = 20
 SHOW = False
 
 # axes
-POINTS_BETWEEN_TICKS = 20
+POINTS_BETWEEN_TICKS = 10
 LOG_START_C = -10
 LOG_END_C = -4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
@@ -166,7 +166,8 @@ def multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, l
     ax4 = plt.subplot2grid((2,4), (1,3), colspan=1, rowspan=1);
 
     # Determinant plot
-    heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
+    #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
+    heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
 
     # each of the diagonals
     heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
@@ -280,7 +281,7 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
                     [c2 * c1, c2 * koff, c2 * c2, c2 * koff2], [koff2 * c1, koff2 * koff, koff2 * c2, koff2 * koff2]])
     relErrorMatrix = np.divide(error_matrix, rel)
 
-    return error_matrix, np.linalg.det(error_matrix), relErrorMatrix
+    return error_matrix, np.linalg.det(error_matrix), relErrorMatrix, np.linalg.det(error_matrix)/(c1**2 * c2**2 * koff**2 * koff2**2 )
 
 
 def dmudthetaInv(c1, koff, c2, koff2):
@@ -350,8 +351,12 @@ def fig_2ligands_vs_1ligand_det(arrDetErrorRatio, array_x, array_y, fname, label
 
 if __name__ == '__main__':
 
-    flag_general = False
-    flag_compare_2ligands_vs_1ligand = True
+    for dirs in ['ligands2', 'ligands2_over_ligands1']:
+        if not os.path.exists(DIR_OUTPUT + os.sep + dirs):
+            os.makedirs(DIR_OUTPUT + os.sep + dirs)
+
+    flag_general = True
+    flag_compare_2ligands_vs_1ligand = False
     ADD_TRACE_TERM = True
     LOG_SELECT = True
 
@@ -385,14 +390,20 @@ if __name__ == '__main__':
     arrDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrDetSigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrDetDmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    arrRelDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
 
     # making our heatmap,
+    n = 0;
     for i, xi in enumerate(dimension[dim['x']]):
         value[dim['x']] = xi
+        m = 0
         for j, yi in enumerate(dimension[dim['y']]):
             value[dim['y']] = yi
-            arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :] = \
+            arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
+            print(n,m)
+            m += 1
+        n += 1
 
     ver = "new_"
     multi_fname = "multi_" + ver + axes
