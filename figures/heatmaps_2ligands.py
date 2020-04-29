@@ -262,7 +262,7 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
         FI_trace_term = np.zeros((4, 4))
         for n in range(4):
             for m in range(4):
-                FI_trace_term[0, 0] = 0.5 * compute_trace(n, m)
+                FI_trace_term[n, m] = 0.5 * compute_trace(n, m)
 
         return FI_trace_term
 
