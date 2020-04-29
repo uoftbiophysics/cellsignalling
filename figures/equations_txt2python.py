@@ -22,7 +22,7 @@ def write_function_2ligands(textfile, equationfile, path):
         eqn = f.read().strip()
 
     with open(equationfile,'a+') as g:
-        g.write("\n\ndef %(filename)s(c1, c2, koff, koff2, kon=KON, T=T, KP=KP, ALPHA=ALPHA):\n    return %(eqn)s" %{'filename' : filename, 'eqn': eqn} )
+        g.write("\n\ndef %(filename)s(c1, koff, c2, koff2, kon=KON, T=T, KP=KP, ALPHA=ALPHA):\n    return %(eqn)s" %{'filename' : filename, 'eqn': eqn} )
 
     return 0
 
@@ -83,4 +83,4 @@ if __name__ == '__main__':
         # matrix equations
         with open(python_equation_file,'a+') as g:
             for matrix in ["dmudthetaInv","sigmadata"]:
-                g.write("\n\ndef matrix_%(matrix)s(c1, c2, koff, koff2, kon=KON, T=T, KP=KP,  ALPHA=ALPHA):\n    return np.array([[%(matrix)s11(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s12(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s13(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s14(c1, c2, koff, koff2, kon, T, KP, ALPHA)],[%(matrix)s21(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s22(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s23(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s24(c1, c2, koff, koff2, kon, T, KP, ALPHA)],[%(matrix)s31(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s32(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s33(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s34(c1, c2, koff, koff2, kon, T, KP, ALPHA)],[%(matrix)s41(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s42(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s43(c1, c2, koff, koff2, kon, T, KP, ALPHA), %(matrix)s44(c1, c2, koff, koff2, kon, T, KP, ALPHA)]])" %{'matrix' : matrix})
+                g.write("\n\ndef matrix_%(matrix)s(c1, koff, c2, koff2, kon=KON, T=T, KP=KP,  ALPHA=ALPHA):\n    return np.array([[%(matrix)s11(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s12(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s13(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s14(c1, koff, c2, koff2, kon, T, KP, ALPHA)],[%(matrix)s21(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s22(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s23(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s24(c1, koff, c2, koff2, kon, T, KP, ALPHA)],[%(matrix)s31(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s32(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s33(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s34(c1, koff, c2, koff2, kon, T, KP, ALPHA)],[%(matrix)s41(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s42(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s43(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s44(c1, koff, c2, koff2, kon, T, KP, ALPHA)]])" %{'matrix' : matrix})

@@ -31,7 +31,7 @@ TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
 LOG_START_KOFF = 0
 LOG_END_KOFF = 2
-LOG_START_KOFF2 = -2
+LOG_START_KOFF2 = -1
 LOG_END_KOFF2 = 4
 #LOG_START_KOFF = -2
 #LOG_END_KOFF = 0
@@ -214,8 +214,8 @@ def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labe
 
 def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
     # eqns2l are the equations imported from Mathematica and turned into matrices (function of c1,c2,koff,koff2)
-    A = eqns2l.matrix_dmudthetaInv(c1, c2, koff, koff2)
-    B = eqns2l.matrix_sigmadata(c1, c2, koff, koff2)
+    A = eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2)
+    B = eqns2l.matrix_sigmadata(c1, koff, c2, koff2)
     Atrans = np.transpose(A)
 
     def build_dcov_dtheta_idx(theta_idx):
@@ -239,13 +239,13 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
         dcov_dtheta_idx = np.zeros((4, 4))
         for i in range(4):
             for j in range(4):
-                dcov_dtheta_idx[i, j] = fetch_eqn(i, j)(c1, c2, koff, koff2)
+                dcov_dtheta_idx[i, j] = fetch_eqn(i, j)(c1, koff, c2, koff2)
 
         return dcov_dtheta_idx
 
     def build_FI_trace_term():
         print("Preparing trace term for FI")
-        cov_matrix = eqns2l.matrix_sigmadata(c1, c2, koff, koff2)
+        cov_matrix = eqns2l.matrix_sigmadata(c1, koff, c2, koff2)
         cov_matrix_inv = np.linalg.inv(cov_matrix)
         dcov_dtheta_idx_dict = {0: build_dcov_dtheta_idx(0),
                                 1: build_dcov_dtheta_idx(1),
@@ -285,11 +285,11 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
 
 def dmudthetaInv(c1, koff, c2, koff2):
 
-    return eqns2l.matrix_dmudthetaInv(c1, c2, koff, koff2), np.linalg.det( eqns2l.matrix_dmudthetaInv(c1, c2, koff, koff2) )
+    return eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2), np.linalg.det( eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2) )
 
 def sigmaData(c1, koff, c2, koff2):
 
-    return eqns2l.matrix_sigmadata(c1, c2, koff, koff2), np.linalg.det( eqns2l.matrix_sigmadata(c1, c2, koff, koff2) )
+    return eqns2l.matrix_sigmadata(c1, koff, c2, koff2), np.linalg.det( eqns2l.matrix_sigmadata(c1, koff, c2, koff2) )
 
 
 def fig_2ligands_vs_1ligand_diag(arrErrorRatio, array_x, array_y, fname, labels, log_select=True):
@@ -435,11 +435,11 @@ if __name__ == '__main__':
         From Jeremy pre-April 27 code we create the following arrays in main:
         size = (4 x 4 x axis1 x axis2)
             - arrSigmaEst
-            - arrRelErrorEst 
+            - arrRelErrorEst
         size = (1 x axis1 x axis2)
             - arrDetSigmaEst
             - arrDetSigmaData
-            - arrDetdmudthetaInv  
+            - arrDetdmudthetaInv
 
         We want to compare these arrays to their 1 ligand counterparts
         """
