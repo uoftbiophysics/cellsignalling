@@ -245,7 +245,6 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
         return dcov_dtheta_idx
 
     def build_FI_trace_term():
-        print("Preparing trace term for FI")
         cov_matrix = eqns2l.matrix_sigmadata(c1, koff, c2, koff2)
         cov_matrix_inv = np.linalg.inv(cov_matrix)
         dcov_dtheta_idx_dict = {0: build_dcov_dtheta_idx(0),
@@ -269,7 +268,6 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
 
     error_matrix = np.linalg.multi_dot([A, B, Atrans])
     if add_trace_term:
-        print("WARNING -- adding trace term to the error covariance matrix - TEST")
         # idea is to invert the matrix above, add the trace term, then invert the whole thing
         FI_term_base = np.linalg.inv(error_matrix)
         FI_term_trace = build_FI_trace_term()
@@ -383,8 +381,8 @@ if __name__ == '__main__':
     # heatmap for any element of sigmaEst(4x4 matrix)
     arrSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
     arrRelErrorEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
-    arrSigmaData =  np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
-    arrDmudthetaInv =  np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
+    arrSigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
+    arrDmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
 
     # heatmap for the det estimate covariance
     arrDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
@@ -393,17 +391,13 @@ if __name__ == '__main__':
     arrRelDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
 
     # making our heatmap,
-    n = 0;
     for i, xi in enumerate(dimension[dim['x']]):
         value[dim['x']] = xi
-        m = 0
+        print('Heatmap point:', i, xi)
         for j, yi in enumerate(dimension[dim['y']]):
             value[dim['y']] = yi
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
-            print(n,m)
-            m += 1
-        n += 1
 
     ver = "new_"
     multi_fname = "multi_" + ver + axes
