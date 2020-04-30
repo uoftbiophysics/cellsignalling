@@ -390,15 +390,24 @@ if __name__ == '__main__':
     arrDetDmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrRelDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
 
-    # making our heatmap,
+    # making our heatmap
+    num_heatmap_points = len(dimension[dim['x']]) * len(dimension[dim['y']])
+    pixel_num = 0.0
+    progress_update_threshold = 5.0
+    print("Computing matrices")
     for i, xi in enumerate(dimension[dim['x']]):
         value[dim['x']] = xi
-        print('Heatmap point:', i, xi)
         for j, yi in enumerate(dimension[dim['y']]):
+            # progress update
+            pixel_num += 1.0
+            if 100*pixel_num/num_heatmap_points > progress_update_threshold:
+                print(str(progress_update_threshold) + "%")
+                progress_update_threshold += 5.0
+            # matrix calculations
             value[dim['y']] = yi
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
-
+    print("Done computing matrices\n Plotting results")
     ver = "new_"
     multi_fname = "multi_" + ver + axes
 
