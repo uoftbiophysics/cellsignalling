@@ -17,6 +17,7 @@ from settings import DIR_OUTPUT, DIR_INPUT, KON, KP, T, KF, ALPHA, C1, C2, KOFF,
 #from settings import COLOR_SCHEME as cs
 
 
+
 plt.style.use('parameters.mplstyle')  # particularIMporting
 
 # plot params
@@ -24,26 +25,29 @@ FS = 20
 SHOW = False
 
 # axes
-POINTS_BETWEEN_TICKS = 10
-LOG_START_C = -10
+POINTS_BETWEEN_TICKS = 15
+LOG_START_C = -9
 LOG_END_C = -4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
 LOG_START_KOFF = 0
 LOG_END_KOFF = 2
 LOG_START_KOFF2 = -1
-LOG_END_KOFF2 = 4
-#LOG_START_KOFF = -2
-#LOG_END_KOFF = 0
-#LOG_START_KOFF2 = -2
-#LOG_END_KOFF2 = 0
+LOG_END_KOFF2 = 3
 TOTAL_POINTS_KOFF = (LOG_END_KOFF - LOG_START_KOFF) * POINTS_BETWEEN_TICKS + 1
 TOTAL_POINTS_KOFF2 = (LOG_END_KOFF2 - LOG_START_KOFF2) * POINTS_BETWEEN_TICKS + 1
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
-KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF2) - 10**(LOG_START_KOFF2-4)
-#KOFFRANGE2 = (np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF) + 10**(LOG_START_KOFF2-2))**2 #ratios
-#KOFFRANGE2 = 2*KOFFRANGE # diff
-#KOFFRANGE2 = KOFFRANGE + 0.1
+KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF2)
+
+class MidPointLogNorm(mpl.colors.LogNorm):
+    def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+        mpl.colors.LogNorm.__init__(self,vmin=vmin, vmax=vmax, clip=clip)
+        self.midpoint=midpoint
+    def __call__(self, value, clip=None):
+        # I'm ignoring masked values and all kinds of edge cases to make a
+        # simple example...
+        x, y = [np.log(self.vmin), np.log(self.midpoint), np.log(self.vmax)], [0, 0.5, 1]
+        return np.ma.masked_array(np.interp(np.log(value), x, y))
 
 def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
                  xy_label_force=None, **kwargs):
@@ -61,14 +65,14 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
     else: levels = [1E0, 1E5, 1E10, 1E20]
 
     if 'vmin' in kwargs.keys(): vmin = kwargs['vmin']
-    else: vmin = np.min(arr)
+    else: vmin = 1E-3#np.min(arr)#1E-3#
 
     if 'vmax' in kwargs.keys(): vmax = kwargs['vmax']
     else:
         if np.max(arr) > 1E10:
-            vmax = 1E10
+            vmax = 1E5
         else:
-            vmax = np.max(arr)
+            vmax = 1E5#np.max(arr)#1E5#
 
     if 'contour_linestyle' in kwargs.keys(): contour_linestyle = kwargs['contour_linestyle']
     else: contour_linestyle = '-'
@@ -80,14 +84,15 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
     else: contour_lindewidths = 2
 
     if 'cmap_colour' in kwargs.keys(): cmap_colour = kwargs['cmap_colour']
-    else: cmap_colour = 'YlGnBu'
+    else: cmap_colour = 'RdBu_r'#'YlGnBu'
 
     if 'fmt' in kwargs.keys(): fmt = kwargs['fmt']
     else: fmt = ticker.LogFormatterMathtext()
 
     if log_norm:
-        vmin = np.min( arr[arr > 0.0] )
+        #vmin = np.min( arr[arr > 0.0] )
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm(vmin,vmax)}
+        imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': MidPointLogNorm(vmin,vmax,1.0)}
         print("Logscale")
     else:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax}
@@ -134,7 +139,7 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
 
     plt.tight_layout(h_pad=1)
 
-    return ax
+    return ax, cbar, im
 
 def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=True, log_norm=True,
                  xy_label_force=None, **kwargs):
@@ -158,27 +163,38 @@ def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=
 def multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
     # makes a figure with many subplots.
 
-    fig = plt.figure(figsize=(24,10));
-    ax0 = plt.subplot2grid((2,4), (0,0), colspan=2, rowspan=2);
-    ax1 = plt.subplot2grid((2,4), (0,2), colspan=1, rowspan=1);
-    ax2 = plt.subplot2grid((2,4), (0,3), colspan=1, rowspan=1);
-    ax3 = plt.subplot2grid((2,4), (1,2), colspan=1, rowspan=1);
-    ax4 = plt.subplot2grid((2,4), (1,3), colspan=1, rowspan=1);
+    #fig = plt.figure(figsize=(24,11));
+    fig = plt.figure(figsize=(23,10));
+    gs = fig.add_gridspec(2,5, hspace=0.05, wspace=0.05, width_ratios=[1.,1.,1.,1.,0.1], height_ratios=[1.,1.])
+    #gs = fig.add_gridspec(2,4, hspace=0.05, wspace=0.05, width_ratios=[1.,1.,1.,1.], height_ratios=[1.,1.])
+
+    #ax0 = fig.add_subplot(gs[:,:-2])
+    ax0 = fig.add_subplot(gs[:,:-3])
+    ax1 = fig.add_subplot(gs[0,2])
+    ax2 = fig.add_subplot(gs[0,3])
+    ax3 = fig.add_subplot(gs[1,2])
+    ax4 = fig.add_subplot(gs[1,3])
+    ax5 = fig.add_subplot(gs[:,-1])
 
     # Determinant plot
     #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
-    heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
+    ax0, cbar0, im0 = heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
+    cbar0.remove(); ax0.set_title(r'Det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{off,1}}^2{k_{off,2}}^2$)', fontsize=FS)
 
     # each of the diagonals
-    heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
-    heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', log_norm=log_select)
-    heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
-    heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
+    ax1, cbar1, _ = heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
+    cbar1.remove(); ax1.tick_params(labelbottom=False); ax1.tick_params(labelleft=False); ax1.set_xticklabels([]); ax1.set_yticklabels([]); ax1.set_ylabel(''); ax1.xaxis.set_label_position('top'); ax1.set_xlabel(r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$')
+    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', log_norm=log_select)
+    cbar2.remove(); ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.xaxis.set_label_position('top'); ax2.set_xlabel(r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$')
+    a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
+    cbar3.remove(); ax3.tick_params(labelbottom=False); ax3.tick_params(labelleft=False); ax3.set_xticklabels([]); ax3.set_yticklabels([]); ax3.set_ylabel(''); ax3.set_xlabel( r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$')
+    a4, cbar4, _ = heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
+    cbar4.remove(); ax4.tick_params(labelbottom=False); ax4.tick_params(labelleft=False); ax4.set_xticklabels([]); ax4.set_yticklabels([]); ax4.set_ylabel(''); ax4.set_xlabel( r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$')
+
+    cb = fig.colorbar(im0, cax=ax5); cb.ax.tick_params(labelsize=FS)
 
     # save
-    #fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
-    fig.suptitle(r"T Cell antigen detection $c_2/c_1=1000$", fontsize=int(1.5*FS))
-    plt.tight_layout(h_pad=1, rect=[0,0.03,1,0.95]) # need to change this to not have the title overlap, figuring it out still
+    plt.tight_layout(h_pad=0.05, w_pad=0.05, rect=[0.,0.,1.,1.]) # need to change this to not have the title overlap, figuring it out still
 
     plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
 
@@ -399,7 +415,7 @@ if __name__ == '__main__':
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
 
-    ver = "new_"
+    ver = "final_"
     multi_fname = "multi_" + ver + axes
 
     if flag_general:
@@ -411,7 +427,7 @@ if __name__ == '__main__':
         """
 
         # make a figure with multiple subplots
-        multiple_heatmaps(arrDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
+        multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
         # fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
         """
