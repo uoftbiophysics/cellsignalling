@@ -64,7 +64,7 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
     """
     # default parameters, this is relic ofthe previous way we did things. Still might be useful.
     if 'levels' in kwargs.keys(): levels = kwargs['levels']
-    else: levels = [1E0, 1E5, 1E10, 1E20]
+    else: levels = [1E0]#, 1E5, 1E10, 1E20]
 
     if 'vmin' in kwargs.keys(): vmin = kwargs['vmin']
     else: vmin = 1E-3#np.min(arr)#1E-3#
@@ -167,7 +167,7 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
 
     #fig = plt.figure(figsize=(24,11));
     fig = plt.figure(figsize=(23,10));
-    gs = fig.add_gridspec(2,5, hspace=0.05, wspace=0.05, width_ratios=[1.,1.,1.,1.,0.1], height_ratios=[1.,1.])
+    gs = fig.add_gridspec(2,5, hspace=-0.01, wspace=-0.01, width_ratios=[1.,1.,1.,1.,0.1], height_ratios=[1.,1.])
     #gs = fig.add_gridspec(2,4, hspace=0.05, wspace=0.05, width_ratios=[1.,1.,1.,1.], height_ratios=[1.,1.])
 
     #ax0 = fig.add_subplot(gs[:,:-2])
@@ -199,9 +199,11 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
     cb = fig.colorbar(im0, cax=ax5); cb.ax.tick_params(labelsize=FS)
 
     # save
-    plt.tight_layout(h_pad=0.05, w_pad=0.05, rect=[0.,0.,1.,1.]) # need to change this to not have the title overlap, figuring it out still
+    #plt.tight_layout(h_pad=0.05, w_pad=0.05, rect=[0.,0.,1.,1.]) # need to change this to not have the title overlap, figuring it out still
 
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    # note tight layout seems incompatible with gridspec/subplots
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png', bbox_inches='tight')
 
     plt.close()
 
