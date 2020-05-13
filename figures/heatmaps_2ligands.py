@@ -39,6 +39,7 @@ TOTAL_POINTS_KOFF2 = (LOG_END_KOFF2 - LOG_START_KOFF2) * POINTS_BETWEEN_TICKS + 
 KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
 KOFFRANGE2 = np.logspace(LOG_START_KOFF2, LOG_END_KOFF2, TOTAL_POINTS_KOFF2)
 
+
 class MidPointLogNorm(mpl.colors.LogNorm):
     def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
         mpl.colors.LogNorm.__init__(self,vmin=vmin, vmax=vmax, clip=clip)
@@ -48,6 +49,7 @@ class MidPointLogNorm(mpl.colors.LogNorm):
         # simple example...
         x, y = [np.log(self.vmin), np.log(self.midpoint), np.log(self.vmax)], [0, 0.5, 1]
         return np.ma.masked_array(np.interp(np.log(value), x, y))
+
 
 def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True,
                  xy_label_force=None, **kwargs):
@@ -178,7 +180,7 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
 
     # Determinant plot
     #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
-    ax0, cbar0, im0 = heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
+    ax0, cbar0, im0 = heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
     cbar0.remove(); ax0.set_title(r'Det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{off,1}}^2{k_{off,2}}^2$)', fontsize=FS)
 
     # each of the diagonals
