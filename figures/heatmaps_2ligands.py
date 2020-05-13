@@ -180,18 +180,21 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
 
     # Determinant plot
     #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
-    ax0, cbar0, im0 = heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{off,1}}^2{k_{off,2}}^2$)', log_norm=True)
-    cbar0.remove(); ax0.set_title(r'Det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{off,1}}^2{k_{off,2}}^2$)', fontsize=FS)
+    ax0, cbar0, im0 = heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', log_norm=True)
+    cbar0.remove(); ax0.set_title(r'det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', fontsize=FS)
 
     # each of the diagonals
     ax1, cbar1, _ = heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
     cbar1.remove(); ax1.tick_params(labelbottom=False); ax1.tick_params(labelleft=False); ax1.set_xticklabels([]); ax1.set_yticklabels([]); ax1.set_ylabel(''); ax1.xaxis.set_label_position('top'); ax1.set_xlabel(r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$')
+
     a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', log_norm=log_select)
-    cbar2.remove(); ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.xaxis.set_label_position('top'); ax2.set_xlabel(r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$')
+    cbar2.remove(); ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.xaxis.set_label_position('top'); ax2.set_xlabel(r'$\langle \delta {k_{\mathrm{off}}}^2 \rangle / {k_{\mathrm{off}}}^2$')
+
     a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
-    cbar3.remove(); ax3.tick_params(labelbottom=False); ax3.tick_params(labelleft=False); ax3.set_xticklabels([]); ax3.set_yticklabels([]); ax3.set_ylabel(''); ax3.set_xlabel( r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$')
+    cbar3.remove(); ax3.tick_params(labelbottom=False); ax3.tick_params(labelleft=False); ax3.set_xticklabels([]); ax3.set_yticklabels([]); ax3.set_ylabel(''); ax3.xaxis.set_label_position('top'); ax3.set_xlabel( r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$')
+
     a4, cbar4, _ = heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
-    cbar4.remove(); ax4.tick_params(labelbottom=False); ax4.tick_params(labelleft=False); ax4.set_xticklabels([]); ax4.set_yticklabels([]); ax4.set_ylabel(''); ax4.set_xlabel( r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$')
+    cbar4.remove(); ax4.tick_params(labelbottom=False); ax4.tick_params(labelleft=False); ax4.set_xticklabels([]); ax4.set_yticklabels([]); ax4.set_ylabel(''); ax4.xaxis.set_label_position('top'); ax4.set_xlabel( r'$\langle \delta {k_{\mathrm{off},2}}^2 \rangle / {k_{\mathrm{off},2}}^2$')
 
     cb = fig.colorbar(im0, cax=ax5); cb.ax.tick_params(labelsize=FS)
 
@@ -382,13 +385,13 @@ if __name__ == '__main__':
     # axis we'd like to plot
     value = [C1, KOFF, C2, KOFF2]
     label_fig = ['c1', 'koff1', 'c2', 'koff2']
-    label = [r'$c_1$', r'$k_{off,1}$', r'$c_2$', r'$k_{off,2}$']
+    label = [r'$c_1$', r'$k_{\mathrm{off},1}$', r'$c_2$', r'$k_{\mathrm{off},2}$']
     dimension = [CRANGE, KOFFRANGE, CRANGE, KOFFRANGE2]
     axes = label_fig[dim['x']]+ '_' + label_fig[dim['y']]
 
     # for plotting the dedimensionalized values
     dedimension = [dimension[0] * KON / KP, dimension[1] / KP, dimension[2] * KON / KP, dimension[3] / KP]
-    dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{p}$']
+    dedimension_label = [r'$k_{\mathrm{on}}c_1/k_{p}$', r'$k_{\mathrm{off},1}/k_{p}$', r'$k_{\mathrm{on}}c_2/k_{p}$', r'$k_{\mathrm{off},2}/k_{p}$']
     # ratio
     # dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, dimension[3]/dimension[1]]
     # dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{off,1}$']
