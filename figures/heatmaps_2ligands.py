@@ -2,6 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
+import scipy as sp
 import os
 
 import plotting_dictionaries as pd
@@ -25,7 +26,7 @@ FS = 22
 SHOW = False
 
 # axes
-POINTS_BETWEEN_TICKS = 15
+POINTS_BETWEEN_TICKS = 12
 LOG_START_C = -9
 LOG_END_C = -4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
@@ -91,7 +92,7 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     else: fmt = ticker.LogFormatterMathtext()
 
     if log_norm:
-        #vmin = np.min( arr[arr > 0.0] )
+        arr = np.ma.array(arr, mask=( arr<=0.0 ) )
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm(vmin,vmax)}
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': MidPointLogNorm(vmin,vmax,1.0)}
         print("Logscale")
@@ -103,14 +104,9 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     """
     Colours viridis, YlGnBu, terrain, plasma
     """
-    #print 'arr limits:', np.min(arr), np.max(arr)
-
-    #im = plt.imshow(arr, interpolation='spline36', **imshow_kw)
-    arr = np.ma.array(arr, mask=( arr<=0.0 ) )
-    #arr[arr <= ]
 
     im = ax.imshow(arr, interpolation='none', **imshow_kw)
-    #im = plt.imshow(arr, **imshow_kw)
+    #im = plt.imshow(arr, interpolation='spline36', **imshow_kw)
 
     # axes setup
 
@@ -127,8 +123,8 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     #divider = make_axes_locatable(ax) # this does not work, proposed solution online for colorbar for multiplots
     #cax = divider.append_axes("right",size="5%",pad=0.05)
     #cbar = plt.colorbar(im, ax=cax)
+    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04) # Fig 3 way
 
-    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
     cbar.ax.minorticks_off();
     #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001]) # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
@@ -138,12 +134,22 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     CL = ax.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
     ax.clabel(CL, CL.levels, inline=True, fmt=fmt, fontsize=FS-4)
 
-    plt.tight_layout(h_pad=1)
+    #Might be an issue
+    #plt.tight_layout(h_pad=1)
+    plt.tight_layout(h_pad=1,w_pad=1)
 
     return ax, cbar, im
 
 def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=True, log_norm=True,
                  xy_label_force=None, **kwargs):
+    """
+    arr: array to used
+    xrange, yrange: the range for the axis
+    fname: filename to save
+    xy_label: the label of the x,y axis (need this to be an array of 2 values, both strings)
+    show, save: whehther to show or save the plots
+    log_norm: whether or not to have a log norm for the heatmap
+    """
     # Make only 1 heatmap at a time.
 
     f = plt.figure()
@@ -162,6 +168,13 @@ def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=
     return fig, ax
 
 def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
+    """
+    arr*: various 2D arrays to used for heatmap
+    array_x, array_y: the range for the axis
+    fname: filename to save
+    labels: the label of the x,y axis (need this to be an array of 2 values, both strings)
+    log_select: whether or not to have a log norm for the heatmap
+    """
     # makes a figure with many subplots.
 
     #fig = plt.figure(figsize=(24,11));
@@ -247,7 +260,78 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
 
     return fig
 
+def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direction_label):
+    """
+    arr*: various 2D arrays to used for heatmap
+    array_x, array_y: the range for the axis
+    fname: filename to save
+    labels: the label of the x,y axis (need this to be an array of 2 values, both strings)
+    log_select: whether or not to have a log norm for the heatmap
+    """
+    # makes a figure with many subplots, each row is for an eigenvalue
+    flag_multiple = True
+
+    if not flag_multiple:
+        #fig = plt.figure(figsize=(24,11));
+        fig = plt.figure(figsize=(30,24), constrained_layout=True);
+        gs = fig.add_gridspec(4, 5, hspace=-0.12, wspace=0.05, width_ratios=[1., 1., 1., 1., 1.], height_ratios=[1., 1., 1., 1.])
+
+        plot_projection_params = {'vmin' : -1., 'vmax' : 1. }
+
+        for i in [0,1,2,3]:
+            ax = fig.add_subplot(gs[i,0])
+            # plotting eigenvalues
+            plot_eigen_params = {'vmin' : np.min( arrValues[:,:,i]), 'vmax' : np.min( arrValues[:,:,i]), 'cmap_colour' : 'YlGnBu' }
+            heatmap(ax, arrValues[:,:,i], array_x, array_y, labels, '', log_norm=False, **plot_eigen_params )
+            ax.set_title( str(i)+r'$^{th}$ eigenvalue', fontsize=FS )
+
+            for j in [0,1,2,3]:
+                axj = fig.add_subplot(gs[i,1+j])
+                # plotting components of the arrVectors
+                heatmap(axj, arrVectors[:,:,j,i], array_x, array_y, labels, '', log_norm=False, **plot_projection_params)
+                axj.set_title( r'projection on'+direction_label[j], fontsize=FS )
+
+        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')
+        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png', bbox_inches='tight')
+
+        plt.close()
+    else:
+        for i in [0,1,2,3]:
+            #fig = plt.figure(figsize=(30,3), constrained_layout=True);
+            fig = plt.figure(figsize=(30,3), tight_layout=True);
+            fig.set_constrained_layout_pads(w_pad=0.1, h_pad=0.1)
+            gs = fig.add_gridspec(1, 5, hspace=-0.12, wspace=0.05, width_ratios=[1., 1., 1., 1., 1.], height_ratios=[1.])
+
+            plot_projection_params = {'vmin' : -1., 'vmax' : 1. }
+            ax = fig.add_subplot(gs[0,0])
+            # plotting eigenvalues
+            plot_eigen_params = {'vmin' : np.min( arrValues[:,:,i]), 'vmax' : np.min( arrValues[:,:,i]), 'cmap_colour' : 'YlGnBu' }
+            heatmap(ax, arrValues[:,:,i], array_x, array_y, labels, '', log_norm=False, **plot_eigen_params )
+            ax.set_title( str(i)+r'$^{th}$ eigenvalue', fontsize=FS )
+
+            for j in [0,1,2,3]:
+                axj = fig.add_subplot(gs[0,1+j])
+                # plotting components of the arrVectors
+                heatmap(axj, arrVectors[:,:,j,i], array_x, array_y, labels, '', log_norm=False, **plot_projection_params)
+                axj.set_title( r'projection on '+direction_label[j], fontsize=FS )
+
+            plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + str(i) + '.pdf', bbox_inches='tight')
+            plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + str(i) + '.png', bbox_inches='tight')
+
+            plt.close()
+
+
+    return fig
+
+
 def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
+    """
+    arr*: various 2D arrays to used for heatmap
+    array_x, array_y: the range for the axis
+    fname: filename to save
+    labels: the label of the x,y axis (need this to be an array of 2 values, both strings)
+    log_select: whether or not to have a log norm for the heatmap
+    """
     # makes a figure with many subplots.
 
     fig = plt.figure(figsize=(5,20));
@@ -272,6 +356,17 @@ def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labe
     plt.close()
 
     return fig
+
+def eigens_of_sigmaEst(sigmaEst):
+    #value, vector = np.linalg.eig(sigmaEst)
+    value, vector = sp.linalg.eig(sigmaEst)
+
+    # the eigenvalues are not in any particular order: I will order them now
+    idx = value.argsort()
+
+    # returns ordered eigenvalues, smallest to largest
+    return value[idx], vector[:,idx], np.prod(value)
+
 
 
 def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
@@ -344,11 +439,11 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
 
 
 def dmudthetaInv(c1, koff, c2, koff2):
-
+    """ Create the matrix from exported mathematica expressions """
     return eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2), np.linalg.det( eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2) )
 
 def sigmaData(c1, koff, c2, koff2):
-
+    """ Create the matrix from exported mathematica expressions """
     return eqns2l.matrix_sigmadata(c1, koff, c2, koff2), np.linalg.det( eqns2l.matrix_sigmadata(c1, koff, c2, koff2) )
 
 
@@ -444,9 +539,12 @@ if __name__ == '__main__':
     arrRelErrorEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
     arrSigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
     arrDmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
+    arrEigenvalues = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4) )
+    arrEigenvectors = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
 
     # heatmap for the det estimate covariance
     arrDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    arrDetEigenvalue = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrDetSigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrDetDmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrRelDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
@@ -468,22 +566,23 @@ if __name__ == '__main__':
             value[dim['y']] = yi
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
+            arrEigenvalues[j,i,:], arrEigenvectors[j,i,:,:], arrDetEigenvalue[j,i] = eigens_of_sigmaEst( arrSigmaEst[j,i,:,:] )
     print("Done computing matrices\n Plotting results")
     ver = "new_"
     multi_fname = "multi_" + ver + axes
 
     if flag_general:
         # Here I have selected the plots I want, when we are making individual heatmaps. LOG_SELECT is kinda old, used to be for when we didn't want log colorbar, but we nearly always want it now
-        """
-        LOG_SELECT = True
-        single_heatmap(arrDetSigmaEst[:,:], dedimension[dim['x']], dedimension[dim['y']], 'DetSigmaEst_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Det($\Sigma_{est}$)', log_norm=LOG_SELECT)
-        single_heatmap(arrDetSigmaData[:,:], dedimension[dim['x']], dedimension[dim['y']], 'DetSigmaData_'+axes, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], r'Det($\Sigma_{data}$)', log_norm=LOG_SELECT)
-        """
 
-        # make a figure with multiple subplots
+        # make a Fig3 from paper
+        """
         multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
-        # fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst,  dedimension[dim['x']],  dedimension[dim['y']], multi_fname, [ dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
+        """
+
+        # Eigenvalue plots
+        #eigen_heatmaps( arrEigenvalues, arrEigenvectors, dedimension[dim['x']], dedimension[dim['y']], 'eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], label)
+        single_heatmap( arrDetEigenvalue, dedimension[dim['x']], dedimension[dim['y']], 'det_eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], 'determinant', log_norm=True)
         """
         # covariance
         multi_dcov_fname = "multi_jacob_"+ver+axes
