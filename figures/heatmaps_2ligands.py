@@ -241,9 +241,9 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
     cbar1.remove(); ax1.tick_params(labelbottom=False); ax1.set_xticklabels([]);  ax1.set_xlabel('')
     ax1.set_title(r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', fontsize=FS)
 
-    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', less_xticks=True, log_norm=log_select)
+    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off},1}^2 \rangle / {k_{off},1}^2$', less_xticks=True, log_norm=log_select)
     cbar2.remove(); ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.set_xlabel('')
-    ax2.set_title(r'$\langle \delta {k_{\mathrm{off}}}^2 \rangle / {k_{\mathrm{off}}}^2$', fontsize=FS)
+    ax2.set_title(r'$\langle \delta {k_{\mathrm{off},1}}^2 \rangle / {k_{\mathrm{off},1}}^2$', fontsize=FS)
 
     a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', less_xticks=True, log_norm=log_select)
     cbar3.remove()
