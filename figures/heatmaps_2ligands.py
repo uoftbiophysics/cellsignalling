@@ -26,7 +26,7 @@ FS = 22
 SHOW = False
 
 # axes
-POINTS_BETWEEN_TICKS = 12
+POINTS_BETWEEN_TICKS = 10
 LOG_START_C = -9
 LOG_END_C = -4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
@@ -66,7 +66,11 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     if 'levels' in kwargs.keys(): levels = kwargs['levels']
     else: levels = [1E0]#, 1E5, 1E10, 1E20]
 
-    if 'vmin' in kwargs.keys(): vmin = kwargs['vmin']
+    if 'vmin' in kwargs.keys():
+        if log_norm:
+            vmin = 1E-14
+        else:
+            vmin = kwargs['vmin']
     else: vmin = 1E-3#np.min(arr)#1E-3#
 
     if 'vmax' in kwargs.keys(): vmax = kwargs['vmax']
@@ -270,6 +274,31 @@ def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direc
     """
     # makes a figure with many subplots, each row is for an eigenvalue
     flag_multiple = True
+    eigenvalues = True
+
+    if eigenvalues:
+
+        vmin_mathematica = [3E-13, 3E-13, 0.00010, 4]
+        vmax_mathematica = [7E-13, 7E-13, 0.00030, 6]
+        vmin_mathematica = [np.min(arrValues[:,:,0]), np.min(arrValues[:,:,1]), np.min(arrValues[:,:2]), np.min(arrValues[:,:,3])]
+        vmax_mathematica = [np.max(arrValues[:,:,0]), np.max(arrValues[:,:,1]), np.max(arrValues[:,:2]), np.max(arrValues[:,:,3])]
+
+        fig = plt.figure(figsize=(3,20), tight_layout=True);
+        fig.set_constrained_layout_pads(w_pad=0.1, h_pad=0.1)
+        gs = fig.add_gridspec(4, 1, hspace=-0.12, wspace=0.05, width_ratios=[1.], height_ratios=[ 1., 1., 1., 1.])
+
+        for i in [0,1,2,3]:
+            #fig = plt.figure(figsize=(30,3), constrained_layout=True);
+            ax = fig.add_subplot(gs[i,0])
+            # plotting eigenvalues
+            arrayEval = np.sign(arrValues[:,:,i])
+            arrayEval = arrValues[:,:,i]
+            plot_eigen_params = {'vmin' : vmin_mathematica[i], 'vmax' : vmax_mathematica[i], 'cmap_colour' : 'YlGnBu' }
+            heatmap(ax, arrayEval, array_x, array_y, labels, '', log_norm=False, **plot_eigen_params )
+            ax.set_title( str(i)+r'$^{th}$ eigenvalue', fontsize=FS )
+
+        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')
+        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png', bbox_inches='tight')
 
     if not flag_multiple:
         #fig = plt.figure(figsize=(24,11));
@@ -281,7 +310,7 @@ def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direc
         for i in [0,1,2,3]:
             ax = fig.add_subplot(gs[i,0])
             # plotting eigenvalues
-            plot_eigen_params = {'vmin' : np.min( arrValues[:,:,i]), 'vmax' : np.min( arrValues[:,:,i]), 'cmap_colour' : 'YlGnBu' }
+            plot_eigen_params = {'vmin' : np.min( arrValues[:,:,i]), 'vmax' : np.max( arrValues[:,:,i]), 'cmap_colour' : 'YlGnBu' }
             heatmap(ax, arrValues[:,:,i], array_x, array_y, labels, '', log_norm=False, **plot_eigen_params )
             ax.set_title( str(i)+r'$^{th}$ eigenvalue', fontsize=FS )
 
@@ -303,10 +332,17 @@ def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direc
             gs = fig.add_gridspec(1, 5, hspace=-0.12, wspace=0.05, width_ratios=[1., 1., 1., 1., 1.], height_ratios=[1.])
 
             plot_projection_params = {'vmin' : -1., 'vmax' : 1. }
+
+            # black and white projection
+            plot_projection_params = {'vmin' : 0., 'vmax' : 1. , 'cmap_colour' : 'gray_r' }
+
             ax = fig.add_subplot(gs[0,0])
             # plotting eigenvalues
-            plot_eigen_params = {'vmin' : np.min( arrValues[:,:,i]), 'vmax' : np.min( arrValues[:,:,i]), 'cmap_colour' : 'YlGnBu' }
-            heatmap(ax, arrValues[:,:,i], array_x, array_y, labels, '', log_norm=False, **plot_eigen_params )
+            arrayEval = np.sign(arrValues[:,:,i])
+            arrayEval = arrValues[:,:,i]
+            arrayEval = np.absolute(arrValues[:,:,i])
+            plot_eigen_params = {'vmin' : np.min( arrayEval ), 'vmax' : np.max( arrayEval ), 'cmap_colour' : 'YlGnBu' }
+            heatmap(ax, arrayEval, array_x, array_y, labels, '', log_norm=False, **plot_eigen_params )
             ax.set_title( str(i)+r'$^{th}$ eigenvalue', fontsize=FS )
 
             for j in [0,1,2,3]:
@@ -317,6 +353,7 @@ def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direc
 
             plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + str(i) + '.pdf', bbox_inches='tight')
             plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + str(i) + '.png', bbox_inches='tight')
+            print("done 1")
 
             plt.close()
 
@@ -511,7 +548,7 @@ if __name__ == '__main__':
 
     flag_general = True
     flag_compare_2ligands_vs_1ligand = False
-    ADD_TRACE_TERM = True
+    ADD_TRACE_TERM = False
     LOG_SELECT = True
 
     # choose any of these 2 to be arrays [0: c1, 1: koff, 2: c2, 3: koff2], they will be your axes
@@ -549,6 +586,15 @@ if __name__ == '__main__':
     arrDetDmudthetaInv = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrRelDetSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
 
+
+    arraySE, _, _, _ = sigmaEst(value[0], value[1], 1E-5, 398.1071705534973, add_trace_term=False) # negative eigenvalue
+    arraySE, _, _, _ = sigmaEst(value[0], value[1], 1.9952623149688828E-9, 1E3, add_trace_term=False)  # zero eigenvalue
+    arraySE, _, _, _ = sigmaEst(value[0], value[1], 1E-6, 1E0, add_trace_term=False)  # zero eigenvalue
+    arrayEval, arrayEvec, _ = eigens_of_sigmaEst( arraySE )
+    print(arrayEval, arrayEvec)
+    #exit()
+
+
     # making our heatmap
     num_heatmap_points = len(dimension[dim['x']]) * len(dimension[dim['y']])
     pixel_num = 0.0
@@ -566,7 +612,9 @@ if __name__ == '__main__':
             value[dim['y']] = yi
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
-            arrEigenvalues[j,i,:], arrEigenvectors[j,i,:,:], arrDetEigenvalue[j,i] = eigens_of_sigmaEst( arrSigmaEst[j,i,:,:] )
+            arrEigenvalues[j,i,:], arrEigenvectors[j,i,:,:], arrDetEigenvalue[j,i] = eigens_of_sigmaEst( arrRelErrorEst[j,i,:,:] )
+            #if arrEigenvalues[j,i,0] == 0.0:
+            #    print(value[2],value[3])
     print("Done computing matrices\n Plotting results")
     ver = "new_"
     multi_fname = "multi_" + ver + axes
@@ -581,7 +629,7 @@ if __name__ == '__main__':
         """
 
         # Eigenvalue plots
-        #eigen_heatmaps( arrEigenvalues, arrEigenvectors, dedimension[dim['x']], dedimension[dim['y']], 'eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], label)
+        eigen_heatmaps( arrEigenvalues, arrEigenvectors, dedimension[dim['x']], dedimension[dim['y']], 'eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], label)
         single_heatmap( arrDetEigenvalue, dedimension[dim['x']], dedimension[dim['y']], 'det_eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], 'determinant', log_norm=True)
         """
         # covariance
