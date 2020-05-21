@@ -22,7 +22,7 @@ from settings import DIR_OUTPUT, DIR_INPUT, KON, KP, T, KF, ALPHA, C1, C2, KOFF,
 plt.style.use('parameters.mplstyle')  # particularIMporting
 
 # plot params
-FS = 22
+FS = 8
 SHOW = False
 
 # axes
@@ -52,7 +52,8 @@ class MidPointLogNorm(mpl.colors.LogNorm):
         return np.ma.masked_array(np.interp(np.log(value), x, y))
 
 
-def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_force=None, **kwargs):
+def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_force=None, less_xticks=False,
+            skip_cbar=False, **kwargs):
     """
     xrange: range of values for x
     yrange: range of y values
@@ -78,7 +79,7 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
         if np.max(arr) > 1E10:
             vmax = 1E5
         else:
-            vmax = 1E5#np.max(arr)#1E5#
+            vmax = 1E5 #np.max(arr)#1E5#
 
     if 'contour_linestyle' in kwargs.keys(): contour_linestyle = kwargs['contour_linestyle']
     else: contour_linestyle = '-'
@@ -87,7 +88,7 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     else: contour_color = 'k'
 
     if 'contour_linewidths' in kwargs.keys(): contour_lindewidths = kwargs['contour_linewidths']
-    else: contour_lindewidths = 2
+    else: contour_lindewidths = 1.2
 
     if 'cmap_colour' in kwargs.keys(): cmap_colour = kwargs['cmap_colour']
     else: cmap_colour = 'RdBu_r'#'YlGnBu'
@@ -115,9 +116,13 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     # axes setup
 
     # axes log scaled
-    ax.set_xticks([i for i, cval in enumerate(xrange) if i % POINTS_BETWEEN_TICKS == 0])
+    if less_xticks:
+        ax.set_xticks([i for i, xval in enumerate(xrange) if (i % POINTS_BETWEEN_TICKS==0 and np.log10(xval)%2 == 0)])
+        ax.set_xticklabels([r'$10^{%d}$' % np.log10(xval) for i, xval in enumerate(xrange) if (i % POINTS_BETWEEN_TICKS==0 and np.log10(xval)%2 == 0)], fontsize=FS)
+    else:
+        ax.set_xticks([i for i, cval in enumerate(xrange) if i % POINTS_BETWEEN_TICKS == 0])
+        ax.set_xticklabels([r'$10^{%d}$' % np.log10(xval) for i, xval in enumerate(xrange) if (i % POINTS_BETWEEN_TICKS==0)], fontsize=FS)
     ax.set_yticks([i for i, kval in enumerate(yrange) if i % POINTS_BETWEEN_TICKS == 0])
-    ax.set_xticklabels([r'$10^{%d}$' % np.log10(xval) for i, xval in enumerate(xrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
     ax.set_yticklabels([r'$10^{%d}$' % np.log10(yval) for i, yval in enumerate(yrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
 
     ax.invert_yaxis()
@@ -127,22 +132,27 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     #divider = make_axes_locatable(ax) # this does not work, proposed solution online for colorbar for multiplots
     #cax = divider.append_axes("right",size="5%",pad=0.05)
     #cbar = plt.colorbar(im, ax=cax)
-    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04) # Fig 3 way
+    if skip_cbar:
+        cbar = None
+    else:
+        cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04) # Fig 3 way
 
-    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
-    cbar.ax.minorticks_off();
-    #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001]) # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
-    cbar.update_ticks()
+        cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=-20); cbar.ax.tick_params(labelsize=FS)
+        cbar.ax.minorticks_off();
+        #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001]) # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
+        cbar.update_ticks()
+
 
     # TODO IDK why do ticks hide sometimes?
     CL = ax.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
-    ax.clabel(CL, CL.levels, inline=True, fmt=fmt, fontsize=FS-4)
+    ax.clabel(CL, CL.levels, inline=True, fmt=fmt, fontsize=FS-2)
 
     #Might be an issue
     #plt.tight_layout(h_pad=1)
     plt.tight_layout(h_pad=1,w_pad=1)
 
     return ax, cbar, im
+
 
 def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=True, log_norm=True,
                  xy_label_force=None, **kwargs):
@@ -171,6 +181,7 @@ def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=
     plt.close()
     return fig, ax
 
+
 def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select):
     """
     arr*: various 2D arrays to used for heatmap
@@ -182,13 +193,19 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
     # makes a figure with many subplots.
 
     #fig = plt.figure(figsize=(24,11));
-    fig = plt.figure(figsize=(23,10));
     #gs = fig.add_gridspec(2,4, hspace=0.05, wspace=0.05, width_ratios=[1.,1.,1.,1.], height_ratios=[1.,1.])
 
     #ax0 = fig.add_subplot(gs[:,:-2])
+    layout_horizontal = False
     det_on_left = False
-    if det_on_left:
-        gs = fig.add_gridspec(2, 6, hspace=-0.01, wspace=0.05, width_ratios=[1., 1., 0.08, 1., 1., 0.1], height_ratios=[1., 1.])
+
+    if layout_horizontal:
+        fig = plt.figure(figsize=(7, 3.2))
+    else:
+        fig = plt.figure(figsize=(4.6, 8.4))
+
+    if layout_horizontal and det_on_left:
+        gs = fig.add_gridspec(2, 6, hspace=-0.14, wspace=0.05, width_ratios=[1., 1., 0.08, 1., 1., 0.1], height_ratios=[1., 1.])
 
         ax0 = fig.add_subplot(gs[:,:2])  # the det
         ax1 = fig.add_subplot(gs[0,3])
@@ -197,30 +214,8 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
         ax4 = fig.add_subplot(gs[1,4])
         ax5 = fig.add_subplot(gs[:,-1])   # the cbar
 
-        # Determinant plot
-        """
-        #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
-        ax0, cbar0, im0 = heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', log_norm=True)
-        cbar0.remove(); ax0.set_title(r'det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', fontsize=FS)
-
-        # each of the diagonals
-        ax1, cbar1, _ = heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
-        cbar1.remove(); ax1.tick_params(labelbottom=False); ax1.tick_params(labelleft=False); ax1.set_xticklabels([]); ax1.set_yticklabels([]); ax1.set_ylabel(''); ax1.xaxis.set_label_position('top'); ax1.set_xlabel(r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$')
-
-        a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', log_norm=log_select)
-        cbar2.remove(); ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.xaxis.set_label_position('top'); ax2.set_xlabel(r'$\langle \delta {k_{\mathrm{off}}}^2 \rangle / {k_{\mathrm{off}}}^2$')
-
-        a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
-        cbar3.remove(); ax3.tick_params(labelbottom=False); ax3.tick_params(labelleft=False); ax3.set_xticklabels([]); ax3.set_yticklabels([]); ax3.set_ylabel(''); ax3.xaxis.set_label_position('top'); ax3.set_xlabel( r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$')
-
-        a4, cbar4, _ = heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
-        cbar4.remove(); ax4.tick_params(labelbottom=False); ax4.tick_params(labelleft=False); ax4.set_xticklabels([]); ax4.set_yticklabels([]); ax4.set_ylabel(''); ax4.xaxis.set_label_position('top'); ax4.set_xlabel( r'$\langle \delta {k_{\mathrm{off},2}}^2 \rangle / {k_{\mathrm{off},2}}^2$')
-
-        cb = fig.colorbar(im0, cax=ax5); cb.ax.tick_params(labelsize=FS)
-        """
-
-    else:
-        gs = fig.add_gridspec(2, 6, hspace=-0.12, wspace=0.05, width_ratios=[1., 1., 0.2, 1., 1., 0.1], height_ratios=[1., 1.])
+    elif layout_horizontal:
+        gs = fig.add_gridspec(2, 6, hspace=0.0, wspace=0.05, width_ratios=[1., 1., 0.4, 1., 1., 0.1], height_ratios=[1., 1.])
 
         ax0 = fig.add_subplot(gs[:,3:5])  # the det
         ax1 = fig.add_subplot(gs[0,0])
@@ -229,32 +224,39 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
         ax4 = fig.add_subplot(gs[1,1])
         ax5 = fig.add_subplot(gs[:,-1])   # the cbar
 
+    else:
+        gs = fig.add_gridspec(8, 8, hspace=0.2, wspace=-0.1,
+                              width_ratios=[0.4, 0.15, 0.4, 1.2, 1.2, 0.4, 0.15, 0.4],
+                              height_ratios=[1., 0.07, 1., 0.01, 0.1, 1., 1, 0.1])
+        ax0 = fig.add_subplot(gs[4:, 1:5])  # the det
+        ax1 = fig.add_subplot(gs[0, 0:4])
+        ax2 = fig.add_subplot(gs[0, 4:])
+        ax3 = fig.add_subplot(gs[2, 0:4])
+        ax4 = fig.add_subplot(gs[2, 4:])
+        ax5 = fig.add_subplot(gs[5:7, -2])  # the cbar
+
     # Determinant plot
     #heatmap(ax0, arrDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)', log_norm=True)
-    ax0, cbar0, im0 = heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', log_norm=True)
-    cbar0.remove(); ax0.set_title(r'det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', fontsize=FS)
+    ax0, cbar0, im0 = heatmap(ax0, arrRelDetSigmaEst[:,:], array_x, array_y, labels, r'Det($\Sigma_{est}$)/(${c_1}^2{c_1}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', log_norm=True, skip_cbar=True)
+    ax0.set_title(r'det($\Sigma_{est}$)/(${c_1}^2{c_2}^2{k_{\mathrm{off},1}}^2{k_{\mathrm{off},2}}^2$)', fontsize=FS)
 
     # each of the diagonals
-    ax1, cbar1, _ = heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', log_norm=log_select)
-    cbar1.remove(); ax1.tick_params(labelbottom=False); ax1.set_xticklabels([]);  ax1.set_xlabel('')
+    ax1, cbar1, _ = heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True)
+    ax1.tick_params(labelbottom=False); ax1.set_xticklabels([]);  ax1.set_xlabel('')
     ax1.set_title(r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', fontsize=FS)
 
-    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off}}^2 \rangle / {k_{off}}^2$', log_norm=log_select)
-    cbar2.remove(); ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.set_xlabel('')
-    ax2.set_title(r'$\langle \delta {k_{\mathrm{off}}}^2 \rangle / {k_{\mathrm{off}}}^2$', fontsize=FS)
+    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off},1}^2 \rangle / {k_{off},1}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True)
+    ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.set_xlabel('')
+    ax2.set_title(r'$\langle \delta {k_{\mathrm{off},1}}^2 \rangle / {k_{\mathrm{off},1}}^2$', fontsize=FS)
 
-    a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', log_norm=log_select)
-    cbar3.remove()
+    a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True)
     ax3.set_title(r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', fontsize=FS)
 
-    a4, cbar4, _ = heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
-    cbar4.remove(); ax4.tick_params(labelleft=False); ax4.set_yticklabels([]); ax4.set_ylabel('')
+    a4, cbar4, _ = heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True)
+    ax4.tick_params(labelleft=False); ax4.set_yticklabels([]); ax4.set_ylabel('')
     ax4.set_title(r'$\langle \delta {k_{\mathrm{off},2}}^2 \rangle / {k_{\mathrm{off},2}}^2$', fontsize=FS)
 
-    cb = fig.colorbar(im0, cax=ax5, fraction=0.9); cb.ax.tick_params(labelsize=FS)
-
-    # save
-    #plt.tight_layout(h_pad=0.05, w_pad=0.05, rect=[0.,0.,1.,1.]) # need to change this to not have the title overlap, figuring it out still
+    cb = fig.colorbar(im0, cax=ax5, fraction=0.8); cb.ax.tick_params(labelsize=FS)
 
     # note tight layout seems incompatible with gridspec/subplots
     plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')
@@ -263,6 +265,7 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
     plt.close()
 
     return fig
+
 
 def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direction_label):
     """
@@ -357,7 +360,6 @@ def eigen_heatmaps(arrValues, arrVectors, array_x, array_y, fname, labels, direc
 
             plt.close()
 
-
     return fig
 
 
@@ -394,6 +396,7 @@ def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labe
 
     return fig
 
+
 def eigens_of_sigmaEst(sigmaEst):
     #value, vector = np.linalg.eig(sigmaEst)
     value, vector = sp.linalg.eig(sigmaEst)
@@ -403,7 +406,6 @@ def eigens_of_sigmaEst(sigmaEst):
 
     # returns ordered eigenvalues, smallest to largest
     return value[idx], vector[:,idx], np.prod(value)
-
 
 
 def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
@@ -478,6 +480,7 @@ def sigmaEst(c1, koff, c2, koff2, add_trace_term=True):
 def dmudthetaInv(c1, koff, c2, koff2):
     """ Create the matrix from exported mathematica expressions """
     return eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2), np.linalg.det( eqns2l.matrix_dmudthetaInv(c1, koff, c2, koff2) )
+
 
 def sigmaData(c1, koff, c2, koff2):
     """ Create the matrix from exported mathematica expressions """
@@ -623,10 +626,8 @@ if __name__ == '__main__':
         # Here I have selected the plots I want, when we are making individual heatmaps. LOG_SELECT is kinda old, used to be for when we didn't want log colorbar, but we nearly always want it now
 
         # make a Fig3 from paper
-        """
         multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
-        """
 
         # Eigenvalue plots
         eigen_heatmaps( arrEigenvalues, arrEigenvectors, dedimension[dim['x']], dedimension[dim['y']], 'eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], label)
