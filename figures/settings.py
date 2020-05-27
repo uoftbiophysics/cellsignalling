@@ -14,7 +14,7 @@ for dirs in [DIR_INPUT, DIR_OUTPUT]:
 # globals for heatmaps and equations (to prevent circular imports)
 KON = 1E5
 KP = 1.
-T = 1E3
+T = 1E2
 KF = None
 ALPHA = 0.2
 C1 = 1E-6 # concentration nano to micro molar
