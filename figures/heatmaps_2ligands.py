@@ -294,10 +294,10 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
     ax4.set_title(r'%s$\frac{\langle \delta {k_{\mathrm{off},2}}^2 \rangle}{{k_{\mathrm{off},2}}^2}$' % scalelabel, fontsize=FS)
 
     cb_det = fig.colorbar(im0, cax=ax5, fraction=0.8); cb_det.ax.tick_params(labelsize=FS)
-    if rescale:
+    """if rescale:
         cb_det_yticks = [1E0, 1E2, 1E4, 1E6, 1E8, 1E10, 1E12]
         cb_det.ax.set_yticks(cb_det_yticks)  # TODO make less manual
-        cb_det.ax.set_yticklabels([r'$10^{%d}$' % np.log10(a) for a in cb_det_yticks])  # TODO make less manual
+        cb_det.ax.set_yticklabels([r'$10^{%d}$' % np.log10(a) for a in cb_det_yticks])  # TODO make less manual"""
 
     if rescale:
         cb_diags = fig.colorbar(im1, cax=ax6, fraction=0.8); cb_diags.ax.tick_params(labelsize=FS)
