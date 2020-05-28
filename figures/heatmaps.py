@@ -27,8 +27,8 @@ SHOW = False
 
 # axes
 POINTS_BETWEEN_TICKS = 10
-LOG_START_C = -2
-LOG_END_C = 4
+LOG_START_C = -9
+LOG_END_C = -4
 TOTAL_POINTS_C = (LOG_END_C - LOG_START_C) * POINTS_BETWEEN_TICKS + 1
 CRANGE = np.logspace(LOG_START_C, LOG_END_C, TOTAL_POINTS_C)
 LOG_START_KOFF = -2
@@ -1039,6 +1039,84 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
                  xy_label_force=xy_label_force, show=True, save=True, log_norm=True, dedim=False, **contour_args)
     return
 
+def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
+    figname1 = 'Figure_1E'
+    figname2 = 'Figure_2B'
+    font_size = 8
+
+    mpl.rcParams['xtick.labelsize'] = font_size
+    mpl.rcParams['ytick.labelsize'] = font_size
+
+    vecErrorX1 = eqns.dedimRelErrorX1NoTrace(crange, koff);
+    vecRelErrorEst2C = eqns.dedimRelErrC2NoTrace(crange, koff);
+    vecRelErrorEst2K = eqns.dedimRelErrK2NoTrace(crange, koff);
+
+    # plot
+    plt.figure(figsize=(3.4, 3.2))
+    ax = plt.gca()
+
+    plt.plot(crange*KON/KP,vecErrorX1/N, color='purple')
+    ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
+    ax.set_xscale('log')
+    ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta x^{2}\rangle} {x^{2}}$',fontsize=font_size)
+    ax.set_xlim([1E-4, 1E1])
+    #plt.ylim([0, 0.01*alpha])
+    plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.eps')
+
+    plt.show()
+
+    # plot
+    plt.figure(figsize=(3.4, 3.2))
+    ax = plt.gca()
+
+    plt.plot(crange*KON/KP,vecRelErrorEst2C/N, color='purple', label=r'$c$')
+    plt.plot(crange*KON/KP,vecRelErrorEst2K/N, color='orangered', label=r'$k_{\mathrm{off}}$')
+    plt.legend()
+    ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
+    ax.set_xscale('log')
+    ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle}{(\cdot)^{2}}$',fontsize=font_size)
+    ax.set_xlim([1E-4, 1E1])
+    #plt.ylim([0, 0.01*alpha])
+    plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.eps')
+
+    plt.show()
+
+    """
+    ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle$}{$(\cdot)^{2}}$',fontsize=FS)
+    if label_style == 0:
+        ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$c$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{off}$', zorder=1)
+        #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
+
+    elif label_style == 1:
+        ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
+        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
+        plt.ylabel(r'$\langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
+
+    # axis
+    ax1.set_xlabel(r'$k_{on}c/k_{p}$')
+    ax1.set_ylabel(r'$k_{p}t \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
+    #ax2.set_xlabel(r'$k_{off}$')
+
+    ax1.set_xscale('log')
+    ax2.set_xscale('log')
+    ax1.set_xlim([1E-2, 1E2])
+    ax2.set_xlim([1E-2, 1E2])
+    plt.ylim([0, 0.01*alpha])
+
+    lns = ln1 + ln2
+    labs = [l.get_label() for l in lns]
+    ax1.legend(lns, labs)
+
+    plt.tight_layout()
+    # save figure
+    """
+
+
+
 
 if __name__ == '__main__':
     """
@@ -1048,6 +1126,9 @@ if __name__ == '__main__':
     There are 2 types of dictionaries: ratios or 1 equation. Depending on what type of dictionary you create, you will want to use the respoective plotting function above (ether plot_dictionary_one_equation or plot_dictionary_ratio)
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
+    """
+    plot_1E_and_2B()
+    exit()
     """
     dk_plotting()
     exit()
@@ -1065,3 +1146,4 @@ if __name__ == '__main__':
     #                     'vmin': 1.0}
 
     custom_ratio_diagram(contour_args=contour_args_SI)
+    """

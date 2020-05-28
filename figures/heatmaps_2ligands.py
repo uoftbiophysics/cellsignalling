@@ -720,7 +720,7 @@ if __name__ == '__main__':
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
 
         figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2KOFF, dedimension[dim['x']], dedimension[dim['y']], 'Fig1D', 'Fig2C', 'Fig2D',
-                          [r'$c$', r'$k_{\mathrm{off}}$',], LOG_SELECT) # need the -2 to get the correct axis label
+                          [r'$k_{\mathrm{on}}c/k_{p}$', r'$k_{\mathrm{off}}/k_{p}$'], LOG_SELECT) # need the -2 to get the correct axis label
 
         # Eigenvalue plots
         #eigen_heatmaps( arrEigenvalues, arrEigenvectors, dedimension[dim['x']], dedimension[dim['y']], 'eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], label)
