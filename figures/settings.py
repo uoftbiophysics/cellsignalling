@@ -21,6 +21,7 @@ C1 = 1E-6 # concentration nano to micro molar
 C2 = 1E-6
 KOFF = 1E-2 # roughly 10^-2
 KOFF2 = 1E0
+N = 1E2
 
 # color = plt.cm.get_cmap('Classic', 10)  # unnecessary unless you want different colors
 colour_palette = sns.color_palette("muted", 10)

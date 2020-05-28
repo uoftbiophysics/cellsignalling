@@ -10,7 +10,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import equations2ligands as eqns2l
 import equations as eqns
 
-from settings import DIR_OUTPUT, DIR_INPUT, KON, KP, T, KF, ALPHA, C1, C2, KOFF, KOFF2
+from settings import DIR_OUTPUT, DIR_INPUT, KON, KP, T, KF, ALPHA, C1, C2, KOFF, KOFF2, N
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
 
@@ -172,6 +172,44 @@ def single_heatmap(arr, xrange, yrange, fname, xy_label, label, show=SHOW, save=
 
     plt.close()
     return fig, ax
+
+def figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2KOFF, array_x, array_y, fname1, fname2, fname3, labels, log_select):
+    """
+    Makes figures 1D, 2C,D for our papers.
+    """
+
+    arr1 = arrRelErrorEst1X/N
+    args1 = {'vmin': np.min(arr1), 'vmax': np.max(arr1), 'levels' : [1E-1, 1E0, 1E1, 1E2]}
+    arr2 = arrRelErrorEst2C/N
+    args2 = {'vmin': np.min(arr2), 'vmax': np.max(arr2), 'levels' : [1E-1, 1E0, 1E1, 1E2]}
+    arr3 = arrRelErrorEst2KOFF/N
+    args3 = {'vmin': np.min(arr3), 'vmax': np.max(arr3), 'levels' : [1E-1, 1E0, 1E1, 1E2]}
+
+    args4 = {'vmin': np.min(arr2), 'vmax': np.max(arr3), 'levels' : [1E-1, 1E0, 1E1, 1E2], 'level_label' : [r'$0.01 k_p t$', r'$0.1 k_p t$', r'$1 k_p t$', r'$10 k_p t$']}
+
+
+    fig0 = plt.figure(figsize=(3.2, 3.0)); fig0 = plt.gcf(); ax0 = plt.gca()
+    # axes setup
+    ax0, cbar0, im0 = heatmap(ax0, arr1, array_x, array_y, labels, '', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args1)
+    ax0.set_title(r'$\frac{k_p t}{N} \frac{\langle\delta x^{2}\rangle}{x^{2}}$', fontsize=FS)
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    plt.close()
+
+    fig1 = plt.figure(figsize=(3.2, 3.0)); fig1 = plt.gcf(); ax1 = plt.gca()
+    # axes setup
+    ax1, cbar1, im1 = heatmap(ax1, arr2, array_x, array_y, labels, r'', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args2)
+    ax1.set_title(r'$\frac{k_p t}{N} \frac{\langle\delta c^{2}\rangle}{c^{2}}$', fontsize=FS)
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname2 + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname2 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    plt.close()
+
+    fig2 = plt.figure(figsize=(3.2, 3.0)); fig2 = plt.gcf(); ax2 = plt.gca()
+    # axes setup
+    ax2, cbar2, im2 = heatmap(ax2, arr3, array_x, array_y, labels, r'', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args3)
+    ax2.set_title(r'$\frac{k_p t}{N} \frac{\langle{\delta k_{off}^2}\rangle}{k_{off}^{2}}$', fontsize=FS)
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    plt.close()
+
+    return fig0, fig1, fig2
 
 
 def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select, rescale=True):
@@ -618,6 +656,11 @@ if __name__ == '__main__':
     # dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, (dimension[3]-dimension[1])/KP]
     # dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$(k_{off,2}-k_{off,1})/k_{p}$']
 
+    # Figure 1 and 2 heatmaps
+    arrRelErrorEst1X = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    arrRelErrorEst2C = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+    arrRelErrorEst2KOFF = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
+
     # heatmap for any element of sigmaEst(4x4 matrix)
     arrSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
     arrRelErrorEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
@@ -660,6 +703,9 @@ if __name__ == '__main__':
             arrSigmaEst[j, i, :, :], arrDetSigmaEst[j, i], arrRelErrorEst[j, i, :, :], arrRelDetSigmaEst[j,i] = \
                 sigmaEst(value[0], value[1], value[2], value[3], add_trace_term=ADD_TRACE_TERM)
             arrEigenvalues[j,i,:], arrEigenvectors[j,i,:,:], arrDetEigenvalue[j,i] = eigens_of_sigmaEst( arrRelErrorEst[j,i,:,:] )
+            arrRelErrorEst1X[j,i] = eqns.dedimRelErrorX1NoTrace(value[2], value[3]);
+            arrRelErrorEst2C[j,i] = eqns.dedimRelErrC2NoTrace(value[2], value[3]);
+            arrRelErrorEst2KOFF[j,i] = eqns.dedimRelErrK2NoTrace(value[2], value[3]);
             #if arrEigenvalues[j,i,0] == 0.0:
             #    print(value[2],value[3])
     print("Done computing matrices\n Plotting results")
@@ -672,6 +718,9 @@ if __name__ == '__main__':
         # make a Fig3 from paper
         multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, dedimension[dim['x']], dedimension[dim['y']], multi_fname,
                           [dedimension_label[dim['x']], dedimension_label[dim['y']]], LOG_SELECT)
+
+        figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2KOFF, dedimension[dim['x']], dedimension[dim['y']], 'Fig1D', 'Fig2C', 'Fig2D',
+                          [r'$c$', r'$k_{\mathrm{off}}$',], LOG_SELECT) # need the -2 to get the correct axis label
 
         # Eigenvalue plots
         #eigen_heatmaps( arrEigenvalues, arrEigenvectors, dedimension[dim['x']], dedimension[dim['y']], 'eigen_plots', [dedimension_label[dim['x']], dedimension_label[dim['y']]], label)

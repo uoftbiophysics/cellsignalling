@@ -1038,13 +1038,13 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
-    #dk_plotting()
-    #exit()
+    dk_plotting()
+    exit()
     dictionary = pd.MAIN; dictionary_SI = pd.SI_ALT_RATIO
     want_dedim = True; subdir_2_use = 'heatmaps'
 
     contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01, 1.1, 10.0, 100.0, 1000.0], 'fmt' : '%.2f'}
-    heatmap_figure_4()
+    #heatmap_figure_4()
     #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
     #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 

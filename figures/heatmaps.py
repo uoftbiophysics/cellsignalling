@@ -12,7 +12,7 @@ from decimal import Decimal
 #from load_inputs import DATADICT
 from settings import DIR_OUTPUT, DIR_INPUT
 from settings import COLOR_SCHEME as cs
-from settings import KON, KP, T, KF, ALPHA
+from settings import KON, KP, T, KF, ALPHA, N
 
 
 plt.style.use('parameters.mplstyle')  # particularIMporting
@@ -39,6 +39,15 @@ KOFFRANGE = np.logspace(LOG_START_KOFF, LOG_END_KOFF, TOTAL_POINTS_KOFF)
 CTILDERANGE = np.divide(list(CRANGE), c0)
 ZRANGE = np.divide(list(KOFFRANGE), KP)
 
+class MidPointLogNorm(mpl.colors.LogNorm):
+    def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+        mpl.colors.LogNorm.__init__(self,vmin=vmin, vmax=vmax, clip=clip)
+        self.midpoint=midpoint
+    def __call__(self, value, clip=None):
+        # I'm ignoring masked values and all kinds of edge cases to make a
+        # simple example...
+        x, y = [np.log(self.vmin), np.log(self.midpoint), np.log(self.vmax)], [0, 0.5, 1]
+        return np.ma.masked_array(np.interp(np.log(value), x, y))
 
 def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False,
                  xy_label_force=None, **kwargs):
@@ -183,14 +192,17 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
 
 def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=True, make_panel=False,
-                          scale_factor=alpha, label_style=0):
+                          scale_factor=alpha, divide_by_N=True, label_style=0):
     if make_heatmap == True:
         def mode1_error_x(ctilde, z, scale_factor=scale_factor):
             c = ctilde * c0
             koff = z * KP
             x = c * KON / koff
             val = (1 + x) / (KP * T * x) * ((1 + x) ** 2 + 2 * KP / koff)
-            return scale_factor * val
+            if divide_by_N:
+                return scale_factor * val / N
+            else:
+                return scale_factor * val
 
         arr = np.zeros((len(koffrange), len(crange)))
         for i, koffval in enumerate(koffrange):
@@ -207,7 +219,10 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
                 koff = z * KP
                 x = c * KON / koff
                 val = (1 + x) / (KP * T * x) * ((1 + x) ** 2 + 2 * KP / koff)
-                return scale_factor * val
+                if divide_by_N:
+                    return scale_factor * val / N
+                else:
+                    return scale_factor * val
 
             arr = [mode1_error_c(cval, 1) for cval in crange]
             return dict({'xpts': crange, 'ypts':arr})
@@ -221,7 +236,10 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
         # axis
         if label_style == 0:
             #plt.title('Mode 1: MLE relative error comparison \n'+r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
-            plt.ylabel(r'$k_{p} t \langle\delta c^{2}\rangle$/$c^{2}$')
+            if divide_by_N:
+                plt.ylabel(r'$\frac{k_{p} t}{N} \langle\delta c^{2}\rangle$/$c^{2}$')
+            else:
+                plt.ylabel(r'$k_{p} t \langle\delta c^{2}\rangle$/$c^{2}$')
         elif label_style == 1:
             plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
             plt.ylabel(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
@@ -1038,7 +1056,7 @@ if __name__ == '__main__':
 
     contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01, 1.1, 10.0, 100.0, 1000.0], 'fmt' : '%.2f'}
 
-    #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
+    plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
     #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 
     #custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'

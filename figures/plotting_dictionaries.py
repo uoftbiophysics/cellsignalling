@@ -220,10 +220,10 @@ MAIN = { 'subdir2' : 'main', 'log' : True,
                    'plots' : {
                    'relErrX1': { 'eqn' : eqns.dedimRelErrorX1NoTrace, 'label' : r'$k_p t \langle\delta x^{2}\rangle /x^{2}$'},
                    'relErrC2': { 'eqn' : eqns.dedimRelErrC2NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
-                   'relErrKoff2': { 'eqn' : eqns.dedimRelErrK2NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
-                   'relErrC3': { 'eqn' : eqns.dedimRelErrC3NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
-                   'relErrKoff3': { 'eqn' : eqns.dedimRelErrK3NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
-                   'relErrC4': { 'eqn' : eqns.dedimRelErrC4NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
-                   'relErrKoff4': { 'eqn' : eqns.dedimRelErrK4NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'}
+                   'relErrKoff2': { 'eqn' : eqns.dedimRelErrK2NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'}#,
+                   #'relErrC3': { 'eqn' : eqns.dedimRelErrC3NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
+                   #'relErrKoff3': { 'eqn' : eqns.dedimRelErrK3NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
+                   #'relErrC4': { 'eqn' : eqns.dedimRelErrC4NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
+                   #'relErrKoff4': { 'eqn' : eqns.dedimRelErrK4NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'}
                    }
 }
