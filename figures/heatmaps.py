@@ -1039,15 +1039,22 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
                  xy_label_force=xy_label_force, show=True, save=True, log_norm=True, dedim=False, **contour_args)
     return
 
-def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
+def plot_1E_and_2B():
     figname1 = 'Figure_1E'
     figname2 = 'Figure_2B'
-    font_size = 8
+    font_size = 12
 
     mpl.rcParams['xtick.labelsize'] = font_size
     mpl.rcParams['ytick.labelsize'] = font_size
 
-    vecErrorX1 = eqns.dedimRelErrorX1NoTrace(crange, koff);
+    # Fig 1E
+    koffrange = KOFFRANGE
+    c = c0 # = KP/KON
+    vecErrorX1 = eqns.dedimRelErrorX1NoTrace(c, koffrange);
+
+    # Fig 2B
+    crange = CRANGE*10
+    koff = 1.0
     vecRelErrorEst2C = eqns.dedimRelErrC2NoTrace(crange, koff);
     vecRelErrorEst2K = eqns.dedimRelErrK2NoTrace(crange, koff);
 
@@ -1055,12 +1062,12 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     plt.figure(figsize=(3.4, 3.2))
     ax = plt.gca()
 
-    plt.plot(crange*KON/KP,vecErrorX1/N, color='purple')
-    ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
+    plt.plot(koffrange/KP,vecErrorX1/N, color='purple')
+    ax.set_xlabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=font_size)
     ax.set_xscale('log')
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta x^{2}\rangle} {x^{2}}$',fontsize=font_size)
-    ax.set_xlim([1E-4, 1E1])
-    #plt.ylim([0, 0.01*alpha])
+    ax.set_xlim([1E-1, 1E3])
+    plt.ylim([0, 1])
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.eps')
 
@@ -1076,8 +1083,8 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
     ax.set_xscale('log')
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle}{(\cdot)^{2}}$',fontsize=font_size)
-    ax.set_xlim([1E-4, 1E1])
-    #plt.ylim([0, 0.01*alpha])
+    #ax.set_xlim([1E-4, 1E1])
+    plt.ylim([0, 50])
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.eps')
 
