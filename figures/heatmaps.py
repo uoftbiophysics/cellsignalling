@@ -1039,15 +1039,22 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
                  xy_label_force=xy_label_force, show=True, save=True, log_norm=True, dedim=False, **contour_args)
     return
 
-def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
+def plot_1E_and_2B():
     figname1 = 'Figure_1E'
     figname2 = 'Figure_2B'
-    font_size = 8
+    font_size = 11
 
     mpl.rcParams['xtick.labelsize'] = font_size
     mpl.rcParams['ytick.labelsize'] = font_size
 
-    vecErrorX1 = eqns.dedimRelErrorX1NoTrace(crange, koff);
+    # Fig 1E
+    koffrange = KOFFRANGE
+    c = c0 # = KP/KON
+    vecErrorX1 = eqns.dedimRelErrorX1NoTrace(c, koffrange);
+
+    # Fig 2B
+    crange = CRANGE*10
+    koff = 1.0
     vecRelErrorEst2C = eqns.dedimRelErrC2NoTrace(crange, koff);
     vecRelErrorEst2K = eqns.dedimRelErrK2NoTrace(crange, koff);
 
@@ -1055,12 +1062,12 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     plt.figure(figsize=(3, 2.5))
     ax = plt.gca()
 
-    plt.plot(crange*KON/KP,vecErrorX1/N, color='purple')
-    ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
+    plt.plot(koffrange/KP,vecErrorX1/N, color='purple')
+    ax.set_xlabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=font_size)
     ax.set_xscale('log')
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta x^{2}\rangle} {x^{2}}$',fontsize=font_size)
-    ax.set_xlim([1E-4, 1E1])
-    #plt.ylim([0, 0.01*alpha])
+    ax.set_xlim([1E-1, 1E3])
+    plt.ylim([0, 1])
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.eps')
 
@@ -1077,8 +1084,8 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
     ax.set_xscale('log')
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle}{(\cdot)^{2}}$',fontsize=font_size)
-    ax.set_xlim([1E-4, 1E1])
-    #plt.ylim([0, 0.01*alpha])
+    #ax.set_xlim([1E-4, 1E1])
+    plt.ylim([0, 50])
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.eps')
 
@@ -1117,7 +1124,77 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     # save figure
     """
 
+def plot_1F():
+    figname = 'heatmap_log_posterior_mode1'
 
+    nobs = 0.1 * KP * T # 10
+
+    LOG_START_KOFF_1F = -1
+    LOG_END_KOFF_1F = 3
+    TOTAL_POINTS_KOFF_1F = (LOG_END_KOFF_1F - LOG_START_KOFF_1F) * POINTS_BETWEEN_TICKS + 1
+    crange = CRANGE
+    koffrange = np.logspace(LOG_START_KOFF_1F, LOG_END_KOFF_1F, TOTAL_POINTS_KOFF_1F)
+
+    def log_posterior_x(c, koff, n):
+        if c==0:
+            c=1E-16
+        if koff==0:
+            koff=1E-16
+        x = KON * c / koff
+        mu = KP * T * x / (1 + x)
+        var = (KP * T * x)/(1 + x) + (2 * KP**2 * T * x)/(koff * (1 + x)**3) *(1 + (np.exp(-T * koff * (1 + x)) - 1)/(T * koff * (1 + x)))
+        post = -(n - mu)**2 / (2 * var) - 0.5 * np.log(2 * 3.14159 * var)
+        return post
+
+    arr = np.zeros((len(koffrange), len(crange)))
+    for i, koffval in enumerate(koffrange):
+        for j, cval in enumerate(crange):
+            arr[i, j] = log_posterior_x(cval, koffval, nobs)
+    arr = -1.0 * arr
+    label = r'-ln $P(c, k_{\mathrm{off}}|n)$'
+    #log_contours = [-i for i in list(np.logspace(-3, 4,num=20))[::-1]]
+    linear_contours = []#[truncate(np.min(-1.*arr), 1)*1.01]#list(range(-500, 0, 50))
+
+    if np.all(arr) > 0.0:
+        fig, ax = plot_heatmap(arr, crange*KON/KP, koffrange/KP, figname, label, save=False, log_norm=True,
+                               levels=linear_contours, vmin=1, vmax=500, contour_color='k', contour_linewidths=0.5,
+                               cmap_colour='viridis_r')
+    else:
+        print("Not all posterior points evaluated to non-zero probability")
+        return 1
+
+    ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+    ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
+
+
+    # Superimpose heuristic estimate
+    def heuristic_estimate(c, n):
+        koff_est = ((KP * T - n) * KON * c) / n
+        return koff_est
+    koff_star = [heuristic_estimate(ctilde, nobs) for ctilde in crange]
+
+    # rescale onto weird axes scale which do not run from min to max of koffrange and crange anymore
+    max_log10koff = np.log10(np.max(koffrange))
+    min_log10koff = np.log10(np.min(koffrange))
+    max_koff_pixel_pos = len(koffrange)
+    slope = max_koff_pixel_pos / (max_log10koff - min_log10koff)
+    intercept = min_log10koff * max_koff_pixel_pos / (min_log10koff - max_log10koff)
+    koff_star_rescaled = []
+    c_pts = []
+    for idx, kstar in enumerate(np.log10(koff_star)):
+        if kstar > min_log10koff and kstar < max_log10koff:
+            pixel = kstar * slope + intercept
+            if pixel < max_koff_pixel_pos and pixel > 0:
+                koff_star_rescaled.append(pixel)
+                c_pts.append(idx)
+    ax.plot(c_pts, koff_star_rescaled, 'k--')
+
+    #ax.plot([len(crange)/2 for _ in range(len(koffrange))], range(len(koffrange)), 'k--')
+
+
+    # save figure
+    fig.savefig(DIR_OUTPUT + os.sep + figname + '.pdf', transparent=True)
+    fig.savefig(DIR_OUTPUT + os.sep + figname + '.eps')
 
 
 if __name__ == '__main__':
@@ -1129,7 +1206,7 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
-    plot_1E_and_2B()
+    plot_1F()
     exit()
     """
     dk_plotting()
