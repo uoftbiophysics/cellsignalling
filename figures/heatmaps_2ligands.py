@@ -16,7 +16,7 @@ plt.style.use('parameters.mplstyle')  # particularIMporting
 
 
 # plot params
-FS = 8
+FS = 11
 SHOW = False
 
 # axes
@@ -55,7 +55,9 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     show: shows plots
     save: saves plot
     log_norm: heatmap is log, this is only used when plotting the posterior
-    kwargs: a variety of keyword args are used below. They are mostly used for contour plot lines if I understand correctly. Using Duncan's default ones mostly, but we can talk about it.
+    kwargs: a variety of keyword args are used below. They are mostly used for
+    contour plot lines if I understand correctly. Using Duncan's default ones mostly,
+    but we can talk about it.
     """
     # default parameters, this is relic ofthe previous way we did things. Still might be useful.
     if 'levels' in kwargs.keys(): levels = kwargs['levels']
@@ -212,7 +214,7 @@ def figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2K
     return fig0, fig1, fig2
 
 
-def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select, rescale=True):
+def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labels, log_select, rescale=True, axis_label=True):
     """
     arr*: various 2D arrays to used for heatmap
     array_x, array_y: the range for the axis
@@ -275,16 +277,23 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
             print('Warning: these multiple_heatmaps(...) settings chosen with kp*t=10^3 in mind')
 
     else:
-        fig = plt.figure(figsize=(4.6, 8.4))
-        gs = fig.add_gridspec(8, 9, hspace=0.2, wspace=-0.1,
-                              width_ratios=[0.15, 0.4, 0.4, 1.2, 1.2, 0.4, 0.4, 0.15, 0.15],
-                              height_ratios=[1., 0.07, 1., 0.01, 0.1, 1., 1, 0.1])
+        if not axis_label:
+            fig = plt.figure(figsize=(4.6, 8.4)) # Layout without all axes in diagonal heatmaps
+            gs = fig.add_gridspec(8, 9, hspace=0.2, wspace=-0.1,
+                                  width_ratios=[0.15, 0.4, 0.4, 1.2, 1.2, 0.4, 0.4, 0.15, 0.15],
+                                  height_ratios=[1., 0.07, 1., 0.01, 0.1, 1., 1., 0.1])
+            print('hi')
+        else:
+            fig = plt.figure(figsize=(6.0, 9.5))
+            gs = fig.add_gridspec(8, 9, hspace=.5, wspace=1.0,
+                                  width_ratios=[0.05, 0.4, 0.4, 1.2, 1.2, 0.4, 0.4, 0.2, 0.2],
+                                  height_ratios=[1., 0.1, 1., -0.5, 0.4, 0.4, 1., 0.4])
         ax0 = fig.add_subplot(gs[4:, 2:6])  # the det
         ax1 = fig.add_subplot(gs[0, 0:4])
         ax2 = fig.add_subplot(gs[0, 4:8])
         ax3 = fig.add_subplot(gs[2, 0:4])
         ax4 = fig.add_subplot(gs[2, 4:8])
-        ax5 = fig.add_subplot(gs[5:7, -2])  # the cbar (det)
+        ax5 = fig.add_subplot(gs[5:7, -2])  # the cbar (det) (5:7)
         ax6 = fig.add_subplot(gs[0:3, -1])  # the cbar (4)
 
         N = 1E2  # the number of the receptors
@@ -317,28 +326,29 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
 
     # each of the diagonals
     ax1, cbar1, im1 = heatmap(ax1, arrRelErrorEst[:,:,0,0], array_x, array_y, labels, r'$\langle \delta {c_1}^2 \rangle / {c_1}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True, cbar_white_loc=diag_cbar_white_loc, **diag_kw)
-    ax1.tick_params(labelbottom=False); ax1.set_xticklabels([]);  ax1.set_xlabel('')
+    #ax1.tick_params(labelbottom=False); ax1.set_xticklabels([]);  ax1.set_xlabel('')
     ax1.set_title(r'%s$\frac{\langle \delta {c_1}^2 \rangle}{{c_1}^2}$' % scalelabel, fontsize=FS)
 
     a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off},1}^2 \rangle / {k_{off},1}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True, cbar_white_loc=diag_cbar_white_loc, **diag_kw)
-    ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.set_xlabel('')
+    #ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.set_xlabel('')
     ax2.set_title(r'%s$\frac{\langle \delta {k_{\mathrm{off},1}}^2 \rangle}{{k_{\mathrm{off},1}}^2} $' % scalelabel, fontsize=FS)
 
     a3, cbar3, _ = heatmap(ax3, arrRelErrorEst[:,:,2,2], array_x, array_y, labels, r'$\langle \delta {c_2}^2 \rangle / {c_2}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True, cbar_white_loc=diag_cbar_white_loc, **diag_kw)
     ax3.set_title(r'%s$\frac{\langle \delta {c_2}^2 \rangle}{{c_2}^2}$' % scalelabel, fontsize=FS)
 
     a4, cbar4, _ = heatmap( ax4, arrRelErrorEst[:,:,3,3], array_x, array_y, labels, r'$\langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True, cbar_white_loc=diag_cbar_white_loc, **diag_kw)
-    ax4.tick_params(labelleft=False); ax4.set_yticklabels([]); ax4.set_ylabel('')
+    #ax4.tick_params(labelleft=False); ax4.set_yticklabels([]); ax4.set_ylabel('')
     ax4.set_title(r'%s$\frac{\langle \delta {k_{\mathrm{off},2}}^2 \rangle}{{k_{\mathrm{off},2}}^2}$' % scalelabel, fontsize=FS)
 
-    cb_det = fig.colorbar(im0, cax=ax5, fraction=0.8); cb_det.ax.tick_params(labelsize=FS)
+    cb_det = fig.colorbar(im0, cax=ax5, fraction=1.0); cb_det.ax.tick_params(labelsize=FS)
     """if rescale:
         cb_det_yticks = [1E0, 1E2, 1E4, 1E6, 1E8, 1E10, 1E12]
         cb_det.ax.set_yticks(cb_det_yticks)  # TODO make less manual
         cb_det.ax.set_yticklabels([r'$10^{%d}$' % np.log10(a) for a in cb_det_yticks])  # TODO make less manual"""
 
     if rescale:
-        cb_diags = fig.colorbar(im1, cax=ax6, fraction=0.8); cb_diags.ax.tick_params(labelsize=FS)
+        cb_diags = fig.colorbar(im1, cax=ax6, fraction=1.0); cb_diags.ax.tick_params(labelsize=FS)
+        cb_diags.minorticks_off()
 
     # note tight layout seems incompatible with gridspec/subplots
     plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')

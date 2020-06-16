@@ -1052,7 +1052,7 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     vecRelErrorEst2K = eqns.dedimRelErrK2NoTrace(crange, koff);
 
     # plot
-    plt.figure(figsize=(3.4, 3.2))
+    plt.figure(figsize=(3, 2.5))
     ax = plt.gca()
 
     plt.plot(crange*KON/KP,vecErrorX1/N, color='purple')
@@ -1065,9 +1065,10 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.eps')
 
     plt.show()
+    plt.close()
 
     # plot
-    plt.figure(figsize=(3.4, 3.2))
+    plt.figure(figsize=(3., 2.5))
     ax = plt.gca()
 
     plt.plot(crange*KON/KP,vecRelErrorEst2C/N, color='purple', label=r'$c$')
@@ -1082,6 +1083,7 @@ def plot_1E_and_2B(crange = CRANGE, koff = 1.0):
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.eps')
 
     plt.show()
+    plt.close()
 
     """
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle$}{$(\cdot)^{2}}$',fontsize=FS)
