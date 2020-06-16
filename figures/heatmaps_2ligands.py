@@ -16,7 +16,7 @@ plt.style.use('parameters.mplstyle')  # particularIMporting
 
 
 # plot params
-FS = 11
+FS = 10
 SHOW = False
 
 # axes
@@ -129,9 +129,9 @@ def heatmap(ax, arr, xrange, yrange, xy_label, label, log_norm=True, xy_label_fo
     if skip_cbar:
         cbar = None
     else:
-        cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04) # Fig 3 way
+        cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.05) # Fig 3 way pad 0.04
 
-        cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=-20); cbar.ax.tick_params(labelsize=FS)
+        cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=-20); cbar.ax.tick_params(labelsize=(FS), width=1,length=1)
         cbar.ax.minorticks_off();
         #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001]) # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
         cbar.update_ticks()
@@ -181,34 +181,37 @@ def figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2K
     """
 
     arr1 = arrRelErrorEst1X/N
-    args1 = {'vmin': np.min(arr1), 'vmax': np.max(arr1), 'levels' : [1E-1, 1E0, 1E1, 1E2]}
+    args1 = {'vmin': np.min(arr1), 'vmax': np.max(arr1), 'levels' : [1E-1, 1E0, 1E1, 1E2], 'less_xticks' : True}
     arr2 = arrRelErrorEst2C/N
-    args2 = {'vmin': np.min(arr2), 'vmax': np.max(arr2), 'levels' : [1E-1, 1E0, 1E1, 1E2]}
+    args2 = {'vmin': np.min(arr2), 'vmax': np.max(arr2), 'levels' : [1E-1, 1E0, 1E1, 1E2], 'less_xticks' : True}
     arr3 = arrRelErrorEst2KOFF/N
-    args3 = {'vmin': np.min(arr3), 'vmax': np.max(arr3), 'levels' : [1E-1, 1E0, 1E1, 1E2]}
+    args3 = {'vmin': np.min(arr3), 'vmax': np.max(arr3), 'levels' : [1E-1, 1E0, 1E1, 1E2], 'less_xticks' : True}
 
     args4 = {'vmin': np.min(arr2), 'vmax': np.max(arr3), 'levels' : [1E-1, 1E0, 1E1, 1E2], 'level_label' : [r'$0.01 k_p t$', r'$0.1 k_p t$', r'$1 k_p t$', r'$10 k_p t$']}
 
 
-    fig0 = plt.figure(figsize=(3.2, 3.0)); fig0 = plt.gcf(); ax0 = plt.gca()
+    fig0 = plt.figure(figsize=(2.8, 2.2)); fig0 = plt.gcf(); ax0 = plt.gca()
     # axes setup
     ax0, cbar0, im0 = heatmap(ax0, arr1, array_x, array_y, labels, '', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args1)
     ax0.set_title(r'$\frac{k_p t}{N} \frac{\langle\delta x^{2}\rangle}{x^{2}}$', fontsize=FS)
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.pdf', transparent=True);
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
     plt.close()
 
-    fig1 = plt.figure(figsize=(3.2, 3.0)); fig1 = plt.gcf(); ax1 = plt.gca()
+    fig1 = plt.figure(figsize=(2.8, 2.2)); fig1 = plt.gcf(); ax1 = plt.gca()
     # axes setup
     ax1, cbar1, im1 = heatmap(ax1, arr2, array_x, array_y, labels, r'', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args2)
     ax1.set_title(r'$\frac{k_p t}{N} \frac{\langle\delta c^{2}\rangle}{c^{2}}$', fontsize=FS)
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname2 + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname2 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname2 + '.pdf', transparent=True);
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname2 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
     plt.close()
 
-    fig2 = plt.figure(figsize=(3.2, 3.0)); fig2 = plt.gcf(); ax2 = plt.gca()
+    fig2 = plt.figure(figsize=(2.8, 2.2)); fig2 = plt.gcf(); ax2 = plt.gca()
     # axes setup
     ax2, cbar2, im2 = heatmap(ax2, arr3, array_x, array_y, labels, r'', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args3)
     ax2.set_title(r'$\frac{k_p t}{N} \frac{\langle{\delta k_{off}^2}\rangle}{k_{off}^{2}}$', fontsize=FS)
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.pdf'); plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.pdf', transparent=True);
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
     plt.close()
 
     return fig0, fig1, fig2
@@ -282,10 +285,10 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
             gs = fig.add_gridspec(8, 9, hspace=0.2, wspace=-0.1,
                                   width_ratios=[0.15, 0.4, 0.4, 1.2, 1.2, 0.4, 0.4, 0.15, 0.15],
                                   height_ratios=[1., 0.07, 1., 0.01, 0.1, 1., 1., 0.1])
-            print('hi')
+
         else:
-            fig = plt.figure(figsize=(6.0, 9.5))
-            gs = fig.add_gridspec(8, 9, hspace=.5, wspace=1.0,
+            fig = plt.figure(figsize=(5.5, 8.5))
+            gs = fig.add_gridspec(8, 9, hspace=.5, wspace=2.0,
                                   width_ratios=[0.05, 0.4, 0.4, 1.2, 1.2, 0.4, 0.4, 0.2, 0.2],
                                   height_ratios=[1., 0.1, 1., -0.5, 0.4, 0.4, 1., 0.4])
         ax0 = fig.add_subplot(gs[4:, 2:6])  # the det

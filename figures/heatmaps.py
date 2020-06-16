@@ -22,7 +22,7 @@ c0 = KP/KON
 alpha = KP*T
 
 # plot params
-FS = 20
+FS = 10
 SHOW = False
 
 # axes
@@ -50,7 +50,7 @@ class MidPointLogNorm(mpl.colors.LogNorm):
         return np.ma.masked_array(np.interp(np.log(value), x, y))
 
 def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False,
-                 xy_label_force=None, **kwargs):
+                 xy_label_force=None, less_xticks=True, **kwargs):
     """
     crange: range of values for c
     koffrange: range of koff values
@@ -59,7 +59,8 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     save: saves plots
     log_norm: heatmap is log, this is only used when plotting the posterior
     dedim: makes the axis dedimensionalized. scales them (see by how much below)
-    kwargs: a variety of keyword args are used below. They are mostly used for contour plot lines if I understand correctly. Using Duncan's default ones mostly, but we can talk about it.
+    kwargs: a variety of keyword args are used below. They are mostly used for contour plot lines if I understand correctly.
+    Using Duncan's default ones mostly, but we can talk about it.
     """
     # default parameters
     if 'levels' in kwargs.keys(): levels = kwargs['levels']
@@ -86,6 +87,9 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     if 'fmt' in kwargs.keys(): fmt = kwargs['fmt']
     else: fmt = ticker.LogFormatterMathtext()
 
+    if 'fig_width' in kwargs.keys(): fig_width = kwargs['fig_width']
+    else: fig_width = 3.0
+
     if dedim:
         # if flag is true, this is how we scale the axis. Simple.
         crange = crange*KON/KP;
@@ -110,13 +114,24 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     """
     #print 'arr limits:', np.min(arr), np.max(arr)
     # plot setup
-    f = plt.figure()
+    f = plt.figure(figsize=(fig_width,fig_width/1.2))
     im = plt.imshow(arr, interpolation='spline36', **imshow_kw)
 
     # axes setup
     fig = plt.gcf(); ax = plt.gca()
 
     # method 1
+    # axes log scaled
+    # axes log scaled
+    if less_xticks:
+        ax.set_xticks([i for i, cval in enumerate(crange) if (i % POINTS_BETWEEN_TICKS==0 and np.log10(cval)%2 == 0)])
+        ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if (i % POINTS_BETWEEN_TICKS==0 and np.log10(cval)%2 == 0)], fontsize=FS)
+    else:
+        ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
+        ax.set_xticklabels([r'$10^{%d}$' % np.log10(cval) for i, cval in enumerate(crange) if (i % POINTS_BETWEEN_TICKS==0)], fontsize=FS)
+    ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
+    ax.set_yticklabels([r'$10^{%d}$' % np.log10(yval) for i, yval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS==0], fontsize=FS)
+    """
     if log_norm:
         ax.set_xticks([i for i, cval in enumerate(crange) if i % POINTS_BETWEEN_TICKS == 0])
         ax.set_yticks([i for i, kval in enumerate(koffrange) if i % POINTS_BETWEEN_TICKS == 0])
@@ -125,18 +140,20 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     else:
         # Set ticks later because for some reason plotting contours messes up the ticks that get set here
         pass
+    """
 
     ax.invert_yaxis()
     ax.set_xlabel(xy_label[0], fontsize=FS); ax.set_ylabel(xy_label[1], fontsize=FS)
 
     # create colorbar
-    cbar = fig.colorbar(im)
+    cbar = fig.colorbar(im,fraction=0.0375, pad=0.04)
     #cbar.locator = ticker.LogLocator(base=10)
-    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=20); cbar.ax.tick_params(labelsize=FS)
+    cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=5); cbar.ax.tick_params(labelsize=FS)
     cbar.ax.minorticks_off();
     # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
     #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001])
     cbar.update_ticks()
+    cbar.ax.minorticks_off();
 
     # TODO IDK why do ticks hide sometimes?
     CL = plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
@@ -1042,7 +1059,7 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
 def plot_1E_and_2B():
     figname1 = 'Figure_1E'
     figname2 = 'Figure_2B'
-    font_size = 11
+    font_size = FS
 
     mpl.rcParams['xtick.labelsize'] = font_size
     mpl.rcParams['ytick.labelsize'] = font_size
@@ -1059,7 +1076,8 @@ def plot_1E_and_2B():
     vecRelErrorEst2K = eqns.dedimRelErrK2NoTrace(crange, koff);
 
     # plot
-    plt.figure(figsize=(3, 2.5))
+    fig_width_1E = 2.8
+    plt.figure(figsize=(fig_width_1E, fig_width_1E*0.8))
     ax = plt.gca()
 
     plt.plot(koffrange/KP,vecErrorX1/N, color='purple')
@@ -1071,11 +1089,12 @@ def plot_1E_and_2B():
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.eps')
 
-    plt.show()
+    #plt.show()
     plt.close()
 
     # plot
-    plt.figure(figsize=(3., 2.5))
+    fig_width_2B = 2.2
+    plt.figure(figsize=(fig_width_2B, fig_width_2B*0.8))
     ax = plt.gca()
 
     plt.plot(crange*KON/KP,vecRelErrorEst2C/N, color='purple', label=r'$c$')
@@ -1089,7 +1108,7 @@ def plot_1E_and_2B():
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname2 + '.eps')
 
-    plt.show()
+    #plt.show()
     plt.close()
 
     """
@@ -1156,15 +1175,16 @@ def plot_1F():
     linear_contours = []#[truncate(np.min(-1.*arr), 1)*1.01]#list(range(-500, 0, 50))
 
     if np.all(arr) > 0.0:
-        fig, ax = plot_heatmap(arr, crange*KON/KP, koffrange/KP, figname, label, save=False, log_norm=True,
+        fig, ax = plot_heatmap(arr, crange*KON/KP, koffrange/KP, figname, '', save=False, log_norm=True,
                                levels=linear_contours, vmin=1, vmax=500, contour_color='k', contour_linewidths=0.5,
-                               cmap_colour='viridis_r')
+                               cmap_colour='viridis_r',fig_width=2.8)
     else:
         print("Not all posterior points evaluated to non-zero probability")
         return 1
 
     ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
     ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
+    ax.set_title(label, fontsize=FS)
 
 
     # Superimpose heuristic estimate
@@ -1207,6 +1227,7 @@ if __name__ == '__main__':
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
     plot_1F()
+    plot_1E_and_2B()
     exit()
     """
     dk_plotting()
