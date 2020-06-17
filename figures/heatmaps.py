@@ -49,8 +49,8 @@ class MidPointLogNorm(mpl.colors.LogNorm):
         x, y = [np.log(self.vmin), np.log(self.midpoint), np.log(self.vmax)], [0, 0.5, 1]
         return np.ma.masked_array(np.interp(np.log(value), x, y))
 
-def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, dedim=False,
-                 xy_label_force=None, less_xticks=True, **kwargs):
+def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log_norm=True, log_norm_axes_only=False,
+                 dedim=False, xy_label_force=None, less_xticks=True, return_cb=False, **kwargs):
     """
     crange: range of values for c
     koffrange: range of koff values
@@ -102,10 +102,11 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
 
     print(vmin,vmax)
 
-    if log_norm:
+    # we want most of the functionality that comes with log_norm, but not the log colorbar
+    if log_norm and not log_norm_axes_only:
         imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax, 'norm': mpl.colors.LogNorm(vmin,vmax)}
     else:
-        imshow_kw = {'cmap': 'viridis', 'aspect': None, 'vmin': vmin, 'vmax': vmax}
+        imshow_kw = {'cmap': cmap_colour, 'aspect': None, 'vmin': vmin, 'vmax': vmax}
 
     # TODO change colour scheme, see https://matplotlib.org/examples/color/colormaps_reference.html
     # TODO fix ticks randomly disappearing on colourbar + flip colourbar minor ticks or remove?
@@ -149,11 +150,11 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     cbar = fig.colorbar(im,fraction=0.0375, pad=0.04)
     #cbar.locator = ticker.LogLocator(base=10)
     cbar.ax.set_ylabel(label, rotation=-90, va="bottom", fontsize=FS, labelpad=5); cbar.ax.tick_params(labelsize=FS)
-    cbar.ax.minorticks_off();
+    cbar.ax.minorticks_off()
     # UNCOMMENT THIS ONLY WHEN TICKS DON'T APPEAR
     #cbar.set_ticks([round(vmin,3)+0.001,round(vmax,3)-0.001])
     cbar.update_ticks()
-    cbar.ax.minorticks_off();
+    cbar.ax.minorticks_off()
 
     # TODO IDK why do ticks hide sometimes?
     CL = plt.contour(arr, levels=levels, linestyles=contour_linestyle, colors=contour_color, linewidths=contour_lindewidths)
@@ -205,7 +206,10 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         plt.show()
 
     plt.close()
-    return fig, ax
+    if return_cb:
+        return fig, ax, cbar
+    else:
+        return fig, ax
 
 
 def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=True, make_panel=False,
@@ -1169,23 +1173,34 @@ def plot_1F():
     for i, koffval in enumerate(koffrange):
         for j, cval in enumerate(crange):
             arr[i, j] = log_posterior_x(cval, koffval, nobs)
-    arr = -1.0 * arr
-    label = r'-ln $P(c, k_{\mathrm{off}}|n)$'
+
+    arr = -1.0 * arr # hack to get negative probability with log axes, linear colorbar
+    label = r'ln $P(c, k_{\mathrm{off}}|n)$'
     #log_contours = [-i for i in list(np.logspace(-3, 4,num=20))[::-1]]
     linear_contours = []#[truncate(np.min(-1.*arr), 1)*1.01]#list(range(-500, 0, 50))
 
+    vmin_setting = 0
+    vmax_setting = 100
     if np.all(arr) > 0.0:
-        fig, ax = plot_heatmap(arr, crange*KON/KP, koffrange/KP, figname, '', save=False, log_norm=True,
-                               levels=linear_contours, vmin=1, vmax=500, contour_color='k', contour_linewidths=0.5,
-                               cmap_colour='viridis_r',fig_width=2.8)
+        fig, ax, cb = plot_heatmap(arr, crange*KON/KP, koffrange/KP, figname, '', save=False, log_norm_axes_only=True,
+                               levels=linear_contours, vmin=vmin_setting, vmax=vmax_setting, contour_color='k', contour_linewidths=0.5,
+                               cmap_colour='viridis_r',fig_width=2.8, return_cb=True)
     else:
         print("Not all posterior points evaluated to non-zero probability")
         return 1
 
+    # relabel colorbar with the negative sign
+    if vmin_setting == 0:
+        new_cbar_ticks = [u'$0$'] + [u'-' + item.get_text() for i, item in enumerate(cb.ax.get_yticklabels()) if i != 0]
+    else:
+        new_cbar_ticks = [u'-' + item.get_text() for item in cb.ax.get_yticklabels()]
+
+    cb.ax.set_yticklabels(new_cbar_ticks, fontsize=FS)
+    cb.ax.invert_yaxis() # flips the colorbar so that most negative number is on bottom
+
     ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
     ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
     ax.set_title(label, fontsize=FS)
-
 
     # Superimpose heuristic estimate
     def heuristic_estimate(c, n):
@@ -1227,7 +1242,7 @@ if __name__ == '__main__':
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
     plot_1F()
-    plot_1E_and_2B()
+    #plot_1E_and_2B()
     exit()
     """
     dk_plotting()
