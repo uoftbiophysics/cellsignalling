@@ -209,7 +209,7 @@ def figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2K
     fig2 = plt.figure(figsize=(2.8, 2.2)); fig2 = plt.gcf(); ax2 = plt.gca()
     # axes setup
     ax2, cbar2, im2 = heatmap(ax2, arr3, array_x, array_y, labels, r'', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args3)
-    ax2.set_title(r'$\frac{k_p t}{N} \frac{\langle{\delta k_{off}^2}\rangle}{k_{off}^{2}}$', fontsize=FS)
+    ax2.set_title(r'$\frac{k_p t}{N} \frac{\langle{\delta k_{\mathrm{off}}^2}\rangle}{k_{\mathrm{off}}^{2}}$', fontsize=FS)
     plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.pdf', transparent=True);
     plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname3 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
     plt.close()
@@ -332,7 +332,7 @@ def multiple_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
     #ax1.tick_params(labelbottom=False); ax1.set_xticklabels([]);  ax1.set_xlabel('')
     ax1.set_title(r'%s$\frac{\langle \delta {c_1}^2 \rangle}{{c_1}^2}$' % scalelabel, fontsize=FS)
 
-    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{off},1}^2 \rangle / {k_{off},1}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True, cbar_white_loc=diag_cbar_white_loc, **diag_kw)
+    a2, cbar2, _ = heatmap(ax2, arrRelErrorEst[:,:,1,1], array_x, array_y, labels, r'$\langle \delta {k_{\mathrm{off}},1}^2 \rangle / {k_{\mathrm{off}},1}^2$', less_xticks=True, log_norm=log_select, skip_cbar=True, cbar_white_loc=diag_cbar_white_loc, **diag_kw)
     #ax2.tick_params(labelbottom=False); ax2.tick_params(labelleft=False); ax2.set_xticklabels([]); ax2.set_yticklabels([]); ax2.set_ylabel(''); ax2.set_xlabel('')
     ax2.set_title(r'%s$\frac{\langle \delta {k_{\mathrm{off},1}}^2 \rangle}{{k_{\mathrm{off},1}}^2} $' % scalelabel, fontsize=FS)
 
@@ -481,7 +481,7 @@ def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labe
     heatmap( ax4, arrRelErrorEst[:,:,3,3].astype(np.float64)*(KP*T), array_x, array_y, labels, r'$k_{p} t \langle \delta {k_{off,2}}^2 \rangle / {k_{off,2}}^2$', log_norm=log_select)
 
     # save
-    #fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
+    #fig.suptitle(r"IFN Crosstalk $k_{\mathrm{off}}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
     #fig.suptitle(r"T Cell antigen detection $c_2/c_1=1000$", fontsize=int(1.5*FS))
     plt.tight_layout(h_pad=1, rect=[0,0.03,1,0.95]) # need to change this to not have the title overlap, figuring it out still
 
@@ -595,14 +595,14 @@ def fig_2ligands_vs_1ligand_diag(arrErrorRatio, array_x, array_y, fname, labels,
     heatmap(ax1, arrErrorRatio[:, :, 0, 0].astype(np.float64), array_x, array_y, labels,
             r'$\langle \delta {c_1}^2 \rangle_B / \langle \delta {c}^2 \rangle_{A1}$', log_norm=log_select)
     heatmap(ax2, arrErrorRatio[:, :, 1, 1].astype(np.float64), array_x, array_y, labels,
-            r'$\langle \delta {k_{off,1}}^2 \rangle_B / \langle \delta {k_{off}}^2 \rangle_{A1}$', log_norm=log_select)
+            r'$\langle \delta {k_{off,1}}^2 \rangle_B / \langle \delta {k_{\mathrm{off}}}^2 \rangle_{A1}$', log_norm=log_select)
     heatmap(ax3, arrErrorRatio[:, :, 2, 2].astype(np.float64), array_x, array_y, labels,
             r'$\langle \delta {c_2}^2 \rangle_B / \langle \delta {c}^2 \rangle_{A2}$', log_norm=log_select)
     heatmap(ax4, arrErrorRatio[:, :, 3, 3].astype(np.float64), array_x, array_y, labels,
-            r'$\langle \delta {k_{off,2}}^2 \rangle_B / \langle \delta {k_{off}}^2 \rangle_{A2}$', log_norm=log_select)
+            r'$\langle \delta {k_{off,2}}^2 \rangle_B / \langle \delta {k_{\mathrm{off}}}^2 \rangle_{A2}$', log_norm=log_select)
 
     # save
-    # fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
+    # fig.suptitle(r"IFN Crosstalk $k_{\mathrm{off}}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
     # fig.suptitle(r"T Cell antigen detection $c_2/c_1=1000$", fontsize=int(1.5*FS))
     plt.tight_layout(h_pad=1, rect=[0, 0.03, 1,
                                     0.95])  # need to change this to not have the title overlap, figuring it out still
@@ -625,7 +625,7 @@ def fig_2ligands_vs_1ligand_det(arrDetErrorRatio, array_x, array_y, fname, label
             r'$ \frac{\mathrm{det} \Sigma_B}{\mathrm{det} \Sigma_{A1} \mathrm{det} \Sigma_{A2}} $', log_norm=log_select)#, vmax=10**5)
 
     # save
-    # fig.suptitle(r"IFN Crosstalk $k_{off}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
+    # fig.suptitle(r"IFN Crosstalk $k_{\mathrm{off}}/k_{off,2}=100$", fontsize=int(1.5*FS)) # TODO customize the title
     # fig.suptitle(r"T Cell antigen detection $c_2/c_1=1000$", fontsize=int(1.5*FS))
     #plt.tight_layout(h_pad=1, rect=[0, 0.03, 1,
     #                                0.95])  # need to change this to not have the title overlap, figuring it out still
@@ -664,10 +664,10 @@ if __name__ == '__main__':
     dedimension_label = [r'$k_{\mathrm{on}}c_1/k_{p}$', r'$k_{\mathrm{off},1}/k_{p}$', r'$k_{\mathrm{on}}c_2/k_{p}$', r'$k_{\mathrm{off},2}/k_{p}$']
     # ratio
     # dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, dimension[3]/dimension[1]]
-    # dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$k_{off,2}/k_{off,1}$']
+    # dedimension_label = [r'$k_{\mathrm{on}}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{\mathrm{on}}c_2/k_{p}$', r'$k_{off,2}/k_{off,1}$']
     # different
     # dedimension = [dimension[0]*KON/KP, dimension[1]/KP, dimension[2]*KON/KP, (dimension[3]-dimension[1])/KP]
-    # dedimension_label = [r'$k_{on}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{on}c_2/k_{p}$', r'$(k_{off,2}-k_{off,1})/k_{p}$']
+    # dedimension_label = [r'$k_{\mathrm{on}}c_1/k_{p}$', r'$k_{off,1}/k_{p}$', r'$k_{\mathrm{on}}c_2/k_{p}$', r'$(k_{off,2}-k_{off,1})/k_{p}$']
 
     # Figure 1 and 2 heatmaps
     arrRelErrorEst1X = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )

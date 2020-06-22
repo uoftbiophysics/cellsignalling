@@ -44,9 +44,9 @@ DIAGANDTRACE_RATIO = { 'subdir2' : 'diagonal_ratio', 'log' : True,
                                'ratioSigmaC2' : { 'num' : eqns.SigmacrlbC2NoTrace, 'denom' : eqns.SigmacrlbC2, 'label' : r'Model 2 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
                                'ratioSigmaC3' : { 'num' : eqns.SigmacrlbC3NoTrace, 'denom' : eqns.SigmacrlbC3, 'label' : r'Model 3 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
                                'ratioSigmaC4' : { 'num' : eqns.SigmacrlbC4NoTrace, 'denom' : eqns.SigmacrlbC4, 'label' : r'Model 4 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
-                               'ratioSigmaK2' : { 'num' : eqns.SigmacrlbK2NoTrace, 'denom' : eqns.SigmacrlbK2, 'label' : r'Model 2 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
-                               'ratioSigmaK3' : { 'num' : eqns.SigmacrlbK3NoTrace, 'denom' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
-                               'ratioSigmaK4' : { 'num' : eqns.SigmacrlbK4NoTrace, 'denom' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'}
+                               'ratioSigmaK2' : { 'num' : eqns.SigmacrlbK2NoTrace, 'denom' : eqns.SigmacrlbK2, 'label' : r'Model 2 $\langle\delta k_{\mathrm{off}}^{2}\rangle/^A\langle\delta {k_{\mathrm{off}}^{2}}\rangle^B$'},
+                               'ratioSigmaK3' : { 'num' : eqns.SigmacrlbK3NoTrace, 'denom' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle\delta k_{\mathrm{off}}^{2}\rangle/^A\langle\delta {k_{\mathrm{off}}^{2}}\rangle^B$'},
+                               'ratioSigmaK4' : { 'num' : eqns.SigmacrlbK4NoTrace, 'denom' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle\delta k_{\mathrm{off}}^{2}\rangle/^A\langle\delta {k_{\mathrm{off}}^{2}}\rangle^B$'}
                              }
                   }
 
@@ -67,9 +67,9 @@ DETANDEVAL_RATIO = { 'subdir2' : 'determinant_ratio', 'log' : True, #some of the
 
 COV_RATIO = { 'subdir2' : 'cov_ratio', 'log' : False,
                    'plots' : {
-                               'ratioSigmacrlbCK2': { 'num' : eqns.SigmacrlbCK2NoTrace, 'denom' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle{\delta c \delta k_{off}}\rangle$ / $\langle{\delta c \delta k_{off}}_{crlb}\rangle$'},
-                               'ratioSigmacrlbCK3': { 'num' : eqns.SigmacrlbCK3NoTrace, 'denom' : eqns.SigmacrlbCK3, 'label' : r'Model 2 $\langle{\delta c \delta k_{off}}\rangle$ / $\langle{\delta c \delta k_{off}}_{crlb}\rangle$'},
-                               'ratioSigmacrlbCK4': { 'num' : eqns.SigmacrlbCK4NoTrace, 'denom' : eqns.SigmacrlbCK4, 'label' : r'Model 2 $\langle{\delta c \delta k_{off}}\rangle$ / $\langle{\delta c \delta k_{off}}_{crlb}\rangle$'}
+                               'ratioSigmacrlbCK2': { 'num' : eqns.SigmacrlbCK2NoTrace, 'denom' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle{\delta c \delta k_{\mathrm{off}}}\rangle$ / $\langle{\delta c \delta k_{\mathrm{off}}}_{crlb}\rangle$'},
+                               'ratioSigmacrlbCK3': { 'num' : eqns.SigmacrlbCK3NoTrace, 'denom' : eqns.SigmacrlbCK3, 'label' : r'Model 2 $\langle{\delta c \delta k_{\mathrm{off}}}\rangle$ / $\langle{\delta c \delta k_{\mathrm{off}}}_{crlb}\rangle$'},
+                               'ratioSigmacrlbCK4': { 'num' : eqns.SigmacrlbCK4NoTrace, 'denom' : eqns.SigmacrlbCK4, 'label' : r'Model 2 $\langle{\delta c \delta k_{\mathrm{off}}}\rangle$ / $\langle{\delta c \delta k_{\mathrm{off}}}_{crlb}\rangle$'}
                              }
                   }
 
@@ -80,17 +80,17 @@ RELERRANDTRACE_NOTRACE = { 'subdir2' : 'relerror_notrace', 'log' : True,
                    'plots' : {
                                'relErrX1': { 'eqn' : eqns.RelErrorX1NoTrace, 'label' : r'Model 1 $\langle\delta x^{2}\rangle /x^{2}$'},
                                'relErrC2': { 'eqn' : eqns.RelErrC2NoTrace, 'label' : r'Model 2 $\langle\delta c^{2}\rangle /c^{2}$'},
-                               'relErrK2': { 'eqn' : eqns.RelErrK2NoTrace, 'label' : r'Model 2 $\langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
+                               'relErrK2': { 'eqn' : eqns.RelErrK2NoTrace, 'label' : r'Model 2 $\langle{\delta k_{\mathrm{off}}^2}\rangle /k_{\mathrm{off}}^{2}$'},
                                'relErrC3': { 'eqn' : eqns.RelErrC3NoTrace, 'label' : r'Model 3 $\langle\delta c^{2}\rangle /c^{2}$'},
-                               'relErrK3': { 'eqn' : eqns.RelErrK3NoTrace, 'label' : r'Model 3 $\langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
+                               'relErrK3': { 'eqn' : eqns.RelErrK3NoTrace, 'label' : r'Model 3 $\langle{\delta k_{\mathrm{off}}^2}\rangle /k_{\mathrm{off}}^{2}$'},
                                'relErrC4': { 'eqn' : eqns.RelErrC4NoTrace, 'label' : r'Model 4 $\langle\delta c^{2}\rangle /c^{2}$'},
-                               'relErrK4': { 'eqn' : eqns.RelErrK4NoTrace, 'label' : r'Model 4 $\langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
+                               'relErrK4': { 'eqn' : eqns.RelErrK4NoTrace, 'label' : r'Model 4 $\langle{\delta k_{\mathrm{off}}^2}\rangle /k_{\mathrm{off}}^{2}$'},
                                'SigmacrlbC2': { 'eqn' : eqns.SigmacrlbC2NoTrace, 'label' : r'Model 2 $\langle\delta c^{2}\rangle$'},
-                               'SigmacrlbK2': { 'eqn' : eqns.SigmacrlbK2NoTrace, 'label' : r'Model 2 $\langle{\delta k_{off}^2}\rangle$'},
+                               'SigmacrlbK2': { 'eqn' : eqns.SigmacrlbK2NoTrace, 'label' : r'Model 2 $\langle{\delta k_{\mathrm{off}}^2}\rangle$'},
                                'SigmacrlbC3': { 'eqn' : eqns.SigmacrlbC3NoTrace, 'label' : r'Model 3 $\langle\delta c^{2}\rangle /c^{2}$'},
-                               'SigmacrlbK3': { 'eqn' : eqns.SigmacrlbK3NoTrace, 'label' : r'Model 3 $\langle{\delta k_{off}^2}\rangle$'},
+                               'SigmacrlbK3': { 'eqn' : eqns.SigmacrlbK3NoTrace, 'label' : r'Model 3 $\langle{\delta k_{\mathrm{off}}^2}\rangle$'},
                                'SigmacrlbC4': { 'eqn' : eqns.SigmacrlbC4NoTrace, 'label' : r'Model 4 $\langle\delta c^{2}\rangle$'},
-                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4NoTrace, 'label' : r'Model 4 $\langle{\delta k_{off}^2}\rangle$'},
+                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4NoTrace, 'label' : r'Model 4 $\langle{\delta k_{\mathrm{off}}^2}\rangle$'},
                                'traceSigma2': {'eqn' : eqns.traceSigmacrlb2NoTrace, 'label' : r'Model 2 tr($\Sigma$)'},
                                'traceSigma3': {'eqn' : eqns.traceSigmacrlb3NoTrace, 'label' : r'Model 3 tr($\Sigma$)'},
                                'traceSigma4': {'eqn' : eqns.traceSigmacrlb4NoTrace, 'label' : r'Model 4 tr($\Sigma$)'}
@@ -102,9 +102,9 @@ DETANDEVAL_NOTRACE = { 'subdir2' : 'det_notrace', 'log' : True,
                                'detSigma2': {'eqn' : eqns.DetSigmacrlb2NoTrace, 'label' : r'Model 2 Det($\Sigma^A$)'},
                                'detSigma3': {'eqn' : eqns.DetSigmacrlb3NoTrace, 'label' : r'Model 3 Det($\Sigma^A$)'},
                                'detSigma4': {'eqn' : eqns.DetSigmacrlb4NoTrace, 'label' : r'Model 4 Det($\Sigma^A$)'},
-                               'relDetSigma2': {'eqn' : eqns.RelDetSigmacrlb2NoTrace, 'label' : r'Model 2 Det($\Sigma^A$)/$c^2 k_{off}^2$'},
-                               'relDetSigma3': {'eqn' : eqns.RelDetSigmacrlb3NoTrace, 'label' : r'Model 3 Det($\Sigma^A$)/$c^2 k_{off}^2$'},
-                               'relDetSigma4': {'eqn' : eqns.RelDetSigmacrlb4NoTrace, 'label' : r'Model 4 Det($\Sigma^A$)/$c^2 k_{off}^2$'},
+                               'relDetSigma2': {'eqn' : eqns.RelDetSigmacrlb2NoTrace, 'label' : r'Model 2 Det($\Sigma^A$)/$c^2 k_{\mathrm{off}}^2$'},
+                               'relDetSigma3': {'eqn' : eqns.RelDetSigmacrlb3NoTrace, 'label' : r'Model 3 Det($\Sigma^A$)/$c^2 k_{\mathrm{off}}^2$'},
+                               'relDetSigma4': {'eqn' : eqns.RelDetSigmacrlb4NoTrace, 'label' : r'Model 4 Det($\Sigma^A$)/$c^2 k_{\mathrm{off}}^2$'},
                                'evalplusSigma2': {'eqn' : eqns.evalplusSigmacrlb2NoTrace, 'label' : r'Model 2 $\lambda_{+}$'},
                                'evalminusSigma2': {'eqn' : eqns.evalminusSigmacrlb2NoTrace, 'label' : r'Model 2 $\lambda_{-}$'},
                                'evalplusSigma3': {'eqn' : eqns.evalplusSigmacrlb3NoTrace, 'label' : r'Model 3 $\lambda_{+}$'},
@@ -117,9 +117,9 @@ DETANDEVAL_NOTRACE = { 'subdir2' : 'det_notrace', 'log' : True,
 
 COV_NOTRACE = { 'subdir2' : 'cov_notrace', 'log' : False,
                    'plots' : {
-                               'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle \delta c \delta k_{off} \rangle$'},
-                               'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Model 3 $\langle \delta c \delta k_{off} \rangle$ '},
-                               'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Model 4 $\langle \delta c \delta k_{off} \rangle$'}
+                               'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle \delta c \delta k_{\mathrm{off}} \rangle$'},
+                               'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Model 3 $\langle \delta c \delta k_{\mathrm{off}} \rangle$ '},
+                               'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Model 4 $\langle \delta c \delta k_{\mathrm{off}} \rangle$'}
                              }
                   }
 
@@ -137,11 +137,11 @@ DIAGANDTRACE_FULL = { 'subdir2' : 'full', 'log' : True,
                    'plots' : {
                                #'relErrX1': { 'eqn' : eqns.RelErrorX1, 'label' : r'Model 1 $\langle\delta x^{2}\rangle /x^{2}$'},
                                'SigmacrlbC2': { 'eqn' : eqns.SigmacrlbC2, 'label' : r'Model 2 $\langle \delta c^{2} \rangle$'},
-                               'SigmacrlbK2': { 'eqn' : eqns.SigmacrlbK2, 'label' : r'Model 2 $\langle \delta k_{off}^2 \rangle$'},
+                               'SigmacrlbK2': { 'eqn' : eqns.SigmacrlbK2, 'label' : r'Model 2 $\langle \delta k_{\mathrm{off}}^2 \rangle$'},
                                'SigmacrlbC3': { 'eqn' : eqns.SigmacrlbC3, 'label' : r'Model 3 $\langle\delta c^{2}\rangle$'},
-                               'SigmacrlbK3': { 'eqn' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle \delta k_{off}^2 \rangle$'},
+                               'SigmacrlbK3': { 'eqn' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle \delta k_{\mathrm{off}}^2 \rangle$'},
                                'SigmacrlbC4': { 'eqn' : eqns.SigmacrlbC4, 'label' : r'Model 4 $\langle \delta c^{2} \rangle$'},
-                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle \delta k_{off}^2 \rangle$'},
+                               'SigmacrlbK4': { 'eqn' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle \delta k_{\mathrm{off}}^2 \rangle$'},
                                'traceSigma2': {'eqn' : eqns.traceSigmacrlb2, 'label' : r'Model 2 tr($\Sigma$)'},
                                'traceSigma3': {'eqn' : eqns.traceSigmacrlb3, 'label' : r'Model 3 tr($\Sigma$)'},
                                'traceSigma4': {'eqn' : eqns.traceSigmacrlb4, 'label' : r'Model 4 tr($\Sigma$)'}
@@ -153,9 +153,9 @@ DETANDEVAL_FULL = { 'subdir2' : 'full', 'log' : True,
                                'detSigma2': {'eqn' : eqns.DetSigmacrlb2, 'label' : r'Model 2 Det($\Sigma$)'},
                                'detSigma3': {'eqn' : eqns.DetSigmacrlb3, 'label' : r'Model 3 Det($\Sigma$)'},
                                'detSigma4': {'eqn' : eqns.DetSigmacrlb4, 'label' : r'Model 4 det($\Sigma$)'},
-                               'relDetSigma2': {'eqn' : eqns.RelDetSigmacrlb2, 'label' : r'Model 2 Det($\Sigma$)/$c^2 k_{off}^2$'},
-                               'relDetSigma3': {'eqn' : eqns.RelDetSigmacrlb3, 'label' : r'Model 3 Det($\Sigma$)/$c^2 k_{off}^2$'},
-                               'relDetSigma4': {'eqn' : eqns.RelDetSigmacrlb4, 'label' : r'Model 4 Det($\Sigma$)/$c^2 k_{off}^2$'},
+                               'relDetSigma2': {'eqn' : eqns.RelDetSigmacrlb2, 'label' : r'Model 2 Det($\Sigma$)/$c^2 k_{\mathrm{off}}^2$'},
+                               'relDetSigma3': {'eqn' : eqns.RelDetSigmacrlb3, 'label' : r'Model 3 Det($\Sigma$)/$c^2 k_{\mathrm{off}}^2$'},
+                               'relDetSigma4': {'eqn' : eqns.RelDetSigmacrlb4, 'label' : r'Model 4 Det($\Sigma$)/$c^2 k_{\mathrm{off}}^2$'},
                                'evalplusSigma2': {'eqn' : eqns.evalplusSigmacrlb2, 'label' : r'Model 2 $\lambda_{+}$'},
                                'evalminusSigma2': {'eqn' : eqns.evalminusSigmacrlb2, 'label' : r'Model 2 $\lambda_{-}$'},
                                'evalplusSigma3': {'eqn' : eqns.evalplusSigmacrlb3, 'label' : r'Model 3 $\lambda_{+}$'},
@@ -168,9 +168,9 @@ DETANDEVAL_FULL = { 'subdir2' : 'full', 'log' : True,
 
 COV_FULL = { 'subdir2' : 'full', 'log' : False,
                    'plots' : {
-                               'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle \delta c \delta k_{off} \rangle$'},
-                               'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Model 3 $\langle \delta c \delta k_{off} \rangle$ '},
-                               'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Model 4 $\langle \delta c \delta k_{off} \rangle$'}
+                               'SigmaCK2': { 'eqn' : eqns.SigmacrlbCK2, 'label' : r'Model 2 $\langle \delta c \delta k_{\mathrm{off}} \rangle$'},
+                               'SigmaCK3': { 'eqn' : eqns.SigmacrlbCK3, 'label' : r'Model 3 $\langle \delta c \delta k_{\mathrm{off}} \rangle$ '},
+                               'SigmaCK4': { 'eqn' : eqns.SigmacrlbCK4, 'label' : r'Model 4 $\langle \delta c \delta k_{\mathrm{off}} \rangle$'}
                              }
                   }
 
@@ -181,8 +181,8 @@ SI_RATIO = { 'subdir2' : 'SI_ratios', 'log' : True,
                               'ratioSigmaX1' : { 'num' : eqns.Sigmacrlb1NoTrace, 'denom' : eqns.Sigmacrlb1, 'label' : r'Model 1 $\langle\delta x^{2}\rangle^A$/$\langle\delta x^{2}\rangle^B$'},
                               'ratioSigmaC3' : { 'num' : eqns.SigmacrlbC3NoTrace, 'denom' : eqns.SigmacrlbC3, 'label' : r'Model 3 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
                               'ratioSigmaC4' : { 'num' : eqns.SigmacrlbC4NoTrace, 'denom' : eqns.SigmacrlbC4, 'label' : r'Model 4 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
-                              'ratioSigmaK3' : { 'num' : eqns.SigmacrlbK3NoTrace, 'denom' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
-                              'ratioSigmaK4' : { 'num' : eqns.SigmacrlbK4NoTrace, 'denom' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
+                              'ratioSigmaK3' : { 'num' : eqns.SigmacrlbK3NoTrace, 'denom' : eqns.SigmacrlbK3, 'label' : r'Model 3 $\langle\delta k_{\mathrm{off}}^{2}\rangle/^A\langle\delta {k_{\mathrm{off}}^{2}}\rangle^B$'},
+                              'ratioSigmaK4' : { 'num' : eqns.SigmacrlbK4NoTrace, 'denom' : eqns.SigmacrlbK4, 'label' : r'Model 4 $\langle\delta k_{\mathrm{off}}^{2}\rangle/^A\langle\delta {k_{\mathrm{off}}^{2}}\rangle^B$'},
                               'ratioDetSigma3': { 'num' : eqns.DetSigmacrlb3NoTrace, 'denom' : eqns.DetSigmacrlb3, 'label' : r'Model 3 det$ (\Sigma^A)$/det$ (\Sigma^B)$'},
                               'ratioDetSigma4': { 'num' : eqns.DetSigmacrlb4NoTrace, 'denom' : eqns.DetSigmacrlb4, 'label' : r'Model 4 det$ (\Sigma^A)$/det$ (\Sigma^B)$'},
                               'ratioDetSigma2DetSima3_NoTrace': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb3NoTrace, 'label' : r'Model 2 det$ (\Sigma^A)$ / Model 3 det$ (\Sigma^A )$'},
@@ -194,9 +194,9 @@ SI_RATIO = { 'subdir2' : 'SI_ratios', 'log' : True,
 
 SI_ALT_RATIO = { 'subdir2' : 'SI_ratios', 'log' : True,
                    'plots' : {
-                               'ratioSigmaC2' : { 'num' : eqns.SigmacrlbC2NoTrace, 'denom' : eqns.SigmacrlbC2, 'label' : r'Model 2 $\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
-                               'ratioSigmaK2' : { 'num' : eqns.SigmacrlbK2NoTrace, 'denom' : eqns.SigmacrlbK2, 'label' : r'Model 2 $\langle\delta k_{off}^{2}\rangle/^A\langle\delta {k_{off}^{2}}\rangle^B$'},
-                               'ratioDetSigma2': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb2, 'label' : r'Model 2 det$ (\Sigma^A)$/det$ (\Sigma^B)$'},
+                               'ratioSigmaC2' : { 'num' : eqns.SigmacrlbC2NoTrace, 'denom' : eqns.SigmacrlbC2, 'label' : r'$\langle\delta c^{2}\rangle^A$/$\langle\delta c^{2}\rangle^B$'},
+                               'ratioSigmaK2' : { 'num' : eqns.SigmacrlbK2NoTrace, 'denom' : eqns.SigmacrlbK2, 'label' : r'$\langle\delta k_{\mathrm{off}}^{2}\rangle^A/\langle\delta {k_{\mathrm{off}}^{2}}\rangle^B$'},
+                               'ratioDetSigma2': { 'num' : eqns.DetSigmacrlb2NoTrace, 'denom' : eqns.DetSigmacrlb2, 'label' : r'det$ (\Sigma^A)$/det$ (\Sigma^B)$'},
                              }
                   }
 
@@ -220,10 +220,10 @@ MAIN = { 'subdir2' : 'main', 'log' : True,
                    'plots' : {
                    'relErrX1': { 'eqn' : eqns.dedimRelErrorX1NoTrace, 'label' : r'$k_p t \langle\delta x^{2}\rangle /x^{2}$'},
                    'relErrC2': { 'eqn' : eqns.dedimRelErrC2NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
-                   'relErrKoff2': { 'eqn' : eqns.dedimRelErrK2NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'}#,
+                   'relErrKoff2': { 'eqn' : eqns.dedimRelErrK2NoTrace, 'label' : r'$k_p t \langle{\delta k_{\mathrm{off}}^2}\rangle /k_{\mathrm{off}}^{2}$'}#,
                    #'relErrC3': { 'eqn' : eqns.dedimRelErrC3NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
-                   #'relErrKoff3': { 'eqn' : eqns.dedimRelErrK3NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'},
+                   #'relErrKoff3': { 'eqn' : eqns.dedimRelErrK3NoTrace, 'label' : r'$k_p t \langle{\delta k_{\mathrm{off}}^2}\rangle /k_{\mathrm{off}}^{2}$'},
                    #'relErrC4': { 'eqn' : eqns.dedimRelErrC4NoTrace, 'label' : r'$k_p t \langle\delta c^{2}\rangle /c^{2}$'},
-                   #'relErrKoff4': { 'eqn' : eqns.dedimRelErrK4NoTrace, 'label' : r'$k_p t \langle{\delta k_{off}^2}\rangle /k_{off}^{2}$'}
+                   #'relErrKoff4': { 'eqn' : eqns.dedimRelErrK4NoTrace, 'label' : r'$k_p t \langle{\delta k_{\mathrm{off}}^2}\rangle /k_{\mathrm{off}}^{2}$'}
                    }
 }

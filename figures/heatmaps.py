@@ -94,9 +94,9 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
         # if flag is true, this is how we scale the axis. Simple.
         crange = crange*KON/KP;
         koffrange = koffrange/KP;
-        xy_label = [r'$k_{on}c/k_{p}$', r'$k_{off}/k_{p}$'];
+        xy_label = [r'$k_{\mathrm{on}}c/k_{p}$', r'$k_{\mathrm{off}}/k_{p}$'];
     else:
-        xy_label = [r'${c}$', r'${k}_{off}$']
+        xy_label = [r'${c}$', r'${k}_{\mathrm{off}}$']
     if xy_label_force is not None:
         xy_label = xy_label_force
 
@@ -258,10 +258,10 @@ def heatmap_mode1_error_x(crange=CTILDERANGE, koffrange=ZRANGE, make_heatmap=Tru
             else:
                 plt.ylabel(r'$k_{p} t \langle\delta c^{2}\rangle$/$c^{2}$')
         elif label_style == 1:
-            plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
+            plt.title('Mode 1: MLE relative error comparison \n($k_p=10$, $t=100$, $k_{\mathrm{off}}=k_{\mathrm{on}}=1$)')
             plt.ylabel(r'$\langle\delta c^{2}\rangle$/$c^{2}$')
 
-        plt.xlabel(r'$k_{on}c/k_{p}$')
+        plt.xlabel(r'$k_{\mathrm{on}}c/k_{p}$')
 
         plt.gca().set_xscale('log')
         plt.xlim([0.03, 10])
@@ -316,9 +316,9 @@ def heatmap_combined_error_koff(crange=CRANGE, koffrange=KOFFRANGE, scale_factor
             arr[i, j] = combined_error_koff(cval, koffval, scale_factor=scale_factor)
 
     if label_style == 0:
-        label = r'$k_{p}t \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$k_{p}t \langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     elif label_style == 1:
-        label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_combined_heuristic_error_koff', label)
     return
 
@@ -363,19 +363,19 @@ def figure_2_combined_cross_sections(crange=CRANGE, koffrange=KOFFRANGE,
 
     if label_style == 0:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$c$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{off}$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{\mathrm{off}}$', zorder=1)
         #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
 
     elif label_style == 1:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
-        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{\mathrm{off}}^{2}/k_{\mathrm{off}}^{2}$', zorder=1)
+        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{\mathrm{off}}=k_{\mathrm{on}}=1$)')
         plt.ylabel(r'$\langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
 
     # axis
-    ax1.set_xlabel(r'$k_{on}c/k_{p}$')
+    ax1.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$')
     ax1.set_ylabel(r'$k_{p}t \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
-    #ax2.set_xlabel(r'$k_{off}$')
+    #ax2.set_xlabel(r'$k_{\mathrm{off}}$')
 
     ax1.set_xscale('log')
     ax2.set_xscale('log')
@@ -444,9 +444,9 @@ def heatmap_kpr_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
         for j, cval in enumerate(crange):
             arr[i, j] = kpr_error_koff(cval, koffval)
     if label_style == 0:
-        label = r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\alpha \langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     elif label_style == 1:
-        label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr_heuristic_error_koff', label)
     return
 
@@ -533,9 +533,9 @@ def heatmap_kpr2_error_koff(crange=CTILDERANGE, koffrange=ZRANGE,
         for j, cval in enumerate(crange):
             arr[i, j] = kpr2_error_koff(cval, koffval)
     if label_style == 0:
-        label = r'$\alpha \langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\alpha \langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     elif label_style == 1:
-        label = r'$\langle\delta k_{off}^{2}\rangle$/$k_{off}^{2}$'
+        label = r'$\langle\delta k_{\mathrm{off}}^{2}\rangle$/$k_{\mathrm{off}}^{2}$'
     plot_heatmap(arr, crange, koffrange, 'heatmap_kpr2_heuristic_error_koff', label)
     return
 
@@ -697,15 +697,15 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_x(cval * KP/KON, koffval * KP, nobs)
 
-        label = r'ln $P(c, k_{off}|n)$'
+        label = r'ln $P(c, k_{\mathrm{off}}|n)$'
         #log_contours = [-i for i in list(np.logspace(-3, 4,num=20))[::-1]]
         linear_contours = list(range(-500, 0, 50))
 
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=linear_contours, vmin=-500, vmax=0, contour_color='w', contour_linewidths=0.5)
 
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate(c, n):
@@ -749,11 +749,11 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_c_koff(cval * KP/KON, koffval * KP, nobs, mobs)
 
-        label = r'ln $P(c, k_{off}|n, m)$'
+        label = r'ln $P(c, k_{\mathrm{off}}|n, m)$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-1000, 0, 100)), vmin=-1000, vmax=0, contour_color='w', contour_linewidths=0.5)
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
@@ -828,12 +828,12 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_c_koff(cval, koffval, nobs, mobs)
 
-        label = r'$ln(P(c, k_{off}|n, m))$'
+        label = r'$ln(P(c, k_{\mathrm{off}}|n, m))$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
                                contour_linewidths=0.5)
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n, m):
@@ -915,12 +915,12 @@ def heatmap_figure_4():
             for j, cval in enumerate(crange):
                 arr[i, j] = log_posterior_c_koff(cval, koffval, n1obs, n2obs)
 
-        label = r'$ln(P(c, k_{off}|n_1, n_2))$'
+        label = r'$ln(P(c, k_{\mathrm{off}}|n_1, n_2))$'
         fig, ax = plot_heatmap(arr, crange, koffrange, figname, label, save=False, log_norm=False,
                                levels=list(range(-200, 0, 10)), vmin=-200, vmax=0, contour_color='w',
                                contour_linewidths=0.5)
-        ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=FS)
-        ax.set_ylabel(r'$k_{off}/k_{p}$', fontsize=FS)
+        ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=FS)
+        ax.set_ylabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=FS)
 
         # Superimpose heuristic estimate
         def heuristic_estimate_c(n1, n2):
@@ -1040,7 +1040,7 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
 
     ax1label = r'$k_{f}/k_{p}$'
     ax1range = np.logspace(-2, 4, TOTAL_POINTS_KOFF) / KP
-    ax2label = r'$k_{off}/k_{p}$'
+    ax2label = r'$k_{\mathrm{off}}/k_{p}$'
     ax2range = ZRANGE
     xy_label_force = [ax1label, ax2label]
 
@@ -1076,7 +1076,7 @@ def plot_1E_and_2B():
     vecRelErrorEst2K = eqns.dedimRelErrK2NoTrace(crange, koff);
 
     # plot
-    fig_width_1E = 2.8
+    fig_width_1E = 2.6
     plt.figure(figsize=(fig_width_1E, fig_width_1E*0.8))
     ax = plt.gca()
 
@@ -1084,7 +1084,7 @@ def plot_1E_and_2B():
     ax.set_xlabel(r'$k_{\mathrm{off}}/k_{p}$', fontsize=font_size)
     ax.set_xscale('log')
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta x^{2}\rangle} {x^{2}}$',fontsize=font_size)
-    ax.set_xlim([1E-1, 1E3])
+    ax.set_xlim([1E-1, 1E2])
     plt.ylim([0, 1])
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.pdf', transparent=True)
     plt.savefig(DIR_OUTPUT + os.sep + figname1 + '.eps')
@@ -1100,7 +1100,7 @@ def plot_1E_and_2B():
     plt.plot(crange*KON/KP,vecRelErrorEst2C/N, color='purple', label=r'$c$')
     plt.plot(crange*KON/KP,vecRelErrorEst2K/N, color='orangered', label=r'$k_{\mathrm{off}}$')
     plt.legend()
-    ax.set_xlabel(r'$k_{on}c/k_{p}$', fontsize=font_size)
+    ax.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$', fontsize=font_size)
     ax.set_xscale('log')
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle}{(\cdot)^{2}}$',fontsize=font_size)
     #ax.set_xlim([1E-4, 1E1])
@@ -1115,19 +1115,19 @@ def plot_1E_and_2B():
     ax.set_ylabel(r'$\frac{k_{p}t}{N} \frac{\langle\delta (\cdot)^{2}\rangle$}{$(\cdot)^{2}}$',fontsize=FS)
     if label_style == 0:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$c$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{off}$', zorder=1)
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{\mathrm{off}}$', zorder=1)
         #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
 
     elif label_style == 1:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
-        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{off}^{2}/k_{off}^{2}$', zorder=1)
-        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{off}=k_{on}=1$)')
+        ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{\mathrm{off}}^{2}/k_{\mathrm{off}}^{2}$', zorder=1)
+        plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{\mathrm{off}}=k_{\mathrm{on}}=1$)')
         plt.ylabel(r'$\langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
 
     # axis
-    ax1.set_xlabel(r'$k_{on}c/k_{p}$')
+    ax1.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$')
     ax1.set_ylabel(r'$k_{p}t \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
-    #ax2.set_xlabel(r'$k_{off}$')
+    #ax2.set_xlabel(r'$k_{\mathrm{off}}$')
 
     ax1.set_xscale('log')
     ax2.set_xscale('log')
@@ -1226,24 +1226,26 @@ if __name__ == '__main__':
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
-    plot_1F()
-    plot_1E_and_2B()
-    exit()
-    """
-    dk_plotting()
-    exit()
+    #plot_1F()
+    #plot_1E_and_2B()
+    #exit()
+
+    #dk_plotting()
+    #exit()
     dictionary = pd.MAIN; dictionary_SI = pd.SI_ALT_RATIO
     want_dedim = True; subdir_2_use = 'heatmaps'
 
     contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01, 1.1, 10.0, 100.0, 1000.0], 'fmt' : '%.2f'}
 
-    plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
-    #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
+    #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
+    plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 
     #custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'
     #contour_args_high = {'levels': [1 / (KP * T), 10 / (KP * T), 100 / (KP * T), 1000 / (KP * T), 1E4 / (KP * T)],
     #                     'cmap_colour': custom_cmap_colour,
     #                     'vmin': 1.0}
 
-    custom_ratio_diagram(contour_args=contour_args_SI)
+    #custom_ratio_diagram(contour_args=contour_args_SI)
+    """
+    Hi
     """
