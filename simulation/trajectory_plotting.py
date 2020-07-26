@@ -9,7 +9,7 @@ def plot_traj_and_mean_sd(traj_array, times_array, moment_times, model, data_mea
                           theory_var=None, state_label='n', state_idx=1, title='', show=True):
     # plot individual trajectories
     num_traj = traj_array.shape[-1]
-    for k in xrange(num_traj):
+    for k in range(num_traj):
         times_k = times_array[:, k]
         traj_k = traj_array[:, state_idx, k]
         plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)
@@ -65,11 +65,8 @@ def plot_vars(moment_times, data_var, model, theory_var=None, title='', state_la
 
 
 def plot_hist(moment_times, data_observations, step, model, state_label='n', theory_mean=None, theory_var=None, show=True):
-    time = moment_times[step]
     hist_data = data_observations[step, :]
-    #hist_bins = np.arange(0, hist_data.max() + 1.5) - 0.5
     hist_bins = np.linspace(0, hist_data.max(), 50)
-    points = np.linspace(0, hist_data.max(), 1000)
     num_traj = len(hist_data)
     if theory_mean is not None:
         assert theory_var is not None
@@ -79,14 +76,11 @@ def plot_hist(moment_times, data_observations, step, model, state_label='n', the
         points = np.linspace(mu-3.5*sigma, mu+3.5*sigma, 1000)
         normal_at_bins = 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (points - mu)**2 / (2 * sigma**2))
         plt.plot(points, normal_at_bins, 'k')
-    count, bins, _ = plt.hist(data_observations[step, :]+0.01, bins=hist_bins, color="#3F5D7D", normed=True, ec='k')  # TODO cleanup
-    #plt.title(r'Histogram of Gillespie Algorithm (%d traj), time:%.2f' % (num_traj, time))
+    count, bins, _ = plt.hist(data_observations[step, :]+0.01, bins=hist_bins, color="#3F5D7D", density=True, ec='k')
     plt.title(r'Histogram of Gillespie Algorithm (%d traj)' % (num_traj))
     plt.xlabel(r'%s' %(state_label))
     plt.ylabel(r'probability')
     plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%sf.png' % (model, state_label))
-    #plt.title('Histogram (%d traj) for %s, %s at step:%d, time:%.2f' % (num_traj, model, state_label, step, time))
-    #plt.savefig(FOLDER_OUTPUT + os.sep + 'hist_%s_%s_%d_%.2f.png' % (model, state_label, step, time))
     if show:
         plt.show()
     plt.close()
@@ -94,8 +88,6 @@ def plot_hist(moment_times, data_observations, step, model, state_label='n', the
 
 
 def plot_estimation(moment_times, estimate_data, model, params, theory_curves, est='x', theory=False, show=True):
-    # TODO care normalize var and implement theory
-    print "CARE NORMALIZE EST VAR IN PLOT"
     p = params
 
     def true_model_value():
@@ -118,7 +110,7 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
 
         elif model == 'mode_2':
             assert est == 'x'
-            print "WARNING, est_theory() in plot_estimation() not implemented for mode_2"
+            print("WARNING, est_theory() in plot_estimation() not implemented for mode_2")
             assert 1 == 2
             est_mu_t = -1
             est_var_t = -1
@@ -154,14 +146,14 @@ def plot_estimation(moment_times, estimate_data, model, params, theory_curves, e
     estimate_mean_at_t = np.zeros(moment_times.shape)
     estimate_var_at_t = np.zeros(moment_times.shape)
     model_value = true_model_value()
-    for idx in xrange(len(moment_times)):
+    for idx in range(len(moment_times)):
         estimate_mean_at_t[idx] = np.mean(estimate_data[idx, :])
         estimate_var_at_t[idx] = np.var(estimate_data[idx, :])
 
     if theory:
         theory_mean_at_t = np.zeros(moment_times.shape)
         theory_var_at_t = np.zeros(moment_times.shape)
-        for idx in xrange(len(moment_times)):
+        for idx in range(len(moment_times)):
             est_mu_t, est_var_t = est_theory(idx, moment_times[idx])
             theory_mean_at_t[idx] = est_mu_t
             theory_var_at_t[idx] = est_var_t

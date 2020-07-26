@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from heatmaps import KON, KP, T, KF, ALPHA
+from settings import KON, KP, T, KF, ALPHA
 
 def Sqrt(x):
     return np.sqrt(x)

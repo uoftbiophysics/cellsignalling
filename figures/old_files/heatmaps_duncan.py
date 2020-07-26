@@ -48,7 +48,7 @@ def plot_heatmap(arr, crange, koffrange, fname, label, show=SHOW, save=True, log
     fname: file saved as pdf and eps format with this name
     show: shows plots
     save: saves plots
-    log_norm: heatmap is log, this is only used when plotting the posterior
+    log_norm: __heatmap__ is log, this is only used when plotting the posterior
     dedim: makes the axis dedimensionalized. scales them (see by how much below)
     kwargs: a variety of keyword args are used below. They are mostly used for contour plot lines if I understand correctly. Using Duncan's default ones mostly, but we can talk about it.
     """
@@ -938,7 +938,7 @@ def heatmap_ratio(eqn1, eqn2, label, filename, log_norm, crange=CRANGE, koffrang
             arr2[i, j] = eqn2(cval, koffval)
     print(np.min(arr),np.max(arr))
 
-    # call heatmap plotting
+    # call __heatmap__ plotting
     plot_heatmap(arr, crange, koffrange, filename, label, log_norm=log_norm, dedim=dedim, **contour_args)
     return 0
 
@@ -960,7 +960,7 @@ def heatmap_one_equation(equation, label, filename, log_norm, crange=CRANGE, kof
         for j, cval in enumerate(crange):
             arr[i, j] = equation(cval, koffval)+10**(-10)
 
-    # call heatmap plotting
+    # call __heatmap__ plotting
     plot_heatmap(arr, crange, koffrange, filename, label, dedim=dedim, log_norm=log_norm, **contour_args)
     return 0
 
@@ -1022,7 +1022,7 @@ def custom_ratio_diagram(subdir1='heatmaps', subdir2='', contour_args=None):
             num = eqns.DetSigmacrlb3(fix_C, ival, kon=fix_KON, T=fix_T, KP=fix_KP, KF=jval)
             den = eqns.DetSigmacrlb2(fix_C, ival, kon=fix_KON, T=fix_T, KP=fix_KP, KF=jval)
             ratio_arr[i, j] = num/den + eps  #equation(cval, koffval)
-    print('custom_ratio_diagram -- min max:', np.min(ratio_arr), np.max(ratio_arr))
+    print('__custom_ratio_diagram__ -- min max:', np.min(ratio_arr), np.max(ratio_arr))
     cbar_label = r'det$(\Sigma^{KPR})$/det$(\Sigma)$'
     plot_heatmap(ratio_arr, ax1range, ax2range, 'custom_ratio_det3det2_notrace', cbar_label,
                  xy_label_force=xy_label_force, show=True, save=True, log_norm=True, dedim=False, **contour_args)
@@ -1034,7 +1034,7 @@ if __name__ == '__main__':
     This is how I use the code generally.
     I create a dictionary with a bunch of equations I want to plot in dictionary_plotting.py (for any equations you find in there, they are in equations.py).
     These equations are all taken from mathematica or rescaled versions of these (see equations_txt2python.py for some rescaled equations, trace and eigenvalue, dedimRelErr)
-    There are 2 types of dictionaries: ratios or 1 equation. Depending on what type of dictionary you create, you will want to use the respoective plotting function above (ether plot_dictionary_one_equation or plot_dictionary_ratio)
+    There are 2 types of dictionaries: ratios or 1 equation. Depending on what type of dictionary you create, you will want to use the respoective plotting function above (ether plot_dictionary_one_equation or __plot_dictionary_ratio__)
     You have to specify some arguments, check equations above, they should be obvious.
     You can create your own plotting dictionaries and equations! So much fun to be had!
     """
@@ -1046,11 +1046,11 @@ if __name__ == '__main__':
     contour_args = {'cmap_colour' : 'YlGnBu'}; contour_args_SI = {'cmap_colour' : 'PuBu', 'levels' : [1.01, 1.1, 10.0, 100.0, 1000.0], 'fmt' : '%.2f'}
     #heatmap_figure_4()
     #plot_dictionary_one_equation(dictionary, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args)
-    #plot_dictionary_ratio(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
+    #__plot_dictionary_ratio__(dictionary_SI, subdir1=subdir_2_use, dedim=want_dedim, contour_args=contour_args_SI)
 
     #custom_cmap_colour = 'YlGnBu' # 'YlGnBu' or 'pink_r'
     #contour_args_high = {'levels': [1 / (KP * T), 10 / (KP * T), 100 / (KP * T), 1000 / (KP * T), 1E4 / (KP * T)],
     #                     'cmap_colour': custom_cmap_colour,
     #                     'vmin': 1.0}
 
-    #custom_ratio_diagram(contour_args=contour_args_SI)
+    #__custom_ratio_diagram__(contour_args=contour_args_SI)

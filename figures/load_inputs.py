@@ -5,11 +5,12 @@ import os
 from settings import DIR_INPUT
 
 
-def load_input(filename):
-    with open(os.path.join(os.getcwd(), DIR_INPUT, filename + '.csv'), 'rb') as f:
+def load_input(filename, verbose=True):
+    with open(os.path.join(os.getcwd(), DIR_INPUT, filename + '.csv'), 'r') as f:
         reader = csv.reader(f)
         read_list = list(reader)
-        print filename
+        if verbose:
+            print(filename)
         numeric_read_list = [(read_list[0][0],read_list[0][1])] + [(float(el[0]), float(el[1])) for el in read_list[1:]]
     return numeric_read_list
 
@@ -20,15 +21,16 @@ def get_csvnames():
     return valid_names
 
 
-def gen_datadict():
+def gen_datadict(verbose=True):
     """
     Stores all input csv files in dict of the form
         {csvfilename -> {xlab, ylab, xpts, ypts} }
     """
+    print("Loading expressions exported from Mathematica")
     datadict = {}
     csvnames = get_csvnames()
     for csvname in csvnames:
-        list_of_tuple = load_input(csvname)
+        list_of_tuple = load_input(csvname, verbose=verbose)
         header = list_of_tuple[0]
         arr = np.array(list_of_tuple[1:])
         datadict[csvname] = {'xlab': header[0], 
@@ -37,4 +39,5 @@ def gen_datadict():
                              'ypts': arr[:, 1]}
     return datadict
 
-DATADICT = gen_datadict()
+if __name__ == '__main__':
+    DATADICT = gen_datadict()

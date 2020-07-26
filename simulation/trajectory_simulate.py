@@ -76,28 +76,28 @@ def simulate_traj(num_steps=NUM_STEPS, init_cond=None, model=DEFAULT_MODEL, para
         try:
             assert len(init_cond) == STATE_SIZE[model]
         except AssertionError:
-            print "len(init_cond) = " + str(len(init_cond))
-            print "STATE_SIZE[model] = " + str(STATE_SIZE[model])
+            print("len(init_cond) = " + str(len(init_cond)))
+            print("STATE_SIZE[model] = " + str(STATE_SIZE[model]))
             assert len(init_cond) == STATE_SIZE[model]
     else:
         init_cond = INIT_CONDS[model]
     traj[0, :] = init_cond
     times[0] = 0.0
-    for step in xrange(num_steps-1):
+    for step in range(num_steps-1):
         # generate two U[0,1] random variables
         r1, r2 = np.random.random(2)
         # generate propensities and their partitions
         alpha = propensities(traj[step], model, params=params)
         alpha_partitions = np.zeros(len(alpha)+1)
         alpha_sum = 0.0
-        for i in xrange(len(alpha)):
+        for i in range(len(alpha)):
             alpha_sum += alpha[i]
             alpha_partitions[i + 1] = alpha_sum
         # find time to first reaction
         tau = np.log(1 / r1) / alpha_sum
         # pick a reaction
         r2_scaled = alpha_sum * r2
-        for rxn_idx in xrange(len(alpha)):
+        for rxn_idx in range(len(alpha)):
             if alpha_partitions[rxn_idx] <= r2_scaled < alpha_partitions[rxn_idx + 1]:  # i.e. rxn_idx has occurred
                 break
         # update state
@@ -125,7 +125,7 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_probabilities=0.0, model=DEFA
     draws = np.random.choice(np.arange(0, RECEPTOR_STATE_SIZE[model]), size=num_traj, p=bound_probabilities)
     #draws = np.random.binomial(1, bound_probabilities, num_traj)
     # simulate k trajectories
-    for k in xrange(num_traj):
+    for k in range(num_traj):
         init_vector = np.zeros(RECEPTOR_STATE_SIZE[model])
         init_vector[draws[k]] = 1
         init_cond_base[:RECEPTOR_STATE_SIZE[model]-1] = init_vector[1:] # init_cond_base does not contain unbound state

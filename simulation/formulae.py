@@ -297,7 +297,7 @@ def est_k_off_from_n(n, params, t):
 
 def est_x_from_m(m, params, t):
     # TODO issue that this depends on k_off? x contains k_off info...
-    print "warning... inferring x = k_on c / k_off using information about k_off see formulae.py, est_x_from_m(...)"
+    print("warning... inferring x = k_on c / k_off using information about k_off see formulae.py, est_x_from_m(...)")
     return m / (params.k_off * t - m)
 
 
@@ -316,7 +316,7 @@ def est_k_d_from_nm(n, m, params, t):
 
 def est_k_off_from_nm(n, m, params, t):
     if n == 0:
-        print 'WARNING for est_k_off_from_nm() -- n==0 at time %.3f (set n=1)' % t
+        print('WARNING for est_k_off_from_nm() -- n==0 at time %.3f (set n=1)' % t)
         n = 1.0
     return (float(m) / float(n)) * (params.k_p)
 
@@ -347,7 +347,7 @@ def estimate_general(state, params, t, model, est):
             est = est_k_off_from_m(state[1], params, t)
     elif model == 'combined':
         if est == 'x':
-            print "Warning, est == 'x' for model 'combined' not implemented, setting est = -99"
+            print("Warning, est == 'x' for model 'combined' not implemented, setting est = -99")
             est = -99
         elif est == 'c':
             est = est_c_from_nm(state[1], state[2], params, t)
@@ -355,7 +355,7 @@ def estimate_general(state, params, t, model, est):
             est = est_k_off_from_nm(state[1], state[2], params, t)
     elif model == 'kpr':
         if est == 'x':
-            print "Warning, est == 'x' for model 'combined' not implemented, setting est = -99"
+            print("Warning, est == 'x' for model 'combined' not implemented, setting est = -99")
             est = -99
         elif est == 'c':
             g = params.k_off / params.k_f
@@ -363,6 +363,6 @@ def estimate_general(state, params, t, model, est):
         else:
             est = est_k_off_from_nm(state[1], state[2], params, t)
     else:
-        print "Warning, model %s not implemented in estimate_general() in formulae.py" % model
+        print("Warning, model %s not implemented in estimate_general() in formulae.py" % model)
         assert 1 == 2
     return est

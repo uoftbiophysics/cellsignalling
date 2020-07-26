@@ -194,6 +194,9 @@ def figure_1_and_2_heatmaps(arrRelErrorEst1X, arrRelErrorEst2C, arrRelErrorEst2K
     # axes setup
     ax0, cbar0, im0 = heatmap(ax0, arr1, array_x, array_y, labels, '', log_norm=True, skip_cbar=False, cbar_white_loc=10, **args1)
     ax0.set_title(r'$\frac{k_p t}{N} \frac{\langle\delta x^{2}\rangle}{x^{2}}$', fontsize=FS)
+
+    if not os.path.exists(DIR_OUTPUT + os.sep + 'ligand1'):
+        os.mkdir(DIR_OUTPUT + os.sep + 'ligand1')
     plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.pdf', transparent=True);
     plt.savefig(DIR_OUTPUT + os.sep + 'ligand1' + os.sep + fname1 + '.png'); #plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.eps');
     plt.close()
@@ -493,7 +496,7 @@ def fig23_heatmaps(arrDetSigmaEst, arrRelErrorEst, array_x, array_y, fname, labe
 
 
 def eigens_of_sigmaEst(sigmaEst):
-    #value, vector = np.linalg.eig(sigmaEst)
+    #value, vector = np.linalg.eig(__sigmaEst__)
     value, vector = sp.linalg.eig(sigmaEst)
 
     # the eigenvalues are not in any particular order: I will order them now
@@ -674,7 +677,7 @@ if __name__ == '__main__':
     arrRelErrorEst2C = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
     arrRelErrorEst2KOFF = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]) ) )
 
-    # heatmap for any element of sigmaEst(4x4 matrix)
+    # heatmap for any element of __sigmaEst__(4x4 matrix)
     arrSigmaEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
     arrRelErrorEst = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )
     arrSigmaData = np.zeros( (len(dimension[dim['y']]), len(dimension[dim['x']]), 4, 4) )

@@ -1121,28 +1121,23 @@ def plot_1E_and_2B():
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$c$', zorder=1)
         ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'], label=r'$k_{\mathrm{off}}$', zorder=1)
         #plt.title('Mode 2: MLE relative error comparison\n' + r'($\tilde{c}_0=10$, $\alpha=1 \times 10^4$, $k_{p}=10$)')
-
     elif label_style == 1:
         ln1 = ax1.plot(curve1['xpts'], curve1['ypts'], color=cs['simple_fisher'], label=r'$\delta c^{2}/c^{2}$', zorder=1)
         ln2 = ax2.plot(curve2['xpts'], curve2['ypts'], color=cs['heuristic'],label=r'$\delta k_{\mathrm{off}}^{2}/k_{\mathrm{off}}^{2}$', zorder=1)
         plt.title('Mode 2: MLE relative error comparison\n' + r'($k_p=10$, $t=100$, $k_{\mathrm{off}}=k_{\mathrm{on}}=1$)')
         plt.ylabel(r'$\langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
-
     # axis
     ax1.set_xlabel(r'$k_{\mathrm{on}}c/k_{p}$')
     ax1.set_ylabel(r'$k_{p}t \langle\delta (\cdot)^{2}\rangle$/$(\cdot)^{2}$')
     #ax2.set_xlabel(r'$k_{\mathrm{off}}$')
-
     ax1.set_xscale('log')
     ax2.set_xscale('log')
     ax1.set_xlim([1E-2, 1E2])
     ax2.set_xlim([1E-2, 1E2])
     plt.ylim([0, 0.01*alpha])
-
     lns = ln1 + ln2
     labs = [l.get_label() for l in lns]
     ax1.legend(lns, labs)
-
     plt.tight_layout()
     # save figure
     """

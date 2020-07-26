@@ -82,21 +82,21 @@ def simulate_traj(num_steps=NUM_STEPS, init_cond=None, model=DEFAULT_MODEL, para
         init_cond = INIT_CONDS[model]
     traj[0, :] = init_cond
     times[0] = 0.0
-    for step in xrange(num_steps-1):
+    for step in range(num_steps-1):
         # generate two U[0,1] random variables
         r1, r2 = np.random.random(2)
         # generate propensities and their partitions
         alpha = propensities(traj[step], model, params=params)
         alpha_partitions = np.zeros(len(alpha)+1)
         alpha_sum = 0.0
-        for i in xrange(len(alpha)):
+        for i in range(len(alpha)):
             alpha_sum += alpha[i]
             alpha_partitions[i + 1] = alpha_sum
         # find time to first reaction
         tau = np.log(1 / r1) / alpha_sum
         # pick a reaction
         r2_scaled = alpha_sum * r2
-        for rxn_idx in xrange(len(alpha)):
+        for rxn_idx in range(len(alpha)):
             if alpha_partitions[rxn_idx] <= r2_scaled < alpha_partitions[rxn_idx + 1]:  # i.e. rxn_idx has occurred
                 break
         # update state
@@ -117,7 +117,7 @@ def multitraj(num_traj, num_steps=NUM_STEPS, bound_fraction=0.0, model=DEFAULT_M
     init_cond_base = INIT_CONDS[model]
     draws = np.random.binomial(1, bound_fraction, num_traj)
     # simulate k trajectories
-    for k in xrange(num_traj):
+    for k in rage(num_traj):
         init_cond_base[0] = draws[k]
         traj, times = simulate_traj(num_steps=num_steps, init_cond=init_cond_base, model=model, params=params)
         traj_array[:, :, k] = traj
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     traj_array, times_array = multitraj(num_traj, bound_fraction=init_bound, num_steps=num_steps, model=model)
 
     # plot trajectories
-    for k in xrange(num_traj):
+    for k in range(num_traj):
         times_k = times_array[:, k]
         traj_k = traj_array[:, 1, k]
         plt.plot(times_k, traj_k, '--', lw=0.5, alpha=0.5)

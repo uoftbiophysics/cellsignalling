@@ -17,7 +17,7 @@ def get_state_at_t(traj, times, t, last_step=0):
     return traj[step - 1, :], step - 1
 
 
-def get_moment_timeseries(traj_array, times_array, params):
+def get_moment_timeseries(traj_array, times_array, params, model):
     """
     Returns, as a dict, multiple output timeseries (aligned to moment_times) depending on the model:
         - mode_1: mean(n)(t), var(n)(t), distribution(n)(t), estimate_x(t)
@@ -85,7 +85,7 @@ def get_moment_timeseries(traj_array, times_array, params):
             statesum_m = 0.0
             statesquaresum_m = 0.0
             stateprod_nm = 0.0
-            for k in xrange(num_traj):
+            for k in range(num_traj):
                 state_at_t, step = get_state_at_t(traj_array[:, :, k], times_array[:, k], t, last_step=last_step[k])
                 last_step[k] = step
                 statesum_n += state_at_t[1]
