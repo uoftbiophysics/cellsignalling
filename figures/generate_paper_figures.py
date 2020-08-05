@@ -782,16 +782,16 @@ if __name__ == '__main__':
     # ----------------------------------------------
     # line plot control variables
     flag_Fig1F = True
-    flag_Fig1E_and_2B = False
+    flag_Fig1E_and_2B = True
     # heatmap control variables
-    flag_Fig1_and_Fig2 = False
-    flag_Fig3 = False
+    flag_Fig1_and_Fig2 = True
+    flag_Fig3 = True
     ADD_TRACE_TERM = False
     LOG_SELECT = True
     # supplementary figures control variables
     flag_S1 = True
     flag_S2 = True
-    flag_S3 = False
+    flag_S3 = True
 
     # choose any of these 2 to be arrays [0: c1, 1: koff, 2: c2, 3: koff2], they will be your axes
     dim = {'x': 2, 'y': 3}

@@ -1,1 +1,0 @@
-((c1*kon + c2*kon)*((2*c1*c2*koff*kon**2)/koff2 + (2*c1*c2*koff2*kon**2)/koff + koff*koff2*(1 + (c1**2*kon**2)/koff**2 + (c2**2*kon**2)/koff2**2 - (2*c1*c2*kon**2)/(koff*koff2)))*T)/(koff*koff2*(1 + (c1*kon)/koff + (c2*kon)/koff2)**3)

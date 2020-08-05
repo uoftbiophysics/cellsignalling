@@ -1,1 +1,0 @@
-(c1*(c1 + c2)*koff2**2*KON**2*(c1*(c1 + 2*c2)*koff2**2*KON**2 + koff**2*(3*koff2**2 + 2*c2*koff2*KON + c2*(6*c1 + 5*c2)*KON**2) - 2*koff*koff2*KON*(2*c2*(koff2 + c2*KON) + c1*(koff2 + 3*c2*KON)))*T)/(c1*koff2*KON + koff*(koff2 + c2*KON))**4

@@ -1,1 +1,0 @@
-(KP - c*koff*kon*(1 + (c*kon)/koff)*T)/(kon*KP*T**2)
