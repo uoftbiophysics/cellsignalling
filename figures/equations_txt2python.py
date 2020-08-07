@@ -28,8 +28,10 @@ def write_function_2ligands(textfile, equationfile, path):
 
     return 0
 
-def build_py_eqns(python_equation_file):
-    assert python_equation_file in ['equations.py', 'equations2ligands.py']
+
+if __name__ == '__main__':
+    python_equation_file = 'equations2ligands.py'
+
     if python_equation_file == 'equations.py':
         path = os.getcwd() + os.path.sep + 'input' + os.path.sep + 'mathematica_equations'
         func_write = write_function
@@ -38,7 +40,7 @@ def build_py_eqns(python_equation_file):
         func_write = write_function_2ligands
 
     with open(python_equation_file, 'w+') as f:
-        f.write('import numpy as np\nfrom numpy import exp as exp\nimport os\nfrom settings import KON, KP, T, KF, ALPHA\n\ndef Sqrt(x):\n    return np.sqrt(x)')
+        f.write('import numpy as np\nimport os\nfrom heatmaps import KON, KP, T, KF, ALPHA\n\ndef Sqrt(x):\n    return np.sqrt(x)')
 
     for r, d, f in os.walk(path):
         for file in f:
@@ -80,11 +82,5 @@ def build_py_eqns(python_equation_file):
 
         # matrix equations
         with open(python_equation_file, 'a+') as g:
-            for matrix in ["dmudthetaInv", "sigmadata"]:
+            for matrix in ["__dmudthetaInv__", "sigmadata"]:
                 g.write("\n\ndef matrix_%(matrix)s(c1, koff, c2, koff2, kon=KON, T=T, KP=KP,  ALPHA=ALPHA):\n    return np.array([[%(matrix)s11(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s12(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s13(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s14(c1, koff, c2, koff2, kon, T, KP, ALPHA)],[%(matrix)s21(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s22(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s23(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s24(c1, koff, c2, koff2, kon, T, KP, ALPHA)],[%(matrix)s31(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s32(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s33(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s34(c1, koff, c2, koff2, kon, T, KP, ALPHA)],[%(matrix)s41(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s42(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s43(c1, koff, c2, koff2, kon, T, KP, ALPHA), %(matrix)s44(c1, koff, c2, koff2, kon, T, KP, ALPHA)]])" % {'matrix': matrix})
-    return
-
-
-if __name__ == '__main__':
-    build_py_eqns('equations.py')
-    build_py_eqns('equations2ligands.py')
