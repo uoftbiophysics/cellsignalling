@@ -18,6 +18,5 @@ All figures can be generated from the script */figures/generate_paper_figures.py
 To recreate all figures:
 1. Run the Mathematica master file in the parent directory
 2. run */figures/equations_txt2python.py*
-3. run */figures/equations_txt2python.py* again but with `python_equation_file = 'equations.py'` in `__main__` 
-4. run */figures/generate_paper_figures.py*
-5. run */simulation/make_supplementary_histograms.py*
+3. run */figures/generate_paper_figures.py*
+4. run */simulation/make_supplementary_histograms.py*
