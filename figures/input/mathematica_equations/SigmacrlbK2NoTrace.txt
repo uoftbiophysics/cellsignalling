@@ -1,1 +1,1 @@
-(0.5*koff**6 + 0.5*c**6*kon**6 + koff**5*KP*(3. + c*kon*T) + c**4*koff*kon**4*(KP + c*kon*(-2. + c*kon*T)) + koff**4*(3.*KP**2 + c**3*kon**3*T + c*kon*KP*(-3. + KP*T) + c**2*kon**2*(5.5 + KP*T)) + c*koff**3*kon*(-2.*KP**2 + c**3*kon**3*T + c*kon*KP*(10. + KP*T) + c**2*kon**2*(-6. + 2.*KP*T)) + c**2*koff**2*kon**2*(-5.*c*kon*KP + KP**2 + c**3*kon**3*T + c**2*kon**2*(5.5 + 2.*KP*T)))/(koff**2*(koff + c*kon)**2*(c**2*kon**2 + koff*(koff + KP))**2)
+(koff*(koff + c*kon)*(koff + KP))/(c*kon*KP*T)

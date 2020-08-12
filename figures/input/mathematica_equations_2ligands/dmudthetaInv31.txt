@@ -1,1 +1,1 @@
-((c1*koff2*KON + koff*(koff2 + c2*KON))*(c2*koff**3*KON - koff2**2*(2*ALPHA + c2*koff2*KON) + koff*koff2*(-2*ALPHA + 3*c2*koff2*KON) - koff**2*(2*ALPHA + 6*koff2**2 + 3*c2*koff2*KON)))/(koff*(koff - koff2)**3*koff2*KON*KP*T)
+((c1*koff2*kon + koff*(koff2 + c2*kon))*(c2*koff**3*kon - koff2**2*(2*ALPHA + c2*koff2*kon) + koff*koff2*(-2*ALPHA + 3*c2*koff2*kon) - koff**2*(2*ALPHA + 6*koff2**2 + 3*c2*koff2*kon)))/(koff*(koff - koff2)**3*koff2*kon*KP*T)
