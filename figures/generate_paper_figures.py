@@ -126,6 +126,8 @@ def __heatmap__(ax, arr, xrange, yrange, xy_label, label, log_norm=True, less_xt
     """
     xrange: range of values for x
     yrange: range of y values
+    xy_label: list with first element the x label (str) and second element the
+    y label (str)
     fname: file saved as pdf and eps format with this name
     show: shows plots
     save: saves plot
@@ -819,22 +821,57 @@ def plot_S3():
                           koffrange=np.logspace(-2, 4.2, TOTAL_POINTS_C), dedim=True, contour_args=contour_args_SI)
 
 
+def plot_S5(arrRelDetSigmaEst2Ligand, arrRelDetSigmaEst1Ligand1, arrRelDetSigmaEst1Ligand2, array_x, array_y, fname, labels, log_select, axis_label=True):
+    """
+    Plot the ratio Det[EstCov_2ligand] / {Det[EstCov_1ligandPleio(koff_1)] *
+                                          Det[EstCov_1ligandPleio(koff_1)] }
+    as a check about how error scales with multiple ligands.
+    """
+    fig, ax0 = plt.subplots(nrows=1, ncols=1, figsize=(5.5, 8.5))
+
+    DetRatio = np.divide(arrRelDetSigmaEst2Ligand, np.multiply(arrRelDetSigmaEst1Ligand1, arrRelDetSigmaEst1Ligand2))
+    diag_cbar_white_loc = 10
+    det_cbar_white_loc = diag_cbar_white_loc ** 4
+    det_max_override = 1e3
+    det_min_override = np.min(DetRatio[:, :])
+
+    diag_levels = [1E-1, 1E0, 1E1, 1E2]
+    det_kw = {'vmin': det_min_override, 'vmax': det_max_override,
+              'levels': diag_levels}
+
+    # determinant plot
+    ax0, cbar0, im0 = __heatmap__(ax0, DetRatio[:, :], array_x, array_y,
+                                  labels, '', log_norm=True, skip_cbar=False,
+                                  cbar_white_loc=det_cbar_white_loc, **det_kw)
+    ax0.set_title(r'$\frac{det(\Sigma_{est}^{2 ligand})}{det(\Sigma_{est}^{1 ligand}) \times det(\Sigma_{est}^{1 ligand})}$', fontsize=FS)
+    cbar0.ax.tick_params(labelsize=FS)
+
+    # note tight layout seems incompatible with gridspec/subplots
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')
+    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png', bbox_inches='tight')
+
+    plt.close()
+
+    return fig
+
+
 if __name__ == '__main__':
     # ----------------------------------------------
     # BEGIN: USER CONTROLS
     # ----------------------------------------------
     # line plot control variables
-    flag_Fig1F = True
-    flag_Fig1E_and_2B = True
+    flag_Fig1F = False
+    flag_Fig1E_and_2B = False
     # heatmap control variables
-    flag_Fig1_and_Fig2 = True
-    flag_Fig3 = True
+    flag_Fig1_and_Fig2 = False
+    flag_Fig3 = False
     ADD_TRACE_TERM = False
     LOG_SELECT = True
     # supplementary figures control variables
-    flag_S1 = True
-    flag_S2 = True
-    flag_S3 = True
+    flag_S1 = False
+    flag_S2 = False
+    flag_S3 = False
+    flag_S5 = True
 
     # choose any of these 2 to be arrays [0: c1, 1: koff, 2: c2, 3: koff2], they will be your axes
     dim = {'x': 2, 'y': 3}
@@ -849,7 +886,7 @@ if __name__ == '__main__':
     # ----------------------------------------------
     # END: USER CONTROLS
     # ----------------------------------------------
-    if flag_Fig3 or flag_Fig1_and_Fig2:
+    if flag_Fig3 or flag_Fig1_and_Fig2 or flag_S5:
         for dirs in ['ligand1', 'ligands2', 'ligands2_over_ligands1']:
             if not os.path.exists(DIR_OUTPUT + os.sep + dirs):
                 os.makedirs(DIR_OUTPUT + os.sep + dirs)
@@ -928,3 +965,22 @@ if __name__ == '__main__':
 
     if flag_S3:
         plot_S3()
+
+    if flag_S5:
+        # Should match dimensions of Fig 3 Det plot
+        lig1DetKoff1 = np.zeros((len(dimension[dim['y']]), len(dimension[dim['x']])))
+        lig1DetKoff2 = np.zeros((len(dimension[dim['y']]), len(dimension[dim['x']])))
+        for i, xi in enumerate(dimension[dim['x']]):
+            value[dim['x']] = xi
+            for j, yi in enumerate(dimension[dim['y']]):
+                # matrix calculations
+                value[dim['y']] = yi
+                c1, koff, c2, koff2 = value[0], value[1], value[2], value[3]
+                lig1DetKoff1[j, i] = eqns.DetSigmacrlb2NoTrace(c1, koff)
+                lig1DetKoff2[j, i] = eqns.DetSigmacrlb2NoTrace(c2, koff2)
+
+        plot_S5(arrRelDetSigmaEst, lig1DetKoff1, lig1DetKoff2,
+                dedimension[dim['x']], dedimension[dim['y']],
+                "DetRatio2LigOver1LigSq",
+                [dedimension_label[dim['x']], dedimension_label[dim['y']]],
+                LOG_SELECT)
