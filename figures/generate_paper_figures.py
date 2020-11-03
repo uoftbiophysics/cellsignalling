@@ -821,62 +821,26 @@ def plot_S3():
                           koffrange=np.logspace(-2, 4.2, TOTAL_POINTS_C), dedim=True, contour_args=contour_args_SI)
 
 
-def plot_S5(arrRelDetSigmaEst2Ligand, arrRelDetSigmaEst1Ligand1, arrRelDetSigmaEst1Ligand2, array_x, array_y, fname, labels, log_select, axis_label=True):
+def plot_S5():
     """
-    Plot the ratio Det[EstCov_2ligand] / {Det[EstCov_1ligandPleio(c_1, koff_1)] * Det[EstCov_1ligandPleio(c_2, koff_2)] }
-    as a check about how error scales with multiple ligands.
+    'mode1_MLE_with_prior_compare' figure, 2 curves (numeric vs heuristic)
     """
-    fig, ax0 = plt.subplots(nrows=1, ncols=1, figsize=(5.5, 8.5))
-
-    DetRatio = np.divide(arrRelDetSigmaEst2Ligand, np.multiply(arrRelDetSigmaEst1Ligand1, arrRelDetSigmaEst1Ligand2))
-
-    diag_cbar_white_loc = 10
-    det_cbar_white_loc = diag_cbar_white_loc ** 4
-    det_max_override = 1e3
-    det_min_override = np.min(DetRatio[:, :])
-
-    diag_levels = [1E-1, 1E0, 1E1, 1E2]
-    det_kw = {'vmin': det_min_override, 'vmax': det_max_override,
-              'levels': diag_levels}
-
-    # determinant plot
-    ax0, cbar0, im0 = __heatmap__(ax0, DetRatio[:, :], array_x, array_y,
-                                  labels, '', log_norm=True, skip_cbar=False,
-                                  cbar_white_loc=det_cbar_white_loc, **det_kw)
-    ax0.set_title(r'$\frac{det(\Sigma_{est}^{2 ligand})}{det(\Sigma_{est}^{1 ligand}) \times det(\Sigma_{est}^{1 ligand})}$', fontsize=FS)
-    cbar0.ax.tick_params(labelsize=FS)
-
-    # note tight layout seems incompatible with gridspec/subplots
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.pdf', bbox_inches='tight')
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + fname + '.png', bbox_inches='tight')
-
-    plt.close()
-
-    # Debugging
-    fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(5.5, 8.5))
-    LogRatio = np.log10(arrRelDetSigmaEst2Ligand) - (np.log10(arrRelDetSigmaEst1Ligand1) + np.log10(arrRelDetSigmaEst1Ligand2))
-    diag_cbar_white_loc = 10
-    det_cbar_white_loc = diag_cbar_white_loc ** 4
-    det_max_override = np.max(LogRatio[:, :])
-    det_min_override = np.min(LogRatio[:, :])
-
-    diag_levels = [1E-1, 1E0, 1E1, 1E2]
-    det_kw = {'vmin': det_min_override, 'vmax': det_max_override,
-              'levels': diag_levels}
-
-    # determinant plot
-    ax2, cbar2, im2 = __heatmap__(ax2, DetRatio[:, :], array_x, array_y,
-                                  labels, '', log_norm=True, skip_cbar=False,
-                                  cbar_white_loc=det_cbar_white_loc, **det_kw)
-    ax2.set_title(r'$log[\frac{det(\Sigma_{est}^{2 ligand})}{det(\Sigma_{est}^{1 ligand}) \times det(\Sigma_{est}^{1 ligand})}]$', fontsize=FS)
-    cbar2.ax.tick_params(labelsize=FS)
-
-    # note tight layout seems incompatible with gridspec/subplots
-    plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + 'log_' + fname + '.pdf', bbox_inches='tight')
-
-    plt.close()
-
-    return fig
+    figname = 'mode1_MLE_with_Prior_compare'
+    curve1 = DATADICT['mode1_MLE_with_Prior_compare_numeric']
+    curve2 = DATADICT['mode1_MLE_compare_heuristic']
+    # plot
+    plt.figure(figsize=(6, 4))
+    c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], color=COLOR_SCHEME['heuristic'], label='heuristic')
+    c1 = plt.plot(curve1['xpts'], curve1['ypts'], marker='o', linestyle='None', color=COLOR_SCHEME['numerical_fisher_sp'],
+                  label='numeric')
+    # plt.title('Mode 1 MLE: Numeric vs Heuristic')# ($k_p=10$, $t=1000$, $k_{off}=1$)')
+    plt.xlabel(r'$n$')
+    plt.ylabel(r'$x^{*}$')
+    plt.legend()
+    # save figure
+    plt.gca().set_ylim([-5, max(curve1['ypts'])])
+    plt.savefig(DIR_OUTPUT + os.sep + 'Figure_S5' + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + 'Figure_S5' + '.eps')
 
 
 if __name__ == '__main__':
@@ -910,7 +874,7 @@ if __name__ == '__main__':
     # ----------------------------------------------
     # END: USER CONTROLS
     # ----------------------------------------------
-    if flag_Fig3 or flag_Fig1_and_Fig2 or flag_S5:
+    if flag_Fig3 or flag_Fig1_and_Fig2:
         for dirs in ['ligand1', 'ligands2', 'ligands2_over_ligands1']:
             if not os.path.exists(DIR_OUTPUT + os.sep + dirs):
                 os.makedirs(DIR_OUTPUT + os.sep + dirs)
@@ -977,7 +941,7 @@ if __name__ == '__main__':
     if flag_Fig1F:
         plot_1F()
 
-    if flag_S1 or flag_S2:
+    if flag_S1 or flag_S2 or flag_S5:
         from load_inputs import gen_datadict
         DATADICT = gen_datadict(verbose=False)
 
@@ -991,73 +955,4 @@ if __name__ == '__main__':
         plot_S3()
 
     if flag_S5:
-        # Should match dimensions of Fig 3 Det plot
-        lig1DetKoff1 = np.zeros((len(dimension[dim['y']]), len(dimension[dim['x']])))
-        lig1DetKoff2 = np.zeros((len(dimension[dim['y']]), len(dimension[dim['x']])))
-        for i, xi in enumerate(dimension[dim['x']]):
-            value[dim['x']] = xi
-            for j, yi in enumerate(dimension[dim['y']]):
-                # matrix calculations
-                value[dim['y']] = yi
-                c1, koff, c2, koff2 = value[0], value[1], value[2], value[3]
-                lig1DetKoff1[j, i] = eqns.DetSigmacrlb2NoTrace(c1, koff)
-                lig1DetKoff2[j, i] = eqns.DetSigmacrlb2NoTrace(c2, koff2)
-
-        # Rescaling (redundant for ratios but useful for checking with ground truth (i.e. Figure 3))
-        scale_error_elements = KP * T / N
-        arrRelDetSigmaEst = scale_error_elements ** 4 * arrRelDetSigmaEst
-        lig1DetKoff1 = scale_error_elements ** 2 * lig1DetKoff1
-        lig1DetKoff2 = scale_error_elements ** 2 * lig1DetKoff2
-        # ------------------------------------------------
-        # Debugging
-        # ------------------------------------------------
-        f11, ax11 = plt.subplots()
-        f12, ax12 = plt.subplots()
-        f2, ax2 = plt.subplots()
-        # Denominator
-            # First ligand
-        denom_max_override = np.max([np.max(lig1DetKoff1[:, :]), np.max(lig1DetKoff2[:, :])])
-        denom_min_override = np.min([np.min(lig1DetKoff1[:, :]), np.min(lig1DetKoff2[:, :])])
-        den_levels = [1E-1, 1E0, 1E1, 1E2]
-        denom_kw = {'vmin': denom_min_override, 'vmax': denom_max_override, 'levels': [a**4 for a in den_levels]}
-        ax11, cbar11, im11 = __heatmap__(ax11, lig1DetKoff1,
-                    dedimension[dim['x']], dedimension[dim['y']],
-                    [dedimension_label[dim['x']], dedimension_label[dim['y']]],
-                    'lig1DetKoff1', log_norm=True, skip_cbar=False,
-                    cbar_white_loc=10**4, **denom_kw)
-        cbar11.ax.tick_params(labelsize=FS)
-        plt.figure(f11.number)
-        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + 'Mod2DetLig1' + '.pdf', bbox_inches='tight')
-
-            # Second ligand
-        ax12, cbar12, im12 = __heatmap__(ax12, lig1DetKoff2,
-                    dedimension[dim['x']], dedimension[dim['y']],
-                    [dedimension_label[dim['x']], dedimension_label[dim['y']]],
-                    'lig1DetKoff2', log_norm=True, skip_cbar=False,
-                    cbar_white_loc=10**4, **denom_kw)
-        cbar12.ax.tick_params(labelsize=FS)
-        plt.figure(f12.number)
-        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + 'Mod2DetLig2' + '.pdf', bbox_inches='tight')
-
-        # Numerator (Fig 3 recreaction)
-        det_max_override = 1e12  # np.max(arrRelDetSigmaEst[:,:])
-        det_min_override = np.min(arrRelDetSigmaEst[:, :])  # 1e-2  # np.min(arrRelDetSigmaEst[:,:])
-        diag_levels = [1E-1, 1E0, 1E1, 1E2]
-        det_kw = {'vmin': det_min_override, 'vmax': det_max_override, 'levels': [a**4 for a in diag_levels]}
-        ax2, cbar2, im2 = __heatmap__(ax2, arrRelDetSigmaEst,
-                    dedimension[dim['x']], dedimension[dim['y']],
-                    [dedimension_label[dim['x']], dedimension_label[dim['y']]],
-                    'Mod2Det', log_norm=True, skip_cbar=False,
-                    cbar_white_loc=10**4, **det_kw)
-        cbar2.ax.tick_params(labelsize=FS)
-        plt.figure(f2.number)
-        plt.savefig(DIR_OUTPUT + os.sep + 'ligands2' + os.sep + 'Mod3Det' + '.pdf', bbox_inches='tight')
-
-        # ------------------------------------------------
-        # Actual Figure
-        # ------------------------------------------------
-        plot_S5(arrRelDetSigmaEst, lig1DetKoff1, lig1DetKoff2,
-                dedimension[dim['x']], dedimension[dim['y']],
-                "DetRatio2LigOver1LigSq",
-                [dedimension_label[dim['x']], dedimension_label[dim['y']]],
-                LOG_SELECT)
+        plot_S5()
