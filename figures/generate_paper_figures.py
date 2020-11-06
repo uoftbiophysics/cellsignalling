@@ -126,6 +126,8 @@ def __heatmap__(ax, arr, xrange, yrange, xy_label, label, log_norm=True, less_xt
     """
     xrange: range of values for x
     yrange: range of y values
+    xy_label: list with first element the x label (str) and second element the
+    y label (str)
     fname: file saved as pdf and eps format with this name
     show: shows plots
     save: saves plot
@@ -819,22 +821,45 @@ def plot_S3():
                           koffrange=np.logspace(-2, 4.2, TOTAL_POINTS_C), dedim=True, contour_args=contour_args_SI)
 
 
+def plot_S5():
+    """
+    'mode1_MLE_with_prior_compare' figure, 2 curves (numeric vs heuristic)
+    """
+    figname = 'mode1_MLE_with_Prior_compare'
+    curve1 = DATADICT['mode1_MLE_with_Prior_compare_numeric']
+    curve2 = DATADICT['mode1_MLE_compare_heuristic']
+    # plot
+    plt.figure(figsize=(6, 4))
+    c2_part1 = plt.plot(curve2['xpts'][0:400], curve2['ypts'][0:400], color=COLOR_SCHEME['heuristic'], label='heuristic')
+    c1 = plt.plot(curve1['xpts'], curve1['ypts'], marker='o', linestyle='None', color=COLOR_SCHEME['numerical_fisher_sp'],
+                  label='numeric')
+    # plt.title('Mode 1 MLE: Numeric vs Heuristic')# ($k_p=10$, $t=1000$, $k_{off}=1$)')
+    plt.xlabel(r'$n$')
+    plt.ylabel(r'$x^{*}$')
+    plt.legend()
+    # save figure
+    plt.gca().set_ylim([-5, max(curve1['ypts'])])
+    plt.savefig(DIR_OUTPUT + os.sep + 'Figure_S5' + '.pdf', transparent=True)
+    plt.savefig(DIR_OUTPUT + os.sep + 'Figure_S5' + '.eps')
+
+
 if __name__ == '__main__':
     # ----------------------------------------------
     # BEGIN: USER CONTROLS
     # ----------------------------------------------
     # line plot control variables
-    flag_Fig1F = True
-    flag_Fig1E_and_2B = True
+    flag_Fig1F = False
+    flag_Fig1E_and_2B = False
     # heatmap control variables
-    flag_Fig1_and_Fig2 = True
-    flag_Fig3 = True
+    flag_Fig1_and_Fig2 = False
+    flag_Fig3 = False
     ADD_TRACE_TERM = False
     LOG_SELECT = True
     # supplementary figures control variables
-    flag_S1 = True
-    flag_S2 = True
-    flag_S3 = True
+    flag_S1 = False
+    flag_S2 = False
+    flag_S3 = False
+    flag_S5 = True
 
     # choose any of these 2 to be arrays [0: c1, 1: koff, 2: c2, 3: koff2], they will be your axes
     dim = {'x': 2, 'y': 3}
@@ -916,7 +941,7 @@ if __name__ == '__main__':
     if flag_Fig1F:
         plot_1F()
 
-    if flag_S1 or flag_S2:
+    if flag_S1 or flag_S2 or flag_S5:
         from load_inputs import gen_datadict
         DATADICT = gen_datadict(verbose=False)
 
@@ -928,3 +953,6 @@ if __name__ == '__main__':
 
     if flag_S3:
         plot_S3()
+
+    if flag_S5:
+        plot_S5()
