@@ -542,7 +542,6 @@ def figure_3_heatmaps(arrRelDetSigmaEst, arrRelErrorEst, array_x, array_y, fname
         ax5 = fig.add_subplot(gs[5:7, -2])  # the cbar (det) (5:7)
         ax6 = fig.add_subplot(gs[0:3, -1])  # the cbar (4)
 
-        N = 1E2  # the number of the receptors
         scale_error_elements = KP * T / N
         arrRelDetSigmaEst = scale_error_elements ** 4 * arrRelDetSigmaEst
         arrRelErrorEst = scale_error_elements * arrRelErrorEst
